@@ -745,11 +745,11 @@ Banner Style
   top: 20px;
   border-radius: 25px;
   background-color: #008af8;
-  font-size: 22px;
+  font-size: 14px;
   text-transform: uppercase;
   font-weight: 700;
   color: #fff;
-  padding: 4px 15px;
+  padding: 3px 12px;
 }
 
 .main-banner .right-image span.offer {
@@ -840,7 +840,7 @@ Trending Style
 .trending .item span.price em {
   font-style: normal;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 10px;
   text-decoration: line-through;
   display: block;
 }
@@ -852,11 +852,11 @@ Trending Style
   top: 20px;
   border-radius: 10px;
   background-color: #008af8;
-  font-size: 17px;
+  font-size: 12px;
   text-transform: uppercase;
   font-weight: 600;
   color: #fff;
-  padding: 8px 15px 6px 15px;
+  padding: 6px 12px 4px 12px;
 }
 
 .trending .item .down-content {
