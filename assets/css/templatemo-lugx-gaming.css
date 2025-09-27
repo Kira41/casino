@@ -745,7 +745,7 @@ Banner Style
   top: 20px;
   border-radius: 25px;
   background-color: #008af8;
-  font-size: 22px;
+  font-size: 16px;
   text-transform: uppercase;
   font-weight: 700;
   color: #fff;
@@ -806,8 +806,16 @@ Services Style
   transition: all .3s;
 }
 
+.features .item .image i {
+  color: #fff;
+}
+
 .features .item:hover .image {
   background-color: #ee626b;
+}
+
+.features .item:hover .image i {
+  color: #fff;
 }
 
 
@@ -852,7 +860,7 @@ Trending Style
   top: 20px;
   border-radius: 10px;
   background-color: #008af8;
-  font-size: 17px;
+  font-size: 14px;
   text-transform: uppercase;
   font-weight: 600;
   color: #fff;
