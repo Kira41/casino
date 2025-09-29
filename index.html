@@ -153,7 +153,7 @@ https://templatemo.com/tm-589-lugx-gaming
         <div class="col-lg-6">
           <div class="section-heading">
             <h6>Hot Picks</h6>
-            <h2>top 4 casinos picked</h2>
+            <h2 data-top-picks-heading>Top Picks</h2>
           </div>
         </div>
         <div class="col-lg-6">
@@ -454,7 +454,7 @@ https://templatemo.com/tm-589-lugx-gaming
   <footer>
     <div class="container">
       <div class="col-lg-12">
-        <p>Copyright © 2048 LUGX Gaming Company. All rights reserved. &nbsp;&nbsp; <a rel="nofollow" href="https://templatemo.com" target="_blank">Design: TemplateMo</a></p>
+        <p id="footer-copyright">Copyright © <span data-current-year></span> Timelord casino review. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -467,6 +467,24 @@ https://templatemo.com/tm-589-lugx-gaming
   <script src="assets/js/owl-carousel.js"></script>
   <script src="assets/js/counter.js"></script>
   <script src="assets/js/custom.js"></script>
+
+  <script>
+    (function() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const monthName = now.toLocaleString('default', { month: 'long' });
+
+      const footerElement = document.querySelector('#footer-copyright [data-current-year]');
+      if (footerElement) {
+        footerElement.textContent = year;
+      }
+
+      const topPicksHeading = document.querySelector('[data-top-picks-heading]');
+      if (topPicksHeading) {
+        topPicksHeading.textContent = `Top Picks for ${monthName} ${year}`;
+      }
+    })();
+  </script>
 
   </body>
 </html>
