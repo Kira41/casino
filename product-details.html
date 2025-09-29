@@ -18,6 +18,100 @@
     <link rel="stylesheet" href="assets/css/owl.css">
     <link rel="stylesheet" href="assets/css/animate.css">
     <link rel="stylesheet"href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+    <style>
+      .product-details-copy h4 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      .product-details-copy .price {
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .product-meta-list {
+        list-style: none;
+        padding: 0;
+        margin: 1.5rem 0 0;
+      }
+
+      .product-meta-list li {
+        display: flex;
+        align-items: baseline;
+        font-size: 0.9rem;
+        color: #d1d5db;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.4px;
+      }
+
+      .product-meta-list li i {
+        color: #ff6a3d;
+        margin-right: 0.75rem;
+        font-size: 1rem;
+      }
+
+      .product-meta-list li span {
+        font-weight: 600;
+        margin-right: 0.25rem;
+        color: #ffffff;
+      }
+
+      .product-details-copy p,
+      .product-details-copy ul li,
+      .product-details-copy a,
+      .tab-pane p,
+      .tab-pane li {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        letter-spacing: 0.35px;
+      }
+
+      .highlight-badges {
+        margin-top: 1.5rem;
+      }
+
+      .highlight-badges .badge-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.88rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .highlight-badges .badge-item i {
+        font-size: 1.1rem;
+        color: #40c057;
+      }
+
+      .list-with-icons {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .list-with-icons li {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .list-with-icons li i {
+        color: #ffd43b;
+      }
+
+      .list-with-icons.pros li i {
+        color: #51cf66;
+      }
+
+      .list-with-icons.cons li i {
+        color: #ff6b6b;
+      }
+    </style>
 <!--
 
 TemplateMo 589 lugx gaming
@@ -91,18 +185,23 @@ https://templatemo.com/tm-589-lugx-gaming
             <img src="assets/images/single-game.jpg" alt="">
           </div>
         </div>
-        <div class="col-lg-6 align-self-center">
+        <div class="col-lg-6 align-self-center product-details-copy">
           <h4>Lucky Star Crypto Casino</h4>
-          <span class="price"><em>$2,000</em> $1,500 Welcome Bonus</span>
-          <p>Lucky Star Crypto Casino blends a sleek live-dealer experience with lightning-fast blockchain payments. Explore a curated lobby of roulette, blackjack, and immersive slots backed by provably fair technology and generous promotions tailored for crypto enthusiasts.</p>
+          <span class="price"><i class="fa fa-gift me-2"></i><em>$2,000</em> $1,500 Welcome Bonus</span>
+          <p><i class="fa fa-magic me-2 text-warning"></i>Lucky Star Crypto Casino blends a sleek live-dealer experience with lightning-fast blockchain payments. Explore a curated lobby of roulette, blackjack, and immersive slots backed by provably fair technology and generous promotions tailored for crypto enthusiasts.</p>
           <form id="qty" action="#">
             <button type="submit"><i class="fa fa-shopping-bag"></i> Visit Casino</button>
           </form>
-          <ul>
-            <li><span>Casino Name:</span> Lucky Star Entertainment Group</li>
-            <li><span>Genre:</span> <a href="#">Live Casino</a>, <a href="#">Crypto</a>, <a href="#">Mobile</a></li>
-            <li><span>Multi-tags:</span> <a href="#">Free Spins</a>, <a href="#">Welcome Bonus</a>, <a href="#">VIP Club</a></li>
+          <ul class="product-meta-list">
+            <li><i class="fa fa-building"></i><span>Casino Name:</span> Lucky Star Entertainment Group</li>
+            <li><i class="fa fa-layer-group"></i><span>Genre:</span> <a href="#">Live Casino</a>, <a href="#">Crypto</a>, <a href="#">Mobile</a></li>
+            <li><i class="fa fa-tags"></i><span>Multi-tags:</span> <a href="#">Free Spins</a>, <a href="#">Welcome Bonus</a>, <a href="#">VIP Club</a></li>
+            <li><i class="fa fa-shield-alt"></i><span>License:</span> Curacao eGaming Authority</li>
           </ul>
+          <div class="highlight-badges">
+            <div class="badge-item"><i class="fa fa-bolt"></i>Instant blockchain payouts within minutes</div>
+            <div class="badge-item"><i class="fa fa-headset"></i>24/7 multi-lingual live support desk</div>
+          </div>
         </div>
         <div class="col-lg-12">
           <div class="sep"></div>
@@ -129,7 +228,7 @@ https://templatemo.com/tm-589-lugx-gaming
               </div>              
               <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
-                  <p>Lucky Star Crypto Casino delivers a polished, mobile-first lobby that supports instant deposits with Bitcoin, Ethereum, and other major tokens. Players can jump into streaming live-dealer tables hosted from a modern studio while unlocking tiered rewards that scale with wagering activity.</p>
+                  <p><i class="fa fa-dice text-warning me-2"></i>Lucky Star Crypto Casino delivers a polished, mobile-first lobby that supports instant deposits with Bitcoin, Ethereum, and other major tokens. Players can jump into streaming live-dealer tables hosted from a modern studio while unlocking tiered rewards that scale with wagering activity.</p>
                   <br>
                   <p>The casino’s promotion calendar features rotating free-spin bundles, reload boosts, and weekly rakeback. Security remains a priority thanks to two-factor authentication, cold-storage reserves, and independent game testing that keeps blackjack, roulette, and crash titles provably fair.</p>
                   <div class="table-responsive mt-4">
@@ -163,7 +262,7 @@ https://templatemo.com/tm-589-lugx-gaming
                   </div>
                 </div>
                 <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
-                  <h5>Banking</h5>
+                  <h5><i class="fa fa-university text-primary me-2"></i>Banking</h5>
                   <div class="row g-3 align-items-start">
                     <div class="col-md-6">
                       <div class="d-flex align-items-start">
@@ -178,30 +277,30 @@ https://templatemo.com/tm-589-lugx-gaming
                       </div>
                     </div>
                   </div>
-                  <h5 class="mt-4">Support</h5>
+                  <h5 class="mt-4"><i class="fa fa-life-ring text-info me-2"></i>Support</h5>
                   <p>24/7 live chat agents respond in under two minutes, backed by an email desk that delivers detailed answers to KYC and bonus policy questions.</p>
-                  <h5 class="mt-4">Additional Info</h5>
+                  <h5 class="mt-4"><i class="fa fa-info-circle text-warning me-2"></i>Additional Info</h5>
                   <p>Lucky Star operates under a Curacao license and publishes monthly payout audits that confirm the integrity of its RNG-powered games.</p>
-                  <h5 class="mt-4">Available Game Types</h5>
-                  <ul>
-                    <li>Live blackjack, roulette, and baccarat streams</li>
-                    <li>Provably fair crash and plinko titles</li>
-                    <li>Feature-rich video slots with bonus buy options</li>
+                  <h5 class="mt-4"><i class="fa fa-th-large text-secondary me-2"></i>Available Game Types</h5>
+                  <ul class="list-with-icons">
+                    <li><i class="fa fa-chess-knight"></i>Live blackjack, roulette, and baccarat streams</li>
+                    <li><i class="fa fa-random"></i>Provably fair crash and plinko titles</li>
+                    <li><i class="fa fa-gem"></i>Feature-rich video slots with bonus buy options</li>
                   </ul>
                   <div class="row mt-4">
                     <div class="col-md-6">
-                      <h5>Pros</h5>
-                      <ul>
-                        <li>Crypto-friendly cashier with fast withdrawals</li>
-                        <li>Generous VIP loyalty ladder and rakeback</li>
-                        <li>Mobile-optimized live-dealer studios</li>
+                      <h5><i class="fa fa-thumbs-up text-success me-2"></i>Pros</h5>
+                      <ul class="list-with-icons pros">
+                        <li><i class="fa fa-bolt"></i>Crypto-friendly cashier with fast withdrawals</li>
+                        <li><i class="fa fa-crown"></i>Generous VIP loyalty ladder and rakeback</li>
+                        <li><i class="fa fa-mobile-alt"></i>Mobile-optimized live-dealer studios</li>
                       </ul>
                     </div>
                     <div class="col-md-6">
-                      <h5>Cons</h5>
-                      <ul>
-                        <li>No dedicated mobile app</li>
-                        <li>Limited virtual reality experiences</li>
+                      <h5><i class="fa fa-thumbs-down text-danger me-2"></i>Cons</h5>
+                      <ul class="list-with-icons cons">
+                        <li><i class="fa fa-ban"></i>No dedicated mobile app</li>
+                        <li><i class="fa fa-vr-cardboard"></i>Limited virtual reality experiences</li>
                       </ul>
                     </div>
                   </div>
