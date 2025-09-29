@@ -19,6 +19,96 @@
     <link rel="stylesheet" href="assets/css/owl.css">
     <link rel="stylesheet" href="assets/css/animate.css">
     <link rel="stylesheet"href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+    <style>
+      :root {
+        --brand-primary: #007aff;
+        --brand-accent: #ee626b;
+      }
+
+      .brand-modal .modal-content {
+        border: none;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
+      }
+
+      .brand-modal .modal-header {
+        background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+        color: #fff;
+        border-bottom: none;
+        align-items: flex-start;
+      }
+
+      .brand-modal .modal-header .btn-close {
+        filter: invert(1);
+      }
+
+      .brand-modal .modal-body {
+        padding: 2rem;
+      }
+
+      .brand-modal .form-label {
+        font-weight: 600;
+        color: #1e1e2f;
+      }
+
+      .brand-modal .form-control:focus {
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 0.25rem rgba(0, 122, 255, 0.2);
+      }
+
+      .btn-brand {
+        background-color: var(--brand-primary);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.65rem 1.75rem;
+        border-radius: 999px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        box-shadow: 0 12px 24px rgba(0, 122, 255, 0.25);
+      }
+
+      .btn-brand:hover {
+        transform: translateY(-2px);
+        background-color: #0063d9;
+        box-shadow: 0 16px 32px rgba(0, 122, 255, 0.3);
+        color: #fff;
+      }
+
+      .btn-accent {
+        background-color: var(--brand-accent);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.65rem 1.75rem;
+        border-radius: 999px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        box-shadow: 0 12px 24px rgba(238, 98, 107, 0.25);
+      }
+
+      .btn-accent:hover {
+        transform: translateY(-2px);
+        background-color: #d94d57;
+        box-shadow: 0 16px 32px rgba(238, 98, 107, 0.3);
+        color: #fff;
+      }
+
+      .modal-footer {
+        border-top: none;
+        padding: 0 2rem 2rem;
+      }
+
+      .subscribe-success-icon {
+        font-size: 3rem;
+        color: #28c76f;
+        margin-bottom: 1rem;
+      }
+
+      .subscribe-success-text {
+        font-size: 1.1rem;
+        color: #1e1e2f;
+      }
+    </style>
 <!--
 
 TemplateMo 589 lugx gaming
@@ -60,8 +150,8 @@ https://templatemo.com/tm-589-lugx-gaming
                       <li><a href="shop.html">all casinos</a></li>
                       <li><a href="product-details.html">top 4 casinos</a></li>
                       <li><a href="contact.html">Contact Us</a></li>
-                      <li><a href="#">Sign In</a></li>
-                  </ul>   
+                      <li><a href="#" data-bs-toggle="modal" data-bs-target="#signInModal">Sign In</a></li>
+                  </ul>
                     <a class='menu-trigger'>
                         <span>Menu</span>
                     </a>
@@ -459,6 +549,80 @@ https://templatemo.com/tm-589-lugx-gaming
     </div>
   </footer>
 
+  <!-- Sign In Modal -->
+  <div class="modal fade brand-modal" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="signInModalLabel">Welcome Back</h5>
+            <p class="mb-0 small">Sign in to access exclusive casino insights.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="signInForm">
+            <div class="mb-3">
+              <label for="signInEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="signInEmail" placeholder="name@example.com" required>
+            </div>
+            <div class="mb-4">
+              <label for="signInPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="signInPassword" placeholder="Enter your password" required>
+            </div>
+            <div class="d-flex flex-column flex-sm-row gap-3">
+              <button type="submit" class="btn btn-brand flex-fill">Sign In</button>
+              <button type="button" class="btn btn-accent flex-fill" data-bs-target="#contactAdminModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign Up</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Admin Modal -->
+  <div class="modal fade brand-modal" id="contactAdminModal" tabindex="-1" aria-labelledby="contactAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="contactAdminModalLabel">Need an Account?</h5>
+            <p class="mb-0 small">We can help you get started.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p class="mb-3">Please contact our admin team to get access to the platform.</p>
+          <a href="mailto:admin@timelordcasino.com" class="btn btn-accent w-100">Contact Admin</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscribe Success Modal -->
+  <div class="modal fade brand-modal" id="subscribeSuccessModal" tabindex="-1" aria-labelledby="subscribeSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="subscribeSuccessLabel">Subscription Confirmed</h5>
+            <p class="mb-0 small">You're on the list!</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div class="subscribe-success-icon">
+            <i class="fa fa-check-circle"></i>
+          </div>
+          <p class="subscribe-success-text">Thank you for subscribing. Expect the latest casino bonuses in your inbox.</p>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="button" class="btn btn-brand" data-bs-dismiss="modal">Great!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <!-- Bootstrap core JavaScript -->
   <script src="vendor/jquery/jquery.min.js"></script>
@@ -482,6 +646,17 @@ https://templatemo.com/tm-589-lugx-gaming
       const topPicksHeading = document.querySelector('[data-top-picks-heading]');
       if (topPicksHeading) {
         topPicksHeading.textContent = `Top Picks for ${monthName} ${year}`;
+      }
+
+      const subscribeForm = document.querySelector('#subscribe');
+      const subscribeModalEl = document.getElementById('subscribeSuccessModal');
+      if (subscribeForm && subscribeModalEl && typeof bootstrap !== 'undefined') {
+        const subscribeModal = new bootstrap.Modal(subscribeModalEl);
+        subscribeForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          subscribeModal.show();
+          subscribeForm.reset();
+        });
       }
     })();
   </script>
