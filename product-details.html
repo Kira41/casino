@@ -95,13 +95,23 @@
 
       .list-with-icons li {
         display: flex;
-        align-items: baseline;
+        align-items: flex-start;
         gap: 0.75rem;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .list-with-icons li span {
+        flex: 1;
       }
 
       .list-with-icons li i {
         color: #ffd43b;
+        flex: 0 0 28px;
+        width: 28px;
+        text-align: center;
+        font-size: 1rem;
+        line-height: 1.4;
+        margin-top: 0.1rem;
       }
 
       .list-with-icons.pros li i {
@@ -110,6 +120,17 @@
 
       .list-with-icons.cons li i {
         color: #ff6b6b;
+      }
+
+      .pros-cons-heading {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .pros-cons-heading i {
+        font-size: 1rem;
       }
 
       .review-panel {
@@ -129,6 +150,8 @@
       }
 
       .review-accordion .accordion-button {
+        display: flex;
+        align-items: center;
         font-weight: 600;
         font-size: 0.98rem;
         gap: 0.75rem;
@@ -140,6 +163,8 @@
 
       .review-accordion .accordion-button i {
         font-size: 1.05rem;
+        flex: 0 0 28px;
+        text-align: center;
       }
 
       .review-accordion .accordion-button:focus {
@@ -428,18 +453,18 @@ https://templatemo.com/tm-589-lugx-gaming
                           <div class="accordion-body">
                             <div class="row g-4">
                               <div class="col-md-6">
-                                <h6 class="text-success"><i class="fa fa-thumbs-up me-2"></i>Pros</h6>
+                                <h6 class="pros-cons-heading text-success"><i class="fa fa-thumbs-up"></i><span>Pros</span></h6>
                                 <ul class="list-with-icons pros mb-0">
-                                  <li><i class="fa fa-bolt"></i><span class="ms-2">Crypto-friendly cashier with fast withdrawals</span></li>
-                                  <li><i class="fa fa-crown"></i><span class="ms-2">Generous VIP loyalty ladder and rakeback</span></li>
-                                  <li><i class="fa fa-mobile-alt"></i><span class="ms-2">Mobile-optimized live-dealer studios</span></li>
+                                  <li><i class="fa fa-bolt"></i><span>Crypto-friendly cashier with fast withdrawals</span></li>
+                                  <li><i class="fa fa-crown"></i><span>Generous VIP loyalty ladder and rakeback</span></li>
+                                  <li><i class="fa fa-mobile-alt"></i><span>Mobile-optimized live-dealer studios</span></li>
                                 </ul>
                               </div>
                               <div class="col-md-6">
-                                <h6 class="text-danger"><i class="fa fa-thumbs-down me-2"></i>Cons</h6>
+                                <h6 class="pros-cons-heading text-danger"><i class="fa fa-thumbs-down"></i><span>Cons</span></h6>
                                 <ul class="list-with-icons cons mb-0">
-                                  <li><i class="fa fa-ban"></i><span class="ms-2">No dedicated mobile app</span></li>
-                                  <li><i class="fa fa-vr-cardboard"></i><span class="ms-2">Limited virtual reality experiences</span></li>
+                                  <li><i class="fa fa-ban"></i><span>No dedicated mobile app</span></li>
+                                  <li><i class="fa fa-vr-cardboard"></i><span>Limited virtual reality experiences</span></li>
                                 </ul>
                               </div>
                             </div>
