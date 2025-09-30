@@ -62,6 +62,18 @@
         padding: 2.5rem;
       }
 
+      .brand-modal-square .modal-dialog {
+        max-width: 20rem;
+        width: 100%;
+      }
+
+      .brand-modal-square .modal-content {
+        aspect-ratio: 1 / 1;
+        min-height: 20rem;
+        display: flex;
+        flex-direction: column;
+      }
+
       .brand-modal .form-label {
         font-weight: 600;
         color: #1e1e2f;
@@ -117,6 +129,10 @@
         font-size: 3rem;
         color: #28c76f;
         margin-bottom: 1rem;
+      }
+
+      .subscribe-success-email {
+        margin-top: 0.75rem;
       }
 
       .subscribe-success-text {
@@ -614,7 +630,7 @@ https://templatemo.com/tm-589-lugx-gaming
   </div>
 
   <!-- Subscribe Success Modal -->
-  <div class="modal fade brand-modal" id="subscribeSuccessModal" tabindex="-1" aria-labelledby="subscribeSuccessLabel" aria-hidden="true">
+  <div class="modal fade brand-modal brand-modal-square" id="subscribeSuccessModal" tabindex="-1" aria-labelledby="subscribeSuccessLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
         <div class="modal-header">
@@ -629,6 +645,7 @@ https://templatemo.com/tm-589-lugx-gaming
             <i class="fa fa-check-circle"></i>
           </div>
           <p class="subscribe-success-text">Thank you for subscribing. Expect the latest casino bonuses in your inbox.</p>
+          <p class="subscribe-success-email text-muted">We'll send updates to <span id="subscribeSuccessEmail"></span>.</p>
         </div>
         <div class="modal-footer d-flex justify-content-center">
           <button type="button" class="btn btn-brand" data-bs-dismiss="modal">Great!</button>
@@ -668,6 +685,12 @@ https://templatemo.com/tm-589-lugx-gaming
         const subscribeModal = new bootstrap.Modal(subscribeModalEl);
         subscribeForm.addEventListener('submit', function(event) {
           event.preventDefault();
+          const emailInput = subscribeForm.querySelector('#exampleInputEmail1');
+          const emailDisplay = subscribeModalEl.querySelector('#subscribeSuccessEmail');
+          if (emailInput && emailDisplay) {
+            const trimmedEmail = emailInput.value.trim();
+            emailDisplay.textContent = trimmedEmail || 'your email address';
+          }
           subscribeModal.show();
           subscribeForm.reset();
         });
