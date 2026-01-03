@@ -148,4 +148,47 @@
       }
     });
   }
+
+  const searchForm = document.querySelector('[data-casino-search-form]');
+  const searchInput = document.querySelector('[data-casino-search]');
+  const searchStatus = document.querySelector('[data-search-status]');
+  const casinoCards = document.querySelectorAll('.trending .item');
+
+  function filterCards(term) {
+    const query = term.trim().toLowerCase();
+
+    casinoCards.forEach((card) => {
+      const textContent = card.textContent.toLowerCase();
+      card.closest('[class*="col-"]').style.display =
+        query === '' || textContent.includes(query) ? '' : 'none';
+    });
+
+    if (!searchStatus) return;
+    if (query === '') {
+      setStatusText(searchStatus, 'Showing all casinos.');
+      return;
+    }
+
+    const visibleCount = Array.from(casinoCards).filter(
+      (card) => card.closest('[class*="col-"]').style.display !== 'none'
+    ).length;
+
+    const statusMessage =
+      visibleCount > 0
+        ? `Showing ${visibleCount} result${visibleCount === 1 ? '' : 's'} for "${term}".`
+        : `No casinos found matching "${term}".`;
+
+    setStatusText(searchStatus, statusMessage, visibleCount > 0 ? 'success' : 'error');
+  }
+
+  if (searchForm && searchInput) {
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      filterCards(searchInput.value || '');
+    });
+
+    searchInput.addEventListener('input', () => {
+      filterCards(searchInput.value || '');
+    });
+  }
 })(); 
