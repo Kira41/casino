@@ -19,111 +19,6 @@
     <link rel="stylesheet" href="assets/css/owl.css">
     <link rel="stylesheet" href="assets/css/animate.css">
     <link rel="stylesheet"href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
-    <style>
-      :root {
-        --brand-primary: #007aff;
-        --brand-accent: #ee626b;
-      }
-
-      .brand-modal .modal-content {
-        border: none;
-        border-radius: 1rem;
-        overflow: hidden;
-        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
-      }
-
-      .brand-modal .modal-dialog {
-        margin: 2.5rem auto;
-      }
-
-      .brand-modal .modal-header {
-        background: #007aff;
-        color: #fff;
-        border-bottom: none;
-        align-items: center;
-        padding: 1.75rem 2.5rem;
-      }
-
-      .brand-modal .modal-header .modal-title,
-      .brand-modal .modal-header p {
-        color: #fff;
-      }
-
-      .brand-modal .modal-header > div {
-        flex: 1;
-        text-align: center;
-      }
-
-      .brand-modal .modal-header .btn-close {
-        filter: invert(1);
-      }
-
-      .brand-modal .modal-body {
-        padding: 2.5rem;
-      }
-
-      .brand-modal .form-label {
-        font-weight: 600;
-        color: #1e1e2f;
-      }
-
-      .brand-modal .form-control:focus {
-        border-color: var(--brand-primary);
-        box-shadow: 0 0 0 0.25rem rgba(0, 122, 255, 0.2);
-      }
-
-      .btn-brand {
-        background-color: var(--brand-primary);
-        border: none;
-        color: #fff;
-        font-weight: 600;
-        padding: 0.65rem 1.75rem;
-        border-radius: 999px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-        box-shadow: 0 12px 24px rgba(0, 122, 255, 0.25);
-      }
-
-      .btn-brand:hover {
-        transform: translateY(-2px);
-        background-color: #0063d9;
-        box-shadow: 0 16px 32px rgba(0, 122, 255, 0.3);
-        color: #fff;
-      }
-
-      .btn-accent {
-        background-color: var(--brand-accent);
-        border: none;
-        color: #fff;
-        font-weight: 600;
-        padding: 0.65rem 1.75rem;
-        border-radius: 999px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-        box-shadow: 0 12px 24px rgba(238, 98, 107, 0.25);
-      }
-
-      .btn-accent:hover {
-        transform: translateY(-2px);
-        background-color: #d94d57;
-        box-shadow: 0 16px 32px rgba(238, 98, 107, 0.3);
-        color: #fff;
-      }
-
-      .modal-footer {
-        border-top: none;
-        padding: 0 2.5rem 2.5rem;
-      }
-
-      .subscribe-success-icon {
-        font-size: 3rem;
-        color: #28c76f;
-        margin-bottom: 1rem;
-      }
-
-      .subscribe-success-text {
-        font-size: 1.1rem;
-        color: #1e1e2f;
-      }
-    </style>
 <!--
 
 TemplateMo 589 lugx gaming
@@ -165,6 +60,7 @@ https://templatemo.com/tm-589-lugx-gaming
                       <li><a href="all-casinos.html">all casinos</a></li>
                       <li><a href="product-details.html">top 4 casinos</a></li>
                       <li><a href="contact.html">Contact Us</a></li>
+                      <li><a href="#subscribe-now" data-open-subscribe>Subscribe Now</a></li>
                       <li><a href="#" data-bs-toggle="modal" data-bs-target="#signInModal">Sign In</a></li>
                   </ul>
                     <a class='menu-trigger'>
@@ -247,6 +143,67 @@ https://templatemo.com/tm-589-lugx-gaming
               <h4>VIP & Loyalty Insights</h4>
             </div>
           </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="platform-showcase" id="platform-access">
+    <div class="container">
+      <div class="row align-items-center mb-4">
+        <div class="col-lg-8">
+          <div class="section-heading">
+            <h6>Platform Foundations</h6>
+            <h2>Sign in, subscribe, and rely on our MySQL backbone</h2>
+          </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <div class="d-flex justify-content-lg-end gap-2 flex-wrap">
+            <a class="btn btn-brand" data-bs-toggle="modal" data-bs-target="#signInModal" href="#">Sign In</a>
+            <a class="btn btn-accent" href="#subscribe-now" data-open-subscribe>Subscribe Now</a>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+          <div class="platform-card h-100">
+            <div class="icon">
+              <i class="fa fa-sign-in" aria-hidden="true"></i>
+            </div>
+            <h4>Sign into the platform</h4>
+            <span class="tagline">Secure access for members who want personalized casino lineups.</span>
+            <p>Use the new sign-in modal to pick up right where you left off and sync preferences across devices.</p>
+            <span class="badge-soft">Live access</span>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="platform-card h-100">
+            <div class="icon">
+              <i class="fa fa-database" aria-hidden="true"></i>
+            </div>
+            <h4>MySQL data backbone</h4>
+            <span class="tagline">Real-time updates from a dependable database.</span>
+            <p>Casino rankings, bonus terms, and payout speeds are served from a tuned MySQL cluster for reliable insights.</p>
+            <ul class="platform-meta">
+              <li><i class="fa fa-check-circle" aria-hidden="true"></i><span>Daily freshness checks</span></li>
+              <li><i class="fa fa-check-circle" aria-hidden="true"></i><span>Replicated reads for speed</span></li>
+              <li><i class="fa fa-check-circle" aria-hidden="true"></i><span>Export-ready reporting views</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="platform-card h-100">
+            <div class="icon">
+              <i class="fa fa-envelope-open" aria-hidden="true"></i>
+            </div>
+            <h4>Subscribe now</h4>
+            <span class="tagline">Weekly drops tailored to your play style.</span>
+            <p>Sign up to get MySQL-curated bonus alerts, payout comparisons, and new casino launches as soon as they land.</p>
+            <div class="d-flex flex-wrap gap-2">
+              <a class="btn btn-accent" href="#subscribe-now" data-open-subscribe>Subscribe Now</a>
+              <a class="btn btn-outline-primary" href="#" data-bs-toggle="modal" data-bs-target="#signInModal">Sign In</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -515,7 +472,7 @@ https://templatemo.com/tm-589-lugx-gaming
     </div>
   </div>
   
-  <div class="section cta">
+  <div class="section cta" id="subscribe-now">
     <div class="container">
       <div class="row">
         <div class="col-lg-5">
@@ -542,11 +499,16 @@ https://templatemo.com/tm-589-lugx-gaming
                   <h6>INSIDER UPDATES</h6>
                   <h2>Get Weekly Bonus Alerts When You <em>Subscribe</em> Today!</h2>
                 </div>
+                <p class="mb-3">Every alert is generated from our MySQL data warehouse so you always get fresh limits, wagering rules, and payout speeds.</p>
                 <div class="search-input">
-                  <form id="subscribe" action="#">
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Your email...">
+                  <form id="subscribe" data-subscribe-form action="#">
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Your email..." required>
                     <button type="submit">Subscribe Now</button>
                   </form>
+                </div>
+                <div class="mt-3 d-flex flex-wrap gap-2">
+                  <span class="badge-soft"><i class="fa fa-shield" aria-hidden="true"></i>Data secured in MySQL</span>
+                  <span class="badge-soft"><i class="fa fa-bolt" aria-hidden="true"></i>Instant alerts</span>
                 </div>
               </div>
             </div>
@@ -589,6 +551,7 @@ https://templatemo.com/tm-589-lugx-gaming
               <button type="submit" class="btn btn-brand flex-fill">Sign In</button>
               <button type="button" class="btn btn-accent flex-fill" data-bs-target="#contactAdminModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign Up</button>
             </div>
+            <p class="mt-3 mb-0 small text-muted" aria-live="polite" data-signin-status>Sign in to sync your casino shortlists.</p>
           </form>
         </div>
       </div>
@@ -646,35 +609,7 @@ https://templatemo.com/tm-589-lugx-gaming
   <script src="assets/js/owl-carousel.js"></script>
   <script src="assets/js/counter.js"></script>
   <script src="assets/js/custom.js"></script>
-
-  <script>
-    (function() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const monthName = now.toLocaleString('default', { month: 'long' });
-
-      const footerElement = document.querySelector('#footer-copyright [data-current-year]');
-      if (footerElement) {
-        footerElement.textContent = year;
-      }
-
-      const topPicksHeading = document.querySelector('[data-top-picks-heading]');
-      if (topPicksHeading) {
-        topPicksHeading.textContent = `Top Picks for ${monthName} ${year}`;
-      }
-
-      const subscribeForm = document.querySelector('#subscribe');
-      const subscribeModalEl = document.getElementById('subscribeSuccessModal');
-      if (subscribeForm && subscribeModalEl && typeof bootstrap !== 'undefined') {
-        const subscribeModal = new bootstrap.Modal(subscribeModalEl);
-        subscribeForm.addEventListener('submit', function(event) {
-          event.preventDefault();
-          subscribeModal.show();
-          subscribeForm.reset();
-        });
-      }
-    })();
-  </script>
+  <script src="assets/js/platform.js"></script>
 
   </body>
 </html>
