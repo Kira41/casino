@@ -62,7 +62,7 @@
       const status = form.parentElement?.querySelector('[data-subscribe-status]');
       const email = emailInput ? emailInput.value.trim() : '';
 
-      setStatusText(status, 'Saving your subscription with our SQL backend...');
+      setStatusText(status, 'Saving your subscription...');
 
       try {
         const result = await postToApi('subscribe', { email });
@@ -100,7 +100,7 @@
       const password =
         signInForm.querySelector('#signInPassword')?.value.trim() || '';
 
-      setStatusText(status, 'Signing in with the PHP + SQL service...');
+      setStatusText(status, 'Signing in...');
 
       try {
         const result = await postToApi('signin', { email, password });
@@ -131,7 +131,7 @@
       const subject = contactForm.querySelector('#subject')?.value.trim() || '';
       const message = contactForm.querySelector('#message')?.value.trim() || '';
 
-      setStatusText(status, 'Sending to the SQL inbox...', 'info');
+      setStatusText(status, 'Sending your message...', 'info');
 
       try {
         const result = await postToApi('contact', {
