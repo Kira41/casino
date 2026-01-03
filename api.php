@@ -73,6 +73,14 @@ function openDatabase(): PDO
 
 function initializeTables(PDO $database): void
 {
+    $schemaPath = __DIR__ . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'database.sql';
+    $schemaSql = is_file($schemaPath) ? file_get_contents($schemaPath) : false;
+
+    if ($schemaSql !== false) {
+        $database->exec($schemaSql);
+        return;
+    }
+
     $database->exec(
         'CREATE TABLE IF NOT EXISTS subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
