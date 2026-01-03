@@ -121,16 +121,40 @@ function handleSubscribe(PDO $database, array $payload): void
         throw new InvalidArgumentException('Please provide a valid email address.');
     }
 
-    $statement = $database->prepare(
-        'INSERT INTO subscriptions (email) VALUES (:email)
-        ON CONFLICT(email) DO UPDATE SET updated_at = CURRENT_TIMESTAMP'
-    );
+    $database->beginTransaction();
 
-    $statement->execute([':email' => $email]);
+    try {
+        $statement = $database->prepare(
+            'INSERT INTO subscriptions (email) VALUES (:email)
+            ON CONFLICT(email) DO UPDATE SET updated_at = CURRENT_TIMESTAMP'
+        );
+
+        $statement->execute([':email' => $email]);
+
+        $changes = (int) $database->query('SELECT changes()')->fetchColumn();
+        if ($changes < 1) {
+            throw new RuntimeException('Subscription could not be saved. Please try again.');
+        }
+
+        $subscriptionLookup = $database->prepare(
+            'SELECT id FROM subscriptions WHERE email = :email LIMIT 1'
+        );
+        $subscriptionLookup->execute([':email' => $email]);
+        $subscriptionId = (int) $subscriptionLookup->fetchColumn();
+
+        $database->commit();
+    } catch (Throwable $error) {
+        if ($database->inTransaction()) {
+            $database->rollBack();
+        }
+
+        throw $error;
+    }
 
     respond([
         'success' => true,
         'message' => 'Subscription saved successfully.',
+        'subscription_id' => $subscriptionId,
     ]);
 }
 
