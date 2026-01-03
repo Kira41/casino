@@ -83,10 +83,11 @@ https://templatemo.com/tm-589-lugx-gaming
             <h2>BEST CASINO SITES EVER!</h2>
             <p>Timelord Casino Review is your portal to honest rankings, trusted operator breakdowns, and the latest promotions worth your chips. Explore our expert picks, compare the perks, and find the perfect place to play with complete confidence.</p>
             <div class="search-input">
-              <form id="search" action="#">
-                <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" onkeypress="handle" />
-                <button role="button">Search Now</button>
+              <form id="search" action="#" data-casino-search-form>
+                <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" data-casino-search />
+                <button type="submit">Search Now</button>
               </form>
+              <p class="small text-muted mt-2 mb-0" data-search-status aria-live="polite"></p>
             </div>
           </div>
         </div>
