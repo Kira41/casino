@@ -59,28 +59,32 @@ function openDatabase(): PDO
     $config = is_file($configPath) ? require $configPath : [];
     $databaseConfig = isset($config['database']) && is_array($config['database']) ? $config['database'] : [];
 
-    $dsn = isset($databaseConfig['dsn']) && is_string($databaseConfig['dsn']) && trim($databaseConfig['dsn']) !== ''
-        ? $databaseConfig['dsn']
-        : 'sqlite:' . __DIR__ . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'casino.sqlite';
+    $dsn = isset($databaseConfig['dsn']) && is_string($databaseConfig['dsn']) ? trim($databaseConfig['dsn']) : '';
+
+    if ($dsn === '') {
+        throw new RuntimeException('A valid MySQL DSN is required.');
+    }
 
     $username = isset($databaseConfig['username']) && is_string($databaseConfig['username']) ? $databaseConfig['username'] : null;
     $password = isset($databaseConfig['password']) && is_string($databaseConfig['password']) ? $databaseConfig['password'] : null;
     $options = isset($databaseConfig['options']) && is_array($databaseConfig['options']) ? $databaseConfig['options'] : [];
     $options += [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
 
-    if (str_starts_with($dsn, 'sqlite:')) {
-        $databasePath = substr($dsn, strlen('sqlite:'));
-        $storageDir = dirname($databasePath);
-
-        if (!is_dir($storageDir) && !mkdir($storageDir, 0775, true) && !is_dir($storageDir)) {
-            throw new RuntimeException('Unable to create storage directory.');
+    if (str_starts_with($dsn, 'mysql:')) {
+        if (!defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
+            throw new RuntimeException('MySQL PDO extension is required.');
         }
+
+        $options += [
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
+            PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
+        ];
     }
 
     $database = new PDO($dsn, $username, $password, $options);
 
-    if (str_starts_with($dsn, 'sqlite:')) {
-        $database->exec('PRAGMA foreign_keys = ON');
+    if ($database->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql') {
+        $database->exec('SET time_zone = "+00:00"');
     }
 
     initializeTables($database);
@@ -90,7 +94,11 @@ function openDatabase(): PDO
 
 function initializeTables(PDO $database): void
 {
-    $schemaPath = __DIR__ . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'database.sql';
+    $schemaFilename = $database->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql'
+        ? 'database.mysql.sql'
+        : 'database.sql';
+
+    $schemaPath = __DIR__ . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . $schemaFilename;
     $schemaSql = is_file($schemaPath) ? file_get_contents($schemaPath) : false;
 
     if ($schemaSql !== false) {
@@ -100,33 +108,33 @@ function initializeTables(PDO $database): void
 
     $database->exec(
         'CREATE TABLE IF NOT EXISTS subscriptions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT NOT NULL UNIQUE,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )'
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
 
     $database->exec(
         'CREATE TABLE IF NOT EXISTS signins (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT NOT NULL UNIQUE,
-            password_hash TEXT NOT NULL,
-            last_login_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )'
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password_hash VARCHAR(255) NOT NULL,
+            last_login_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
 
     $database->exec(
         'CREATE TABLE IF NOT EXISTS contact_messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            surname TEXT NOT NULL,
-            email TEXT NOT NULL,
-            subject TEXT,
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            surname VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            subject VARCHAR(255),
             message TEXT,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )'
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
 }
 
@@ -143,13 +151,12 @@ function handleSubscribe(PDO $database, array $payload): void
     try {
         $statement = $database->prepare(
             'INSERT INTO subscriptions (email) VALUES (:email)
-            ON CONFLICT(email) DO UPDATE SET updated_at = CURRENT_TIMESTAMP'
+            ON DUPLICATE KEY UPDATE updated_at = VALUES(updated_at)'
         );
 
         $statement->execute([':email' => $email]);
 
-        $changes = (int) $database->query('SELECT changes()')->fetchColumn();
-        if ($changes < 1) {
+        if ($statement->rowCount() < 1) {
             throw new RuntimeException('Subscription could not be saved. Please try again.');
         }
 
@@ -192,7 +199,7 @@ function handleSignin(PDO $database, array $payload): void
 
     $statement = $database->prepare(
         'INSERT INTO signins (email, password_hash, last_login_at) VALUES (:email, :password_hash, CURRENT_TIMESTAMP)
-        ON CONFLICT(email) DO UPDATE SET password_hash = :password_hash, last_login_at = CURRENT_TIMESTAMP'
+        ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), last_login_at = CURRENT_TIMESTAMP'
     );
 
     $statement->execute([
