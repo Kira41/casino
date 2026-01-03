@@ -55,16 +55,33 @@ try {
 
 function openDatabase(): PDO
 {
-    $storageDir = __DIR__ . DIRECTORY_SEPARATOR . 'storage';
+    $configPath = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
+    $config = is_file($configPath) ? require $configPath : [];
+    $databaseConfig = isset($config['database']) && is_array($config['database']) ? $config['database'] : [];
 
-    if (!is_dir($storageDir) && !mkdir($storageDir, 0775, true) && !is_dir($storageDir)) {
-        throw new RuntimeException('Unable to create storage directory.');
+    $dsn = isset($databaseConfig['dsn']) && is_string($databaseConfig['dsn']) && trim($databaseConfig['dsn']) !== ''
+        ? $databaseConfig['dsn']
+        : 'sqlite:' . __DIR__ . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'casino.sqlite';
+
+    $username = isset($databaseConfig['username']) && is_string($databaseConfig['username']) ? $databaseConfig['username'] : null;
+    $password = isset($databaseConfig['password']) && is_string($databaseConfig['password']) ? $databaseConfig['password'] : null;
+    $options = isset($databaseConfig['options']) && is_array($databaseConfig['options']) ? $databaseConfig['options'] : [];
+    $options += [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+
+    if (str_starts_with($dsn, 'sqlite:')) {
+        $databasePath = substr($dsn, strlen('sqlite:'));
+        $storageDir = dirname($databasePath);
+
+        if (!is_dir($storageDir) && !mkdir($storageDir, 0775, true) && !is_dir($storageDir)) {
+            throw new RuntimeException('Unable to create storage directory.');
+        }
     }
 
-    $databasePath = $storageDir . DIRECTORY_SEPARATOR . 'casino.sqlite';
-    $database = new PDO('sqlite:' . $databasePath);
-    $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $database->exec('PRAGMA foreign_keys = ON');
+    $database = new PDO($dsn, $username, $password, $options);
+
+    if (str_starts_with($dsn, 'sqlite:')) {
+        $database->exec('PRAGMA foreign_keys = ON');
+    }
 
     initializeTables($database);
 
