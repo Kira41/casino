@@ -130,7 +130,7 @@ function handleSubscribe(PDO $database, array $payload): void
 
     respond([
         'success' => true,
-        'message' => 'Subscription saved to the SQL database.',
+        'message' => 'Subscription saved successfully.',
     ]);
 }
 
@@ -161,7 +161,7 @@ function handleSignin(PDO $database, array $payload): void
 
     respond([
         'success' => true,
-        'message' => 'Sign-in recorded and synced with the SQL database.',
+        'message' => 'Sign-in recorded and synced.',
     ]);
 }
 
@@ -200,7 +200,7 @@ function handleContact(PDO $database, array $payload): void
 
     respond([
         'success' => true,
-        'message' => 'Your message has been stored in the SQL database. Our PHP backend will follow up soon.',
+        'message' => 'Your message has been stored. Our team will follow up soon.',
     ]);
 }
 
