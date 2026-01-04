@@ -388,22 +388,24 @@
     if (!searchResultsContainer) return;
 
     const query = term.trim().toLowerCase();
-    const matches =
-      query === ''
-        ? casinoDirectory
-        : casinoDirectory.filter((casino) =>
-            casino.name.toLowerCase().includes(query)
-          );
-
     searchResultsContainer.innerHTML = '';
+
+    if (query === '') {
+      const empty = document.createElement('p');
+      empty.className = 'search-results-empty';
+      empty.textContent = 'Start typing to find a casino.';
+      searchResultsContainer.appendChild(empty);
+      return;
+    }
+
+    const matches = casinoDirectory.filter((casino) =>
+      casino.name.toLowerCase().includes(query)
+    );
 
     if (matches.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'search-results-empty';
-      empty.textContent =
-        query === ''
-          ? 'Start typing to find a casino.'
-          : `No casinos found in our database matching "${term}".`;
+      empty.textContent = `No casinos found in our database matching "${term}".`;
       searchResultsContainer.appendChild(empty);
       return;
     }
