@@ -1522,6 +1522,32 @@ Single Page Style
   color: #aaa;
 }
 
+.product-meta-list {
+  padding: 0;
+  list-style: none;
+}
+
+.product-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-meta-item .product-meta-label {
+  min-width: 150px;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.product-meta-item .product-meta-value {
+  color: #1e1e1e;
+}
+
+.product-meta-item i {
+  width: 24px;
+  text-align: center;
+}
+
 .tabs-content {
   background-color: #f7f7f7;
   border-radius: 25px;

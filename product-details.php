@@ -96,12 +96,32 @@ include __DIR__ . '/partials/header.php';
             <button type="submit"><i class="fa fa-arrow-up-right-from-square"></i> Visit Casino</button>
           </form>
           <ul class="product-meta-list">
-            <li><i class="fa fa-building"></i><span>Casino Name:</span> <span><?= htmlspecialchars($casino['operator'] ?? $casino['name'], ENT_QUOTES, 'UTF-8') ?></span></li>
-            <li><i class="fa fa-layer-group"></i><span>Genre:</span> <span><?= htmlspecialchars($genres, ENT_QUOTES, 'UTF-8') ?></span></li>
-            <li><i class="fa fa-tags"></i><span>Multi-tags:</span> <span><?= htmlspecialchars($perks, ENT_QUOTES, 'UTF-8') ?></span></li>
-            <li><i class="fa fa-shield-alt"></i><span>License:</span> <span><?= htmlspecialchars($casino['license'] ?? 'TBD', ENT_QUOTES, 'UTF-8') ?></span></li>
+            <li class="product-meta-item">
+              <i class="fa fa-building"></i>
+              <span class="product-meta-label">Casino Name:</span>
+              <span class="product-meta-value"><?= htmlspecialchars($casino['operator'] ?? $casino['name'], ENT_QUOTES, 'UTF-8') ?></span>
+            </li>
+            <li class="product-meta-item">
+              <i class="fa fa-layer-group"></i>
+              <span class="product-meta-label">Genre:</span>
+              <span class="product-meta-value"><?= htmlspecialchars($genres !== '' ? $genres : 'N/A', ENT_QUOTES, 'UTF-8') ?></span>
+            </li>
+            <li class="product-meta-item">
+              <i class="fa fa-tags"></i>
+              <span class="product-meta-label">Multi-tags:</span>
+              <span class="product-meta-value"><?= htmlspecialchars($perks !== '' ? $perks : 'N/A', ENT_QUOTES, 'UTF-8') ?></span>
+            </li>
+            <li class="product-meta-item">
+              <i class="fa fa-shield-alt"></i>
+              <span class="product-meta-label">License:</span>
+              <span class="product-meta-value"><?= htmlspecialchars($casino['license'] ?? 'TBD', ENT_QUOTES, 'UTF-8') ?></span>
+            </li>
             <?php if ($minDeposit): ?>
-              <li><i class="fa fa-credit-card"></i><span>Minimum Deposit:</span> <span><?= htmlspecialchars($minDeposit, ENT_QUOTES, 'UTF-8') ?></span></li>
+              <li class="product-meta-item">
+                <i class="fa fa-credit-card"></i>
+                <span class="product-meta-label">Minimum Deposit:</span>
+                <span class="product-meta-value"><?= htmlspecialchars($minDeposit, ENT_QUOTES, 'UTF-8') ?></span>
+              </li>
             <?php endif; ?>
           </ul>
         </div>
