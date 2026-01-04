@@ -158,88 +158,7 @@
   const searchInput = document.querySelector('[data-casino-search]');
   const searchResultsContainer = document.querySelector('[data-search-results]');
   const casinoCards = document.querySelectorAll('.trending .item');
-  const casinoDirectory = [
-    {
-      name: 'Lucky Star Crypto Casino',
-      slug: 'lucky-star-crypto-casino',
-      thumbnail: 'assets/images/trending-01.jpg',
-    },
-    {
-      name: 'Nova Royale Casino',
-      slug: 'nova-royale-casino',
-      thumbnail: 'assets/images/trending-01.jpg',
-    },
-    {
-      name: 'Starlight Spins Resort',
-      slug: 'starlight-spins-resort',
-      thumbnail: 'assets/images/trending-02.jpg',
-    },
-    {
-      name: 'Emerald Mirage Club',
-      slug: 'emerald-mirage-club',
-      thumbnail: 'assets/images/trending-03.jpg',
-    },
-    {
-      name: 'Celestial Fortune Hall',
-      slug: 'celestial-fortune-hall',
-      thumbnail: 'assets/images/trending-04.jpg',
-    },
-    {
-      name: 'Aurora Vault Casino',
-      slug: 'aurora-vault-casino',
-      thumbnail: 'assets/images/top-game-01.jpg',
-    },
-    {
-      name: 'Quantum Spin Lounge',
-      slug: 'quantum-spin-lounge',
-      thumbnail: 'assets/images/top-game-02.jpg',
-    },
-    {
-      name: 'Imperial Halo Casino',
-      slug: 'imperial-halo-casino',
-      thumbnail: 'assets/images/top-game-03.jpg',
-    },
-    {
-      name: 'Obsidian Crown Club',
-      slug: 'obsidian-crown-club',
-      thumbnail: 'assets/images/top-game-04.jpg',
-    },
-    {
-      name: 'Mirage of Millions',
-      slug: 'mirage-of-millions',
-      thumbnail: 'assets/images/top-game-05.jpg',
-    },
-    {
-      name: 'Luminous Ledger Casino',
-      slug: 'luminous-ledger-casino',
-      thumbnail: 'assets/images/top-game-06.jpg',
-    },
-    {
-      name: 'Neon Mirage Casino',
-      slug: 'neon-mirage-casino',
-      thumbnail: 'assets/images/categories-01.jpg',
-    },
-    {
-      name: 'Azure Spire Casino',
-      slug: 'azure-spire-casino',
-      thumbnail: 'assets/images/categories-05.jpg',
-    },
-    {
-      name: 'Lucky Horizon Lounge',
-      slug: 'lucky-horizon-lounge',
-      thumbnail: 'assets/images/categories-03.jpg',
-    },
-    {
-      name: 'Starlit Crown Casino',
-      slug: 'starlit-crown-casino',
-      thumbnail: 'assets/images/categories-04.jpg',
-    },
-    {
-      name: 'Golden Drift Resort',
-      slug: 'golden-drift-resort',
-      thumbnail: 'assets/images/categories-05.jpg',
-    },
-  ];
+  const casinoDirectory = (typeof window !== 'undefined' && window.__CASINO_DIRECTORY__) || [];
   const casinoProfiles = {
     'lucky-star-crypto-casino': {
       name: 'Lucky Star Crypto Casino',
@@ -517,7 +436,7 @@
 
   function attachCasinoLinkHandlers() {
     const productLinks = document.querySelectorAll(
-      'a[href$="product-details.html"]'
+      'a[href$="product-details.php"]'
     );
 
     productLinks.forEach((link) => {
@@ -528,7 +447,7 @@
         const slug = name ? slugifyCasinoName(name) : 'lucky-star-crypto-casino';
 
         const url = new URL(link.href, window.location.href);
-        url.searchParams.set('slug', slug);
+        url.searchParams.set('casino', slug);
         sessionStorage.setItem('selectedCasino', slug);
 
         event.preventDefault();

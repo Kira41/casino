@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS casinos (
     thumbnail_image TEXT,
     rating TINYINT UNSIGNED NOT NULL DEFAULT 0 CHECK (rating BETWEEN 0 AND 5),
     short_description TEXT,
+    cta_url TEXT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -84,6 +85,17 @@ CREATE TABLE IF NOT EXISTS casino_cards (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX IF NOT EXISTS idx_casino_cards_section_position ON casino_cards(section, position);
+
+CREATE TABLE IF NOT EXISTS content_cards (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    section VARCHAR(100) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    category VARCHAR(255),
+    badge VARCHAR(255),
+    description TEXT,
+    image_path TEXT NOT NULL,
+    position INT NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS category_cards (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -134,7 +146,7 @@ CREATE TABLE IF NOT EXISTS casino_highlights (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed reference data from the existing HTML content
-INSERT IGNORE INTO casinos (slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description)
+INSERT IGNORE INTO casinos (slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description, cta_url)
 VALUES
     (
         'lucky-star-crypto-casino',
@@ -146,7 +158,8 @@ VALUES
         'assets/images/single-game.jpg',
         'assets/images/trending-01.jpg',
         5,
-        'Crypto-first live dealer casino with blockchain payouts, curated table games, and provably fair slots.'
+        'Crypto-first live dealer casino with blockchain payouts, curated table games, and provably fair slots.',
+        'https://luckystar.example.com'
     ),
     (
         'nova-royale-casino',
@@ -158,7 +171,8 @@ VALUES
         'assets/images/trending-01.jpg',
         'assets/images/trending-01.jpg',
         5,
-        'Flagship pick with polished lobbies, player-first promos, and a $20 minimum deposit.'
+        'Flagship pick with polished lobbies, player-first promos, and a $20 minimum deposit.',
+        'https://novaroyale.example.com'
     ),
     (
         'starlight-spins-resort',
@@ -170,7 +184,8 @@ VALUES
         'assets/images/trending-02.jpg',
         'assets/images/trending-02.jpg',
         4,
-        'Resort-themed casino featuring quick sign-ins, curated bonuses, and mid-tier deposits.'
+        'Resort-themed casino featuring quick sign-ins, curated bonuses, and mid-tier deposits.',
+        'https://starlightspins.example.com'
     ),
     (
         'emerald-mirage-club',
@@ -182,7 +197,8 @@ VALUES
         'assets/images/trending-03.jpg',
         'assets/images/trending-03.jpg',
         3,
-        'Club-inspired pick blending classic tables with approachable wagering for new members.'
+        'Club-inspired pick blending classic tables with approachable wagering for new members.',
+        'https://emeraldmirage.example.com'
     ),
     (
         'celestial-fortune-hall',
@@ -194,7 +210,8 @@ VALUES
         'assets/images/trending-04.jpg',
         'assets/images/trending-04.jpg',
         5,
-        'High-rated hall with stellar promos, $32 minimum deposits, and VIP-ready support.'
+        'High-rated hall with stellar promos, $32 minimum deposits, and VIP-ready support.',
+        'https://celestialfortune.example.com'
     ),
     (
         'aurora-vault-casino',
@@ -206,7 +223,8 @@ VALUES
         'assets/images/top-game-01.jpg',
         'assets/images/top-game-01.jpg',
         5,
-        'Top casino draw with premium tables and a perfect score from our reviewers.'
+        'Top casino draw with premium tables and a perfect score from our reviewers.',
+        'https://auroravault.example.com'
     ),
     (
         'quantum-spin-lounge',
@@ -218,7 +236,8 @@ VALUES
         'assets/images/top-game-02.jpg',
         'assets/images/top-game-02.jpg',
         4,
-        'Lounge experience with quick spins, dependable payouts, and fast onboarding.'
+        'Lounge experience with quick spins, dependable payouts, and fast onboarding.',
+        'https://quantumspin.example.com'
     ),
     (
         'imperial-halo-casino',
@@ -230,7 +249,8 @@ VALUES
         'assets/images/top-game-03.jpg',
         'assets/images/top-game-03.jpg',
         3,
-        'Reliable operator that focuses on core table games and classic slots.'
+        'Reliable operator that focuses on core table games and classic slots.',
+        'https://imperialhalo.example.com'
     ),
     (
         'obsidian-crown-club',
@@ -242,7 +262,8 @@ VALUES
         'assets/images/top-game-04.jpg',
         'assets/images/top-game-04.jpg',
         5,
-        'VIP-focused destination featuring high-roller tables and concierge-style support.'
+        'VIP-focused destination featuring high-roller tables and concierge-style support.',
+        'https://obsidiancrown.example.com'
     ),
     (
         'mirage-of-millions',
@@ -254,7 +275,8 @@ VALUES
         'assets/images/top-game-05.jpg',
         'assets/images/top-game-05.jpg',
         2,
-        'Approachable option for casual players with a lighter rating from reviewers.'
+        'Approachable option for casual players with a lighter rating from reviewers.',
+        'https://mirageofmillions.example.com'
     ),
     (
         'luminous-ledger-casino',
@@ -266,7 +288,8 @@ VALUES
         'assets/images/top-game-06.jpg',
         'assets/images/top-game-06.jpg',
         4,
-        'Data-forward casino celebrated for transparency and strong payout history.'
+        'Data-forward casino celebrated for transparency and strong payout history.',
+        'https://luminousledger.example.com'
     ),
     (
         'neon-mirage-casino',
@@ -278,7 +301,8 @@ VALUES
         'assets/images/categories-01.jpg',
         'assets/images/categories-01.jpg',
         0,
-        'Bright, modern casino featured as a related destination in the review page.'
+        'Bright, modern casino featured as a related destination in the review page.',
+        'https://neonmirage.example.com'
     ),
     (
         'azure-spire-casino',
@@ -290,7 +314,8 @@ VALUES
         'assets/images/categories-05.jpg',
         'assets/images/categories-05.jpg',
         0,
-        'Coastal-inspired casino listed alongside other related recommendations.'
+        'Coastal-inspired casino listed alongside other related recommendations.',
+        'https://azurespire.example.com'
     ),
     (
         'lucky-horizon-lounge',
@@ -302,7 +327,8 @@ VALUES
         'assets/images/categories-03.jpg',
         'assets/images/categories-03.jpg',
         0,
-        'Lounge experience for players exploring additional curated casinos.'
+        'Lounge experience for players exploring additional curated casinos.',
+        'https://luckyhorizon.example.com'
     ),
     (
         'starlit-crown-casino',
@@ -314,7 +340,8 @@ VALUES
         'assets/images/categories-04.jpg',
         'assets/images/categories-04.jpg',
         0,
-        'Boutique casino highlighted as a related option for readers.'
+        'Boutique casino highlighted as a related option for readers.',
+        'https://starlitcrown.example.com'
     ),
     (
         'golden-drift-resort',
@@ -326,7 +353,8 @@ VALUES
         'assets/images/categories-05.jpg',
         'assets/images/categories-05.jpg',
         0,
-        'Resort-style casino rounding out the related destinations list.'
+        'Resort-style casino rounding out the related destinations list.',
+        'https://goldendrift.example.com'
     );
 
 INSERT IGNORE INTO casino_tags (name, type) VALUES
@@ -367,6 +395,41 @@ VALUES
     ((SELECT id FROM casinos WHERE slug = 'lucky-horizon-lounge'), 'related', 'Lucky Horizon Lounge', 'assets/images/categories-03.jpg', NULL, NULL, NULL, 3),
     ((SELECT id FROM casinos WHERE slug = 'starlit-crown-casino'), 'related', 'Starlit Crown Casino', 'assets/images/categories-04.jpg', NULL, NULL, NULL, 4),
     ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'related', 'Golden Drift Resort', 'assets/images/categories-05.jpg', NULL, NULL, NULL, 5);
+
+INSERT IGNORE INTO content_cards (section, title, category, badge, description, image_path, position)
+VALUES
+    ('fast_payout_highlights', 'Instant blockchain approvals', 'Crypto cashouts', 'Under 2 hours', 'BTC, ETH, and USDT withdrawals are prioritized with automated checks and blockchain monitoring.', 'assets/images/trending-01.jpg', 1),
+    ('fast_payout_highlights', 'Skip the bank queue', 'E-wallets', 'Same-day', 'Neteller, Skrill, and PayPal partners with 24/7 AML desks to release funds on the day you request.', 'assets/images/trending-02.jpg', 2),
+    ('fast_payout_highlights', 'Local payouts', 'Bank wires', 'Next business day', 'Low-fee SEPA and ACH corridors keep funds domestic and reduce costly intermediary holds.', 'assets/images/trending-03.jpg', 3),
+    ('fast_payout_highlights', 'Faster approvals', 'VIP queueing', 'Priority desk', 'Dedicated agents review large withdrawals with proactive KYC refreshes to keep lines moving.', 'assets/images/trending-04.jpg', 4),
+    ('fast_payout_checklist', 'Processing metrics', 'Proof', NULL, 'Average approval times for each payment method and the hours when compliance teams are active.', 'assets/images/top-game-05.jpg', 1),
+    ('fast_payout_checklist', 'Caps & escalations', 'Limits', NULL, 'Per-transaction limits, weekly ceilings, and when VIP managers can double or triple your cap.', 'assets/images/top-game-06.jpg', 2),
+    ('fast_payout_checklist', 'KYC refresh rules', 'Verification', NULL, 'Document requests, source-of-funds standards, and cooldown periods after large cashouts.', 'assets/images/top-game-07.jpg', 3),
+    ('fast_payout_checklist', 'Escalation paths', 'Support', NULL, 'Live chat and phone SLAs plus finance-team contacts when you need real-time updates.', 'assets/images/top-game-08.jpg', 4),
+    ('bonus_guides', 'Maximize first deposits', 'Welcome bundles', 'Step-by-step', 'Stack deposit matches, free spins, and loyalty opt-ins without triggering tough wagering limits.', 'assets/images/trending-01.jpg', 1),
+    ('bonus_guides', 'Instant-cash offers', 'No wagering', 'Low-risk', 'Spot no-wager deals, typical withdrawal rules, and the playthrough traps that still appear in the fine print.', 'assets/images/trending-02.jpg', 2),
+    ('bonus_guides', 'Pick the right slots', 'Free spins', 'Reader favorite', 'Compare RTP, volatility, and eligible game lists so your spins ladder up to withdrawable balances.', 'assets/images/trending-03.jpg', 3),
+    ('bonus_guides', 'Make losses sting less', 'Cashback', 'Sustained value', 'Find casinos with next-day cashback, tier multipliers, and transparent loss calculations.', 'assets/images/trending-04.jpg', 4),
+    ('bonus_shortlist', 'Under $20 deposits', 'Budget', NULL, 'Combine small-deposit matches with low wagering to keep the bankroll flexible.', 'assets/images/top-game-01.jpg', 1),
+    ('bonus_shortlist', 'Big match playbooks', 'High-roller', NULL, 'Prioritize flexible max bets, higher withdrawal caps, and accelerated VIP status triggers.', 'assets/images/top-game-02.jpg', 2),
+    ('bonus_shortlist', 'Token-based promos', 'Crypto', NULL, 'Use faster payouts and coin-specific bonuses to avoid conversion fees and release delays.', 'assets/images/top-game-03.jpg', 3),
+    ('bonus_shortlist', 'Bet-slip boosts', 'Sports', NULL, 'Balance bet insurance, odds boosts, and wagering contribution rules for multi-leg slips.', 'assets/images/top-game-04.jpg', 4),
+    ('game_library', 'Fresh releases weekly', 'Slots & jackpots', '12K+ titles', 'We flag casinos adding new Megaways, cluster pays, and branded slots as soon as they drop.', 'assets/images/categories-01.jpg', 1),
+    ('game_library', 'Studios with low latency', 'Tables & shows', 'Live dealers', 'Lightning roulette, blackjack parties, and game shows streamed with multi-camera coverage.', 'assets/images/categories-05.jpg', 2),
+    ('game_library', 'One wallet play', 'Sports & eSports', 'Hybrid', 'Single-balance wagering across sportsbook, racebook, and in-house virtuals with instant settlement.', 'assets/images/categories-03.jpg', 3),
+    ('game_library', 'Balanced catalogs', 'Premium studios', 'Provider mix', 'NetEnt visuals, Pragmatic volatility, and Evolution live tables curated for every bankroll.', 'assets/images/categories-04.jpg', 4),
+    ('library_signals', 'Smart search', 'Filters', NULL, 'Category filters, volatility tags, and provider shortcuts make it easy to find the right title fast.', 'assets/images/top-game-09.jpg', 1),
+    ('library_signals', 'RTP transparency', 'Fairness', NULL, 'Visible RTP, provably fair checks for crypto titles, and clear game contribution toward wagering.', 'assets/images/top-game-10.jpg', 2),
+    ('library_signals', 'Mobile-ready', 'Performance', NULL, 'HTML5 catalogs with portrait mode, quick-load lobbies, and low-data settings for traveling players.', 'assets/images/top-game-11.jpg', 3),
+    ('library_signals', 'Limited drops', 'Exclusives', NULL, 'Early-access slots, branded live tables, and loyalty-only jackpots we track weekly.', 'assets/images/top-game-12.jpg', 4),
+    ('vip_playbooks', 'Accelerate early progress', 'Entry tiers', 'Level 1-3', 'Build comp multipliers with low-stakes play, mission streaks, and targeted reloads.', 'assets/images/trending-01.jpg', 1),
+    ('vip_playbooks', 'Unlock priority support', 'Mid tiers', 'Level 4-6', 'Blend table and slot volume to hit thresholds while keeping KYC refreshes painless.', 'assets/images/trending-02.jpg', 2),
+    ('vip_playbooks', 'Custom rewards', 'High roller', 'Level 7-9', 'Negotiate bespoke rakeback, higher limits, and concierge service for trips and events.', 'assets/images/trending-03.jpg', 3),
+    ('vip_playbooks', 'Travel & hospitality', 'Invite-only', 'Elite desk', 'Dedicated hosts coordinate cashout speeds, table access, and personalized event invites.', 'assets/images/trending-04.jpg', 4),
+    ('vip_signals', 'Point mechanics', 'Earning', NULL, 'Earn rates per game type, rollover windows, and how multipliers stack on promos.', 'assets/images/top-game-13.jpg', 1),
+    ('vip_signals', 'What you can claim', 'Rewards', NULL, 'Cashback cadence, tournament entries, physical gifts, and real host response times.', 'assets/images/top-game-14.jpg', 2),
+    ('vip_signals', 'Keep your status', 'Flexibility', NULL, 'Tier decay timelines, pause options during travel, and soft-landing offers from VIP hosts.', 'assets/images/top-game-15.jpg', 3),
+    ('vip_signals', 'Events & hospitality', 'Experience', NULL, 'On-site suites, sports hospitality, and milestone gifts for the moments you want to celebrate.', 'assets/images/top-game-16.jpg', 4);
 
 INSERT IGNORE INTO category_cards (title, image_path, section)
 VALUES
