@@ -253,7 +253,7 @@ include __DIR__ . '/partials/header.php';
               <h4><?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?></h4>
               <div class="thumb">
                 <?php $categorySlug = slugifyTag((string) ($category['title'] ?? '')); ?>
-                <a href="product-details.php?category=<?= urlencode($categorySlug) ?>"><img src="<?= htmlspecialchars($category['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
+                <a href="all-casinos.php?category=<?= urlencode($categorySlug) ?>"><img src="<?= htmlspecialchars($category['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
               </div>
             </div>
           </div>

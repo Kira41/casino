@@ -7,7 +7,19 @@ require_once __DIR__ . '/includes/bootstrap.php';
 $database = getDatabase();
 $activePage = 'all';
 $casinoDirectory = fetchCasinoDirectory($database);
-$casinos = fetchCasinosWithCategories($database);
+$categorySlug = isset($_GET['category']) ? trim((string) $_GET['category']) : '';
+$casinos = $categorySlug === ''
+    ? fetchCasinosWithCategories($database)
+    : fetchCasinosByCategory($database, $categorySlug);
+$categoryLabel = $categorySlug !== '' ? ucwords(str_replace('-', ' ', $categorySlug)) : '';
+if ($categorySlug !== '' && !empty($casinos)) {
+    foreach ($casinos[0]['categories'] ?? [] as $categoryName) {
+        if (slugifyTag((string) $categoryName) === slugifyTag($categorySlug)) {
+            $categoryLabel = $categoryName;
+            break;
+        }
+    }
+}
 $pageTitle = 'Lugx Gaming - All Casinos Page';
 
 include __DIR__ . '/partials/html-head.php';
@@ -18,8 +30,14 @@ include __DIR__ . '/partials/header.php';
     <div class="container">
       <div class="row">
         <div class="col-lg-12">
-          <h3>All Casinos</h3>
-          <span class="breadcrumb"><a href="#">Home</a> > All Casinos</span>
+          <h3><?= $categoryLabel !== '' ? htmlspecialchars($categoryLabel, ENT_QUOTES, 'UTF-8') : 'All Casinos' ?></h3>
+          <span class="breadcrumb">
+            <a href="#">Home</a>
+            > <a href="all-casinos.php">All Casinos</a>
+            <?php if ($categoryLabel !== ''): ?>
+              > <span><?= htmlspecialchars($categoryLabel, ENT_QUOTES, 'UTF-8') ?></span>
+            <?php endif; ?>
+          </span>
         </div>
       </div>
     </div>
@@ -42,6 +60,13 @@ include __DIR__ . '/partials/header.php';
         </li>
       </ul>
       <div class="row trending-box">
+        <?php if (empty($casinos)): ?>
+          <div class="col-12">
+            <div class="alert alert-warning mb-0" role="alert">
+              No casinos found for this category. <a href="all-casinos.php" class="alert-link">View all casinos</a>.
+            </div>
+          </div>
+        <?php endif; ?>
         <?php foreach ($casinos as $casino): ?>
           <?php
             $categoryClasses = ['trending-items'];
