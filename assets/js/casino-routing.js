@@ -1,6 +1,6 @@
 (function () {
   function updateProductLinks(container, casinoId) {
-    const anchors = container.querySelectorAll('a[href*="product-details.html"]');
+    const anchors = container.querySelectorAll('a[href*="product-details.php"]');
 
     anchors.forEach((link) => {
       const url = new URL(link.getAttribute("href"), window.location.href);

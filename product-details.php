@@ -1,0 +1,253 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/includes/bootstrap.php';
+
+$database = getDatabase();
+$activePage = 'product';
+$casinoDirectory = fetchCasinoDirectory($database);
+$slug = isset($_GET['casino']) ? (string) $_GET['casino'] : '';
+$casino = $slug !== '' ? fetchCasinoBySlug($database, $slug) : fetchFirstCasino($database);
+
+if (!$casino) {
+    http_response_code(404);
+    echo 'Casino not found';
+    exit;
+}
+
+$pageTitle = 'Lugx Gaming - Product Detail';
+$genres = implode(', ', $casino['genres'] ?? []);
+$perks = implode(', ', $casino['perks'] ?? []);
+$minDeposit = formatMinDeposit(is_numeric($casino['min_deposit_usd'] ?? null) ? (int) $casino['min_deposit_usd'] : null);
+$rating = (int) ($casino['rating'] ?? 0);
+$games = $casino['games'] ?? [];
+$prosCons = $casino['pros_cons'] ?? ['pros' => [], 'cons' => []];
+$highlights = $casino['highlights'] ?? [];
+$reviewSections = $casino['review_sections'] ?? [];
+$relatedCasinos = fetchCasinoCards($database, 'related');
+$headlineBonus = $casino['headline_bonus'] ?? '';
+$additionalScripts = ['assets/js/casino-detail.js'];
+
+include __DIR__ . '/partials/html-head.php';
+include __DIR__ . '/partials/header.php';
+?>
+
+  <div class="page-heading header-text">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h3><?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+          <span class="breadcrumb"><a href="#">Home</a>  >  <a href="#">Casinos</a>  >  <span><?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="single-product section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="left-image">
+            <img src="<?= htmlspecialchars($casino['hero_image'] ?: $casino['thumbnail_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>">
+          </div>
+        </div>
+        <div class="col-lg-6 align-self-center product-details-copy">
+          <h4><?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?></h4>
+          <span class="price"><i class="fa fa-gift me-2"></i><?= htmlspecialchars($headlineBonus ?: 'Featured Welcome Bonus', ENT_QUOTES, 'UTF-8') ?></span>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="category" aria-label="Rating"><?= renderRatingStars($rating) ?></span>
+            <span class="small text-muted"><?= $rating ?> / 5</span>
+          </div>
+          <p><i class="fa fa-magic me-2 text-warning"></i><?= htmlspecialchars($casino['short_description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+          <form id="qty" action="#" onsubmit="window.open('<?= htmlspecialchars($casino['cta_url'] ?: '#', ENT_QUOTES, 'UTF-8') ?>','_blank','noopener'); return false;">
+            <button type="submit"><i class="fa fa-arrow-up-right-from-square"></i> Visit Casino</button>
+          </form>
+          <ul class="product-meta-list">
+            <li><i class="fa fa-building"></i><span>Casino Name:</span> <span><?= htmlspecialchars($casino['operator'] ?? $casino['name'], ENT_QUOTES, 'UTF-8') ?></span></li>
+            <li><i class="fa fa-layer-group"></i><span>Genre:</span> <span><?= htmlspecialchars($genres, ENT_QUOTES, 'UTF-8') ?></span></li>
+            <li><i class="fa fa-tags"></i><span>Multi-tags:</span> <span><?= htmlspecialchars($perks, ENT_QUOTES, 'UTF-8') ?></span></li>
+            <li><i class="fa fa-shield-alt"></i><span>License:</span> <span><?= htmlspecialchars($casino['license'] ?? 'TBD', ENT_QUOTES, 'UTF-8') ?></span></li>
+            <?php if ($minDeposit): ?>
+              <li><i class="fa fa-credit-card"></i><span>Minimum Deposit:</span> <span><?= htmlspecialchars($minDeposit, ENT_QUOTES, 'UTF-8') ?></span></li>
+            <?php endif; ?>
+          </ul>
+        </div>
+        <div class="col-lg-12">
+          <div class="sep"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="more-info">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="tabs-content">
+            <div class="row">
+              <div class="nav-wrapper ">
+                <ul class="nav nav-tabs" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Description</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews</button>
+                  </li>
+                </ul>
+              </div>              
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                  <p><i class="fa fa-dice text-warning me-2"></i><?= htmlspecialchars($casino['short_description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+                  <br>
+                  <p><?= htmlspecialchars($casino['short_description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+                  <div class="table-responsive mt-4">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Game Type</th>
+                          <th>Live Dealer</th>
+                          <th>Virtual Reality</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php foreach ($games as $game): ?>
+                          <tr>
+                            <td><?= htmlspecialchars($game['game_type'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td><?= $game['live_dealer_supported'] ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
+                            <td><?= $game['virtual_reality_supported'] ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                  <div class="review-panel">
+                    <div class="accordion review-accordion" id="reviewsAccordion">
+                      <?php foreach ($reviewSections as $index => $section): ?>
+                        <?php $collapseId = 'section-' . $index; ?>
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="heading-<?= $collapseId ?>">
+                            <button class="accordion-button <?= $index === 0 ? '' : 'collapsed' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?= $collapseId ?>" aria-expanded="<?= $index === 0 ? 'true' : 'false' ?>" aria-controls="collapse-<?= $collapseId ?>">
+                              <i class="fa fa-info-circle text-warning"></i>
+                              <span><?= htmlspecialchars($section['title'], ENT_QUOTES, 'UTF-8') ?></span>
+                            </button>
+                          </h2>
+                          <div id="collapse-<?= $collapseId ?>" class="accordion-collapse collapse <?= $index === 0 ? 'show' : '' ?>" aria-labelledby="heading-<?= $collapseId ?>" data-bs-parent="#reviewsAccordion">
+                            <div class="accordion-body">
+                              <?php if (!empty($section['summary'])): ?>
+                                <p class="mb-3"><?= htmlspecialchars($section['summary'], ENT_QUOTES, 'UTF-8') ?></p>
+                              <?php endif; ?>
+                              <?php if (!empty($section['points'])): ?>
+                                <div class="row g-3 align-items-start">
+                                  <?php foreach ($section['points'] as $point): ?>
+                                    <div class="col-md-6">
+                                      <div class="d-flex align-items-start">
+                                        <?php if (!empty($point['icon'])): ?>
+                                          <i class="fa <?= htmlspecialchars($point['icon'], ENT_QUOTES, 'UTF-8') ?> me-3 mt-1"></i>
+                                        <?php endif; ?>
+                                        <p class="mb-0"><?= htmlspecialchars($point['content'], ENT_QUOTES, 'UTF-8') ?></p>
+                                      </div>
+                                    </div>
+                                  <?php endforeach; ?>
+                                </div>
+                              <?php endif; ?>
+                            </div>
+                          </div>
+                        </div>
+                      <?php endforeach; ?>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingProsCons">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProsCons" aria-expanded="false" aria-controls="collapseProsCons">
+                            <i class="fa fa-balance-scale text-muted"></i>
+                            <span>Pros &amp; Cons</span>
+                          </button>
+                        </h2>
+                        <div id="collapseProsCons" class="accordion-collapse collapse" aria-labelledby="headingProsCons" data-bs-parent="#reviewsAccordion">
+                          <div class="accordion-body">
+                            <div class="row g-4">
+                              <div class="col-md-6">
+                                <h6 class="pros-cons-heading text-success"><i class="fa fa-thumbs-up"></i><span>Pros</span></h6>
+                                <ul class="list-with-icons pros mb-0">
+                                  <?php foreach ($prosCons['pros'] as $pro): ?>
+                                    <li><i class="fa fa-check text-success"></i><span><?= htmlspecialchars($pro, ENT_QUOTES, 'UTF-8') ?></span></li>
+                                  <?php endforeach; ?>
+                                </ul>
+                              </div>
+                              <div class="col-md-6">
+                                <h6 class="pros-cons-heading text-danger"><i class="fa fa-thumbs-down"></i><span>Cons</span></h6>
+                                <ul class="list-with-icons cons mb-0">
+                                  <?php foreach ($prosCons['cons'] as $con): ?>
+                                    <li><i class="fa fa-times text-danger"></i><span><?= htmlspecialchars($con, ENT_QUOTES, 'UTF-8') ?></span></li>
+                                  <?php endforeach; ?>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section categories related-games">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="section-heading">
+            <h6>Action</h6>
+            <h2>Related Casinos</h2>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="main-button">
+            <a href="all-casinos.php">View All</a>
+          </div>
+        </div>
+        <?php foreach ($relatedCasinos as $card): ?>
+          <div class="col-lg col-sm-6 col-xs-12">
+            <div class="item" data-casino-id="<?= htmlspecialchars($card['slug'], ENT_QUOTES, 'UTF-8') ?>">
+              <h4><?= htmlspecialchars($card['name'], ENT_QUOTES, 'UTF-8') ?></h4>
+              <div class="thumb">
+                <a href="product-details.php?casino=<?= urlencode($card['slug']) ?>"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+
+  <div class="platform-subscribe" id="subscribe-now">
+    <div class="container">
+      <div class="row align-items-center gy-4">
+        <div class="col-lg-7">
+          <h4>Subscribe now for platform changelogs</h4>
+          <p>We pair sign-in activity with our recommendations engine to keep picks current—opt in to get the latest review drops.</p>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge-soft"><i class="fa fa-database" aria-hidden="true"></i>Trusted data updates</span>
+            <span class="badge-soft"><i class="fa fa-star" aria-hidden="true"></i>Personalized picks</span>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <form class="subscribe-form" data-subscribe-form>
+            <div class="input-group">
+              <input type="email" class="form-control" placeholder="Enter your email" aria-label="Email address" required>
+              <button class="btn btn-accent" type="submit">Subscribe Now</button>
+            </div>
+          </form>
+          <p class="small text-muted mt-2 mb-0" data-subscribe-status aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<?php include __DIR__ . '/partials/footer.php'; ?>
