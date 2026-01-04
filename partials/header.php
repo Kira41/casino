@@ -8,9 +8,6 @@ $navItems = [
     ['label' => 'All Casinos', 'href' => 'all-casinos.php', 'key' => 'all'],
     ['label' => 'Product Details', 'href' => 'product-details.php', 'key' => 'product'],
     ['label' => 'Contact Us', 'href' => 'contact.php', 'key' => 'contact'],
-    ['label' => 'Top Bonus Guides', 'href' => 'top-bonus-guides.php', 'key' => 'bonus'],
-    ['label' => 'Fast Payout Casinos', 'href' => 'fast-payout-casinos.php', 'key' => 'payouts'],
-    ['label' => 'Game Library Highlights', 'href' => 'game-library-highlights.php', 'key' => 'library'],
     ['label' => 'VIP & Loyalty Insights', 'href' => 'vip-loyalty-insights.php', 'key' => 'vip'],
 ];
 ?>
