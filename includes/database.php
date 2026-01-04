@@ -131,7 +131,17 @@ function tableExists(PDO $database, string $table): bool
         return (bool) $statement->fetchColumn();
     }
 
-    $statement = $database->prepare('SHOW TABLES LIKE :table');
+    if ($driver === 'mysql') {
+        $tableLike = $database->quote($table);
+        if ($tableLike === false) {
+            return false;
+        }
+
+        $statement = $database->query("SHOW TABLES LIKE {$tableLike}");
+        return (bool) $statement->fetchColumn();
+    }
+
+    $statement = $database->prepare('SELECT 1 FROM information_schema.tables WHERE table_name = :table LIMIT 1');
     $statement->execute([':table' => $table]);
     return (bool) $statement->fetchColumn();
 }
