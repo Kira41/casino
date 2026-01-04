@@ -37,7 +37,22 @@ function fetchCategoryCards(PDO $database, string $section): array
     );
     $statement->execute([':section' => $section]);
 
-    return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $categories = $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $uniqueCategories = [];
+    $seenTitles = [];
+
+    foreach ($categories as $category) {
+        $titleKey = strtolower(trim((string) ($category['title'] ?? '')));
+
+        if (isset($seenTitles[$titleKey])) {
+            continue;
+        }
+
+        $seenTitles[$titleKey] = true;
+        $uniqueCategories[] = $category;
+    }
+
+    return $uniqueCategories;
 }
 
 function fetchCasinos(PDO $database): array
