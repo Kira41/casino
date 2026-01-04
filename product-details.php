@@ -57,6 +57,7 @@ if ($categorySlug !== '') {
         return $card;
     }, $relatedCasinos);
 }
+$relatedCasinos = array_slice($relatedCasinos, 0, 20);
 $headlineBonus = $casino['headline_bonus'] ?? '';
 $additionalScripts = ['assets/js/casino-detail.js'];
 
