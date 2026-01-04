@@ -9,8 +9,13 @@
   });
 
   const topPicksHeading = document.querySelector('[data-top-picks-heading]');
+  const topPicksSubtitle = document.querySelector('[data-top-picks-subtitle]');
+  let defaultTopPicksHeading = topPicksHeading?.textContent || '';
+  const defaultTopPicksSubtitle = topPicksSubtitle?.textContent || '';
+
   if (topPicksHeading) {
-    topPicksHeading.textContent = `Top Picks for ${monthName} ${year}`;
+    defaultTopPicksHeading = `Top Picks for ${monthName} ${year}`;
+    topPicksHeading.textContent = defaultTopPicksHeading;
   }
 
   const subscribeModalEl = document.getElementById('subscribeSuccessModal');
@@ -236,6 +241,24 @@
     },
   ];
 
+  function updateTopPicksHeading(isSearching) {
+    if (isSearching) {
+      if (topPicksSubtitle) topPicksSubtitle.textContent = 'search result';
+      if (topPicksHeading) topPicksHeading.textContent = 'search result';
+      return;
+    }
+
+    if (topPicksSubtitle) {
+      topPicksSubtitle.textContent =
+        defaultTopPicksSubtitle || 'Hot Picks';
+    }
+
+    if (topPicksHeading) {
+      topPicksHeading.textContent =
+        defaultTopPicksHeading || `Top Picks for ${monthName} ${year}`;
+    }
+  }
+
   function filterTopPickCards(term) {
     const query = term.trim().toLowerCase();
 
@@ -287,7 +310,7 @@
       empty.textContent =
         query === ''
           ? 'Start typing to find a casino.'
-          : `No casinos found matching "${term}".`;
+          : `No casinos found in our database matching "${term}".`;
       searchResultsContainer.appendChild(empty);
       return;
     }
@@ -299,8 +322,10 @@
   }
 
   function handleSearch(term) {
-    filterTopPickCards(term);
-    renderSearchResults(term);
+    const trimmedTerm = term.trim();
+    updateTopPicksHeading(trimmedTerm !== '');
+    filterTopPickCards(trimmedTerm);
+    renderSearchResults(trimmedTerm);
   }
 
   if (searchForm && searchInput) {
