@@ -59,7 +59,7 @@ include __DIR__ . '/partials/header.php';
           <a href="#!" data-filter=".rac">Racing</a>
         </li>
       </ul>
-      <div class="row trending-box">
+      <div class="row trending-box" data-pagination-scope="all-casinos" data-items-per-page="12">
         <?php if (empty($casinos)): ?>
           <div class="col-12">
             <div class="alert alert-warning mb-0" role="alert">
@@ -83,7 +83,7 @@ include __DIR__ . '/partials/header.php';
             $classString = implode(' ', array_unique($categoryClasses));
             $minDepositLabel = formatMinDeposit(is_numeric($casino['min_deposit_usd']) ? (int) $casino['min_deposit_usd'] : null);
           ?>
-          <div class="col-lg-3 col-md-6 align-self-center mb-30 <?= htmlspecialchars($classString, ENT_QUOTES, 'UTF-8') ?>" data-casino-id="<?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?>">
+          <div class="col-lg-3 col-md-6 align-self-center mb-30 <?= htmlspecialchars($classString, ENT_QUOTES, 'UTF-8') ?>" data-casino-id="<?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?>" data-pagination-item>
             <div class="item">
               <div class="thumb">
                 <a href="product-details.php?casino=<?= urlencode($casino['slug']) ?>"><img src="<?= htmlspecialchars($casino['thumbnail_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
@@ -102,13 +102,7 @@ include __DIR__ . '/partials/header.php';
       </div>
       <div class="row">
         <div class="col-lg-12">
-          <ul class="pagination">
-          <li><a href="#"> &lt; </a></li>
-            <li><a href="#">1</a></li>
-            <li><a class="is_active" href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#"> &gt; </a></li>
-          </ul>
+          <ul class="pagination" data-pagination-controls-for="all-casinos" aria-label="Casino list pagination"></ul>
         </div>
       </div>
     </div>

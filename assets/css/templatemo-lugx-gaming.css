@@ -1404,6 +1404,18 @@ All Casinos Page Style
   color: #fff;
 }
 
+.trending ul.pagination li a[aria-disabled="true"],
+.most-played ul.pagination li a[aria-disabled="true"] {
+  background-color: #f4f4f4;
+  color: #a0a0a0;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pagination-hidden {
+  display: none !important;
+}
+
 
 /* 
 ---------------------------------------------
