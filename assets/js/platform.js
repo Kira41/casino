@@ -151,44 +151,168 @@
 
   const searchForm = document.querySelector('[data-casino-search-form]');
   const searchInput = document.querySelector('[data-casino-search]');
-  const searchStatus = document.querySelector('[data-search-status]');
+  const searchResultsContainer = document.querySelector('[data-search-results]');
   const casinoCards = document.querySelectorAll('.trending .item');
+  const casinoDirectory = [
+    {
+      name: 'Lucky Star Crypto Casino',
+      slug: 'lucky-star-crypto-casino',
+      thumbnail: 'assets/images/trending-01.jpg',
+    },
+    {
+      name: 'Nova Royale Casino',
+      slug: 'nova-royale-casino',
+      thumbnail: 'assets/images/trending-01.jpg',
+    },
+    {
+      name: 'Starlight Spins Resort',
+      slug: 'starlight-spins-resort',
+      thumbnail: 'assets/images/trending-02.jpg',
+    },
+    {
+      name: 'Emerald Mirage Club',
+      slug: 'emerald-mirage-club',
+      thumbnail: 'assets/images/trending-03.jpg',
+    },
+    {
+      name: 'Celestial Fortune Hall',
+      slug: 'celestial-fortune-hall',
+      thumbnail: 'assets/images/trending-04.jpg',
+    },
+    {
+      name: 'Aurora Vault Casino',
+      slug: 'aurora-vault-casino',
+      thumbnail: 'assets/images/top-game-01.jpg',
+    },
+    {
+      name: 'Quantum Spin Lounge',
+      slug: 'quantum-spin-lounge',
+      thumbnail: 'assets/images/top-game-02.jpg',
+    },
+    {
+      name: 'Imperial Halo Casino',
+      slug: 'imperial-halo-casino',
+      thumbnail: 'assets/images/top-game-03.jpg',
+    },
+    {
+      name: 'Obsidian Crown Club',
+      slug: 'obsidian-crown-club',
+      thumbnail: 'assets/images/top-game-04.jpg',
+    },
+    {
+      name: 'Mirage of Millions',
+      slug: 'mirage-of-millions',
+      thumbnail: 'assets/images/top-game-05.jpg',
+    },
+    {
+      name: 'Luminous Ledger Casino',
+      slug: 'luminous-ledger-casino',
+      thumbnail: 'assets/images/top-game-06.jpg',
+    },
+    {
+      name: 'Neon Mirage Casino',
+      slug: 'neon-mirage-casino',
+      thumbnail: 'assets/images/categories-01.jpg',
+    },
+    {
+      name: 'Azure Spire Casino',
+      slug: 'azure-spire-casino',
+      thumbnail: 'assets/images/categories-05.jpg',
+    },
+    {
+      name: 'Lucky Horizon Lounge',
+      slug: 'lucky-horizon-lounge',
+      thumbnail: 'assets/images/categories-03.jpg',
+    },
+    {
+      name: 'Starlit Crown Casino',
+      slug: 'starlit-crown-casino',
+      thumbnail: 'assets/images/categories-04.jpg',
+    },
+    {
+      name: 'Golden Drift Resort',
+      slug: 'golden-drift-resort',
+      thumbnail: 'assets/images/categories-05.jpg',
+    },
+  ];
 
-  function filterCards(term) {
+  function filterTopPickCards(term) {
     const query = term.trim().toLowerCase();
 
     casinoCards.forEach((card) => {
       const textContent = card.textContent.toLowerCase();
-      card.closest('[class*="col-"]').style.display =
+      const column = card.closest('[class*="col-"]');
+      if (!column) return;
+      column.style.display =
         query === '' || textContent.includes(query) ? '' : 'none';
     });
+  }
 
-    if (!searchStatus) return;
-    if (query === '') {
-      setStatusText(searchStatus, 'Showing all casinos.');
+  function buildResultCard(casino) {
+    const card = document.createElement('div');
+    card.className = 'search-result-card';
+
+    const thumb = document.createElement('div');
+    thumb.className = 'search-result-thumb';
+
+    const image = document.createElement('img');
+    image.src = casino.thumbnail;
+    image.alt = `${casino.name} logo`;
+    thumb.appendChild(image);
+
+    const name = document.createElement('span');
+    name.className = 'search-result-name';
+    name.textContent = casino.name;
+
+    card.append(thumb, name);
+    return card;
+  }
+
+  function renderSearchResults(term) {
+    if (!searchResultsContainer) return;
+
+    const query = term.trim().toLowerCase();
+    const matches =
+      query === ''
+        ? casinoDirectory
+        : casinoDirectory.filter((casino) =>
+            casino.name.toLowerCase().includes(query)
+          );
+
+    searchResultsContainer.innerHTML = '';
+
+    if (matches.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'search-results-empty';
+      empty.textContent =
+        query === ''
+          ? 'Start typing to find a casino.'
+          : `No casinos found matching "${term}".`;
+      searchResultsContainer.appendChild(empty);
       return;
     }
 
-    const visibleCount = Array.from(casinoCards).filter(
-      (card) => card.closest('[class*="col-"]').style.display !== 'none'
-    ).length;
+    const grid = document.createElement('div');
+    grid.className = 'search-results-grid';
+    matches.forEach((casino) => grid.appendChild(buildResultCard(casino)));
+    searchResultsContainer.appendChild(grid);
+  }
 
-    const statusMessage =
-      visibleCount > 0
-        ? `Showing ${visibleCount} result${visibleCount === 1 ? '' : 's'} for "${term}".`
-        : `No casinos found matching "${term}".`;
-
-    setStatusText(searchStatus, statusMessage, visibleCount > 0 ? 'success' : 'error');
+  function handleSearch(term) {
+    filterTopPickCards(term);
+    renderSearchResults(term);
   }
 
   if (searchForm && searchInput) {
     searchForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      filterCards(searchInput.value || '');
+      handleSearch(searchInput.value || '');
     });
 
     searchInput.addEventListener('input', () => {
-      filterCards(searchInput.value || '');
+      handleSearch(searchInput.value || '');
     });
+
+    handleSearch(searchInput.value || '');
   }
 })(); 
