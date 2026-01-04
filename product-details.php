@@ -7,8 +7,19 @@ require_once __DIR__ . '/includes/bootstrap.php';
 $database = getDatabase();
 $activePage = 'product';
 $casinoDirectory = fetchCasinoDirectory($database);
+$categorySlug = isset($_GET['category']) ? (string) $_GET['category'] : '';
 $slug = isset($_GET['casino']) ? (string) $_GET['casino'] : '';
-$casino = $slug !== '' ? fetchCasinoBySlug($database, $slug) : fetchFirstCasino($database);
+$categoryCasinos = $categorySlug !== '' ? fetchCasinosByCategory($database, $categorySlug) : [];
+$casino = null;
+
+if ($slug !== '') {
+    $casino = fetchCasinoBySlug($database, $slug);
+} elseif (!empty($categoryCasinos)) {
+    $firstCategoryCasino = $categoryCasinos[0]['slug'] ?? '';
+    $casino = $firstCategoryCasino !== '' ? fetchCasinoBySlug($database, (string) $firstCategoryCasino) : null;
+} else {
+    $casino = fetchFirstCasino($database);
+}
 
 if (!$casino) {
     http_response_code(404);
@@ -17,6 +28,16 @@ if (!$casino) {
 }
 
 $pageTitle = 'Lugx Gaming - Product Detail';
+$categoryLabel = '';
+if ($categorySlug !== '') {
+    foreach ($casino['categories'] ?? [] as $categoryName) {
+        if (slugifyTag((string) $categoryName) === slugifyTag($categorySlug)) {
+            $categoryLabel = $categoryName;
+            break;
+        }
+    }
+    $categoryLabel = $categoryLabel !== '' ? $categoryLabel : ucwords(str_replace('-', ' ', $categorySlug));
+}
 $genres = implode(', ', $casino['genres'] ?? []);
 $perks = implode(', ', $casino['perks'] ?? []);
 $minDeposit = formatMinDeposit(is_numeric($casino['min_deposit_usd'] ?? null) ? (int) $casino['min_deposit_usd'] : null);
@@ -25,7 +46,17 @@ $games = $casino['games'] ?? [];
 $prosCons = $casino['pros_cons'] ?? ['pros' => [], 'cons' => []];
 $highlights = $casino['highlights'] ?? [];
 $reviewSections = $casino['review_sections'] ?? [];
-$relatedCasinos = fetchCasinoCards($database, 'related');
+$relatedCasinos = $categorySlug !== ''
+    ? array_values(array_filter($categoryCasinos, static fn($card) => (string) ($card['slug'] ?? '') !== (string) $casino['slug']))
+    : fetchCasinoCards($database, 'related');
+if ($categorySlug !== '') {
+    $relatedCasinos = array_map(static function (array $card): array {
+        if (empty($card['image_path'])) {
+            $card['image_path'] = $card['thumbnail_image'] ?? '';
+        }
+        return $card;
+    }, $relatedCasinos);
+}
 $headlineBonus = $casino['headline_bonus'] ?? '';
 $additionalScripts = ['assets/js/casino-detail.js'];
 
@@ -203,8 +234,8 @@ include __DIR__ . '/partials/header.php';
       <div class="row">
         <div class="col-lg-6">
           <div class="section-heading">
-            <h6>Action</h6>
-            <h2>Related Casinos</h2>
+            <h6><?= htmlspecialchars($categoryLabel ?: 'Related', ENT_QUOTES, 'UTF-8') ?></h6>
+            <h2><?= $categorySlug !== '' ? 'Casinos in this Category' : 'Related Casinos' ?></h2>
           </div>
         </div>
         <div class="col-lg-6">
@@ -217,7 +248,7 @@ include __DIR__ . '/partials/header.php';
             <div class="item" data-casino-id="<?= htmlspecialchars($card['slug'], ENT_QUOTES, 'UTF-8') ?>">
               <h4><?= htmlspecialchars($card['name'], ENT_QUOTES, 'UTF-8') ?></h4>
               <div class="thumb">
-                <a href="product-details.php?casino=<?= urlencode($card['slug']) ?>"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
+                <a href="product-details.php?casino=<?= urlencode($card['slug']) ?><?= $categorySlug !== '' ? '&category=' . urlencode($categorySlug) : '' ?>"><img src="<?= htmlspecialchars($card['image_path'] ?? ($card['thumbnail_image'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
               </div>
             </div>
           </div>

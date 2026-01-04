@@ -80,6 +80,46 @@ function fetchCasinosWithCategories(PDO $database): array
     return $casinos;
 }
 
+function fetchCasinosByCategory(PDO $database, string $categorySlug): array
+{
+    $categorySlug = trim($categorySlug);
+
+    if ($categorySlug === '') {
+        return [];
+    }
+
+    $categorySlug = slugifyTag($categorySlug);
+    $casinos = fetchCasinosWithCategories($database);
+
+    return array_values(array_filter($casinos, static function (array $casino) use ($categorySlug) {
+        foreach ($casino['categories'] ?? [] as $categoryName) {
+            if (slugifyTag((string) $categoryName) === $categorySlug) {
+                return true;
+            }
+        }
+
+        return false;
+    }));
+}
+
+function casinoHasCategory(array $casino, string $categorySlug): bool
+{
+    $categorySlug = trim($categorySlug);
+
+    if ($categorySlug === '') {
+        return false;
+    }
+
+    $categorySlug = slugifyTag($categorySlug);
+    foreach ($casino['categories'] ?? [] as $categoryName) {
+        if (slugifyTag((string) $categoryName) === $categorySlug) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function fetchCasinoDirectory(PDO $database): array
 {
     $statement = $database->query(
