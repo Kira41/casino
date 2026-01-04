@@ -32,28 +32,160 @@
 		}
 	})
 
-	const elem = document.querySelector('.trending-box');
-	const filtersElem = document.querySelector('.trending-filter');
-	if (elem) {
-		const rdn_events_list = new Isotope(elem, {
-			itemSelector: '.trending-items',
-			layoutMode: 'masonry'
-		});
-		if (filtersElem) {
-			filtersElem.addEventListener('click', function(event) {
-				if (!matchesSelector(event.target, 'a')) {
-					return;
-				}
-				const filterValue = event.target.getAttribute('data-filter');
-				rdn_events_list.arrange({
-					filter: filterValue
+	function setupIsotopeFilters() {
+		document.querySelectorAll('.trending-box').forEach(function(elem) {
+			var filtersElem = elem.closest('.trending') ? elem.closest('.trending').querySelector('.trending-filter') : null;
+			var rdn_events_list = new Isotope(elem, {
+				itemSelector: '.trending-items',
+				layoutMode: 'masonry'
+			});
+			elem._isotopeInstance = rdn_events_list;
+
+			if (filtersElem) {
+				filtersElem.addEventListener('click', function(event) {
+					if (!matchesSelector(event.target, 'a')) {
+						return;
+					}
+					event.preventDefault();
+					var filterValue = event.target.getAttribute('data-filter');
+					rdn_events_list.arrange({
+						filter: filterValue
+					});
+					var activeItem = filtersElem.querySelector('.is_active');
+					if (activeItem) {
+						activeItem.classList.remove('is_active');
+					}
+					event.target.classList.add('is_active');
 				});
-				filtersElem.querySelector('.is_active').classList.remove('is_active');
-				event.target.classList.add('is_active');
+			}
+
+			rdn_events_list.on('arrangeComplete', function() {
+				document.dispatchEvent(new CustomEvent('pagination:refresh', {
+					detail: { container: elem }
+				}));
+			});
+		});
+	}
+
+	function PaginationController(container) {
+		this.container = container;
+		this.scope = container.getAttribute('data-pagination-scope') || '';
+		this.items = Array.prototype.slice.call(container.querySelectorAll('[data-pagination-item]'));
+		this.itemsPerPage = parseInt(container.getAttribute('data-items-per-page'), 10);
+		this.itemsPerPage = isNaN(this.itemsPerPage) ? 8 : this.itemsPerPage;
+		this.controls = document.querySelector('[data-pagination-controls-for="' + this.scope + '"]');
+		this.currentPage = 1;
+		this.isActive = !!this.controls;
+
+		if (!this.controls) {
+			return;
+		}
+
+		this.setPage(1);
+	}
+
+	PaginationController.prototype.getEligibleItems = function() {
+		return this.items.filter(function(item) {
+			return !item.classList.contains('isotope-hidden');
+		});
+	};
+
+	PaginationController.prototype.setPage = function(pageNumber) {
+		if (!this.controls) {
+			return;
+		}
+
+		var eligibleItems = this.getEligibleItems();
+		var totalPages = Math.max(1, Math.ceil(eligibleItems.length / this.itemsPerPage));
+		this.currentPage = Math.min(Math.max(pageNumber, 1), totalPages);
+		var startIndex = (this.currentPage - 1) * this.itemsPerPage;
+		var endIndex = startIndex + this.itemsPerPage;
+
+		this.items.forEach(function(item) {
+			item.classList.add('pagination-hidden');
+		});
+
+		eligibleItems.forEach(function(item, index) {
+			if (index >= startIndex && index < endIndex) {
+				item.classList.remove('pagination-hidden');
+			}
+		});
+
+		if (this.container._isotopeInstance && typeof this.container._isotopeInstance.layout === 'function') {
+			this.container._isotopeInstance.layout();
+		}
+
+		this.renderControls(totalPages);
+	};
+
+	PaginationController.prototype.renderControls = function(totalPages) {
+		if (!this.controls) {
+			return;
+		}
+
+		this.controls.innerHTML = '';
+
+		if (totalPages <= 1) {
+			this.controls.setAttribute('hidden', 'hidden');
+			return;
+		}
+
+		this.controls.removeAttribute('hidden');
+		this.controls.appendChild(this.createControlItem('previous', this.currentPage - 1, this.currentPage === 1, '<', 'Previous page'));
+
+		for (var page = 1; page <= totalPages; page++) {
+			this.controls.appendChild(this.createControlItem('page', page, page === this.currentPage, page, 'Page ' + page));
+		}
+
+		this.controls.appendChild(this.createControlItem('next', this.currentPage + 1, this.currentPage === totalPages, '>', 'Next page'));
+	};
+
+	PaginationController.prototype.createControlItem = function(type, targetPage, isDisabled, label, ariaLabel) {
+		var listItem = document.createElement('li');
+		var anchor = document.createElement('a');
+		anchor.href = '#';
+		anchor.setAttribute('role', 'button');
+		anchor.setAttribute('aria-label', ariaLabel);
+		anchor.textContent = label;
+
+		if (type === 'page' && targetPage === this.currentPage) {
+			anchor.classList.add('is_active');
+		}
+
+		if (isDisabled) {
+			anchor.setAttribute('aria-disabled', 'true');
+		} else {
+			var self = this;
+			anchor.addEventListener('click', function(event) {
 				event.preventDefault();
+				self.setPage(targetPage);
 			});
 		}
+
+		listItem.appendChild(anchor);
+		return listItem;
+	};
+
+	function setupPagination() {
+		document.querySelectorAll('[data-pagination-scope]').forEach(function(container) {
+			var controller = new PaginationController(container);
+			if (controller && controller.isActive) {
+				container._paginationController = controller;
+			}
+		});
+
+		document.addEventListener('pagination:refresh', function(event) {
+			var container = event.detail && event.detail.container ? event.detail.container : null;
+			if (container && container._paginationController) {
+				container._paginationController.setPage(container._paginationController.currentPage);
+			}
+		});
 	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		setupIsotopeFilters();
+		setupPagination();
+	});
 
 
 	// Menu Dropdown Toggle
