@@ -1,17 +1,20 @@
 -- Promotional asset SQL snapshot generated from assets/images/beaa29ad72e9660ca2721906af67d0aa.jpg
 -- The image is embedded as base64 to keep a portable SQL seed for local testing.
 
-BEGIN TRANSACTION;
+START TRANSACTION;
 
 CREATE TABLE IF NOT EXISTS promotions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    subtitle TEXT,
-    language TEXT,
-    offer_percentage INTEGER,
-    image_base64 TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  id INT NOT NULL AUTO_INCREMENT,
+  title TEXT NOT NULL,
+  subtitle TEXT NULL,
+  language VARCHAR(32) NULL,
+  offer_percentage INT NULL,
+  image_base64 LONGTEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
 );
+
+COMMIT;
 
 INSERT INTO promotions (title, subtitle, language, offer_percentage, image_base64)
 VALUES (
