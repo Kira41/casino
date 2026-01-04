@@ -16,16 +16,26 @@ function getDatabase(): PDO
     return $database;
 }
 
-function fetchCasinoCards(PDO $database, string $section): array
+function fetchCasinoCards(PDO $database, string $section, ?int $limit = null): array
 {
-    $statement = $database->prepare(
-        'SELECT cc.section, cc.title, cc.image_path, cc.min_deposit_label, cc.rating, cc.price_label, cc.position, c.slug, c.name, c.min_deposit_usd
+    $sql = 'SELECT cc.section, cc.title, cc.image_path, cc.min_deposit_label, cc.rating, cc.price_label, cc.position, c.slug, c.name, c.min_deposit_usd
         FROM casino_cards cc
         LEFT JOIN casinos c ON c.id = cc.casino_id
         WHERE cc.section = :section
-        ORDER BY cc.position ASC, cc.id ASC'
-    );
-    $statement->execute([':section' => $section]);
+        ORDER BY cc.position ASC, cc.id ASC';
+
+    if ($limit !== null && $limit > 0) {
+        $sql .= ' LIMIT :limit';
+    }
+
+    $statement = $database->prepare($sql);
+    $statement->bindValue(':section', $section);
+
+    if ($limit !== null && $limit > 0) {
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+    }
+
+    $statement->execute();
 
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
