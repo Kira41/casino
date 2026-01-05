@@ -10,12 +10,45 @@ $casinoDirectory = fetchCasinoDirectory($database);
 $categorySlug = isset($_GET['category']) ? trim((string) $_GET['category']) : '';
 $normalizedCategorySlug = slugifyTag($categorySlug);
 $allCasinos = fetchCasinosWithCategories($database);
-$filteredCasinos = $normalizedCategorySlug === ''
-    ? $allCasinos
-    : array_values(array_filter(
+$categoryLabel = '';
+$categoryStats = [];
+
+foreach ($allCasinos as $casino) {
+    foreach ($casino['categories'] ?? [] as $categoryName) {
+        $slug = slugifyTag((string) $categoryName);
+        if ($slug === '') {
+            continue;
+        }
+
+        if (!isset($categoryStats[$slug])) {
+            $categoryStats[$slug] = [
+                'name' => $categoryName,
+                'count' => 0,
+            ];
+        }
+
+        $categoryStats[$slug]['count'] += 1;
+    }
+}
+
+ksort($categoryStats);
+
+$hasCategoryFilter = $normalizedCategorySlug !== '' && isset($categoryStats[$normalizedCategorySlug]);
+
+if (!$hasCategoryFilter) {
+    $normalizedCategorySlug = '';
+}
+
+if ($hasCategoryFilter) {
+    $categoryLabel = $categoryStats[$normalizedCategorySlug]['name'];
+}
+
+$filteredCasinos = $hasCategoryFilter
+    ? array_values(array_filter(
         $allCasinos,
         static fn(array $casino): bool => casinoHasCategory($casino, $normalizedCategorySlug)
-    ));
+    ))
+    : $allCasinos;
 
 $casinosPerPage = 9;
 $totalCasinos = count($filteredCasinos);
@@ -45,32 +78,6 @@ $buildCategoryUrl = static function (?string $category) use ($paginationBase): s
 
     return $paginationBase . '?' . http_build_query(['category' => $category]);
 };
-$categoryLabel = $normalizedCategorySlug !== '' ? ucwords(str_replace('-', ' ', $normalizedCategorySlug)) : '';
-$categoryStats = [];
-
-foreach ($allCasinos as $casino) {
-    foreach ($casino['categories'] ?? [] as $categoryName) {
-        $slug = slugifyTag((string) $categoryName);
-        if ($slug === '') {
-            continue;
-        }
-
-        if (!isset($categoryStats[$slug])) {
-            $categoryStats[$slug] = [
-                'name' => $categoryName,
-                'count' => 0,
-            ];
-        }
-
-        $categoryStats[$slug]['count'] += 1;
-    }
-}
-
-ksort($categoryStats);
-
-if ($normalizedCategorySlug !== '' && isset($categoryStats[$normalizedCategorySlug])) {
-    $categoryLabel = $categoryStats[$normalizedCategorySlug]['name'];
-}
 $pageTitle = 'Lugx Gaming - All Casinos Page';
 
 include __DIR__ . '/partials/html-head.php';
