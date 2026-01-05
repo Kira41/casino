@@ -34,7 +34,7 @@ $buildPageUrl = static function (int $page) use ($paginationBase, $paginationQue
     return $paginationBase . '?' . http_build_query(array_merge($paginationQueryParams, ['page' => $page]));
 };
 $categoryLabel = $categorySlug !== '' ? ucwords(str_replace('-', ' ', $categorySlug)) : '';
-$allCategories = [];
+$categoryStats = [];
 
 foreach ($allCasinos as $casino) {
     foreach ($casino['categories'] ?? [] as $categoryName) {
@@ -43,11 +43,18 @@ foreach ($allCasinos as $casino) {
             continue;
         }
 
-        $allCategories[$slug] = $categoryName;
+        if (!isset($categoryStats[$slug])) {
+            $categoryStats[$slug] = [
+                'name' => $categoryName,
+                'count' => 0,
+            ];
+        }
+
+        $categoryStats[$slug]['count'] += 1;
     }
 }
 
-ksort($allCategories);
+ksort($categoryStats);
 if ($categorySlug !== '' && !empty($allCasinos)) {
     foreach ($allCasinos[0]['categories'] ?? [] as $categoryName) {
         if (slugifyTag((string) $categoryName) === slugifyTag($categorySlug)) {
@@ -92,8 +99,8 @@ include __DIR__ . '/partials/header.php';
         <div class="col-lg-4">
           <div class="casino-grid-meta d-flex flex-wrap gap-2 justify-content-lg-end">
             <span class="badge-soft"><i class="fa fa-database" aria-hidden="true"></i><?= $totalCasinos ?> casinos</span>
-            <?php if (!empty($allCategories)): ?>
-              <span class="badge-soft"><i class="fa fa-th-large" aria-hidden="true"></i><?= count($allCategories) ?> categories</span>
+            <?php if (!empty($categoryStats)): ?>
+              <span class="badge-soft"><i class="fa fa-th-large" aria-hidden="true"></i><?= count($categoryStats) ?> categories</span>
             <?php endif; ?>
           </div>
         </div>
@@ -102,12 +109,16 @@ include __DIR__ . '/partials/header.php';
         <span class="filter-label text-muted">Filter by category</span>
         <ul class="trending-filter flex-wrap" aria-label="Filter casinos by category">
           <li>
-            <a class="is_active" href="#!" data-filter="*">Show All</a>
+            <a class="<?= $categorySlug === '' ? 'is_active' : '' ?>" href="#!" data-filter="*">
+              <span class="filter-name">Show All</span>
+              <span class="filter-count"><?= $totalCasinos ?></span>
+            </a>
           </li>
-          <?php foreach ($allCategories as $categorySlugKey => $categoryName): ?>
+          <?php foreach ($categoryStats as $categorySlugKey => $categoryMeta): ?>
             <li>
-              <a href="#!" data-filter=".category-<?= htmlspecialchars($categorySlugKey, ENT_QUOTES, 'UTF-8') ?>">
-                <?= htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') ?>
+              <a class="<?= $categorySlug !== '' && $categorySlugKey === slugifyTag($categorySlug) ? 'is_active' : '' ?>" href="#!" data-filter=".category-<?= htmlspecialchars($categorySlugKey, ENT_QUOTES, 'UTF-8') ?>">
+                <span class="filter-name"><?= htmlspecialchars($categoryMeta['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="filter-count"><?= $categoryMeta['count'] ?></span>
               </a>
             </li>
           <?php endforeach; ?>

@@ -1266,7 +1266,9 @@ All Casinos Page Style
 }
 
 .trending ul.trending-filter li a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   text-align: center;
   font-size: 15px;
   text-transform: uppercase;
@@ -1315,6 +1317,16 @@ All Casinos Page Style
 .casino-filter-bar .trending-filter {
   margin-bottom: 0;
   text-align: left;
+}
+
+.casino-filter-bar .trending-filter .filter-count {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: inherit;
+  line-height: 1.1;
 }
 
 .casino-grid-meta .badge-soft {
