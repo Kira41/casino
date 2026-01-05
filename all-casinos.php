@@ -59,7 +59,7 @@ include __DIR__ . '/partials/header.php';
           <a href="#!" data-filter=".rac">Racing</a>
         </li>
       </ul>
-      <div class="row trending-box" data-pagination-scope="all-casinos" data-items-per-page="4" data-layout-mode="fitRows">
+      <div class="trending-box row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4" data-pagination-scope="all-casinos" data-items-per-page="4" data-layout-mode="fitRows">
         <?php if (empty($casinos)): ?>
           <div class="col-12">
             <div class="alert alert-warning mb-0" role="alert">
@@ -83,8 +83,8 @@ include __DIR__ . '/partials/header.php';
             $classString = implode(' ', array_unique($categoryClasses));
             $minDepositLabel = formatMinDeposit(is_numeric($casino['min_deposit_usd']) ? (int) $casino['min_deposit_usd'] : null);
           ?>
-          <div class="col-lg-3 col-md-6 align-self-center mb-30 <?= htmlspecialchars($classString, ENT_QUOTES, 'UTF-8') ?>" data-casino-id="<?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?>" data-pagination-item>
-            <div class="item">
+          <div class="col <?= htmlspecialchars($classString, ENT_QUOTES, 'UTF-8') ?>" data-casino-id="<?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?>" data-pagination-item>
+            <div class="item h-100 d-flex flex-column">
               <div class="thumb">
                 <a href="product-details.php?casino=<?= urlencode($casino['slug']) ?>"><img src="<?= htmlspecialchars($casino['thumbnail_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
                 <?php if ($minDepositLabel): ?>

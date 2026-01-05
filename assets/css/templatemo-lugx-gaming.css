@@ -1299,6 +1299,19 @@ All Casinos Page Style
   margin-bottom: 30px;
 }
 
+.trending-box .item.h-100 {
+  height: 100%;
+}
+
+.trending-box .item .thumb img {
+  width: 100%;
+  display: block;
+}
+
+.trending-box .item .down-content {
+  margin-top: auto;
+}
+
 .trending-box .item .thumb {
   position: relative;
   border-radius: 25px;
