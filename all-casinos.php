@@ -59,7 +59,7 @@ include __DIR__ . '/partials/header.php';
           <a href="#!" data-filter=".rac">Racing</a>
         </li>
       </ul>
-      <div class="row trending-box" data-pagination-scope="all-casinos" data-items-per-page="12" data-layout-mode="fitRows">
+      <div class="row trending-box" data-pagination-scope="all-casinos" data-items-per-page="4" data-layout-mode="fitRows">
         <?php if (empty($casinos)): ?>
           <div class="col-12">
             <div class="alert alert-warning mb-0" role="alert">
