@@ -45,54 +45,56 @@ function initializeTables(PDO $database): void
 {
     ensureMetadataTable($database);
 
-    if (isSchemaInitialized($database)) {
-        return;
+    $schemaInitialized = isSchemaInitialized($database);
+
+    if (!$schemaInitialized) {
+        $schemaFilename = $database->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql'
+            ? 'database.mysql.sql'
+            : 'database.sql';
+
+        $schemaPath = __DIR__ . '/../storage/' . $schemaFilename;
+        $schemaSql = is_file($schemaPath) ? file_get_contents($schemaPath) : false;
+
+        if ($schemaSql !== false) {
+            $database->exec($schemaSql);
+        } else {
+            $database->exec(
+                'CREATE TABLE IF NOT EXISTS subscriptions (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    email VARCHAR(255) NOT NULL UNIQUE,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+            );
+
+            $database->exec(
+                'CREATE TABLE IF NOT EXISTS signins (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    email VARCHAR(255) NOT NULL UNIQUE,
+                    password_hash VARCHAR(255) NOT NULL,
+                    last_login_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+            );
+
+            $database->exec(
+                'CREATE TABLE IF NOT EXISTS contact_messages (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    surname VARCHAR(255) NOT NULL,
+                    email VARCHAR(255) NOT NULL,
+                    subject VARCHAR(255),
+                    message TEXT,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+            );
+        }
+
+        removeDuplicateSeedData($database);
+        markSchemaInitialized($database);
     }
 
-    $schemaFilename = $database->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql'
-        ? 'database.mysql.sql'
-        : 'database.sql';
-
-    $schemaPath = __DIR__ . '/../storage/' . $schemaFilename;
-    $schemaSql = is_file($schemaPath) ? file_get_contents($schemaPath) : false;
-
-    if ($schemaSql !== false) {
-        $database->exec($schemaSql);
-    } else {
-        $database->exec(
-            'CREATE TABLE IF NOT EXISTS subscriptions (
-                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                email VARCHAR(255) NOT NULL UNIQUE,
-                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
-        );
-
-        $database->exec(
-            'CREATE TABLE IF NOT EXISTS signins (
-                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                email VARCHAR(255) NOT NULL UNIQUE,
-                password_hash VARCHAR(255) NOT NULL,
-                last_login_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
-        );
-
-        $database->exec(
-            'CREATE TABLE IF NOT EXISTS contact_messages (
-                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                surname VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL,
-                subject VARCHAR(255),
-                message TEXT,
-                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
-        );
-    }
-
-    removeDuplicateSeedData($database);
-    markSchemaInitialized($database);
+    ensureCasinoCategorySeeds($database);
 }
 
 function ensureMetadataTable(PDO $database): void
@@ -190,4 +192,83 @@ function deleteDuplicateRows(PDO $database, string $table, array $uniqueColumns)
     );
 
     $database->exec($sql);
+}
+
+function ensureCasinoCategorySeeds(PDO $database): void
+{
+    static $categoriesSeeded = false;
+
+    if ($categoriesSeeded) {
+        return;
+    }
+
+    $categoriesSeeded = true;
+
+    if (!tableExists($database, 'casino_tags') || !tableExists($database, 'casino_tag_links') || !tableExists($database, 'casinos')) {
+        return;
+    }
+
+    $categoryNames = [
+        'Crypto Casinos',
+        'Fast Payouts',
+        'Low Deposit',
+        'High Roller',
+        'Live Dealer',
+        'Mobile Friendly',
+    ];
+
+    $driver = $database->getAttribute(PDO::ATTR_DRIVER_NAME);
+    $insertIgnore = $driver === 'mysql' ? 'INSERT IGNORE INTO' : 'INSERT OR IGNORE INTO';
+
+    $insertTagStatement = $database->prepare("{$insertIgnore} casino_tags (name, type) VALUES (:name, :type)");
+    foreach ($categoryNames as $categoryName) {
+        $insertTagStatement->execute([':name' => $categoryName, ':type' => 'category']);
+    }
+
+    $casinoCategoryMap = [
+        'lucky-star-crypto-casino' => ['Crypto Casinos', 'Live Dealer', 'Fast Payouts', 'Mobile Friendly'],
+        'nova-royale-casino' => ['Low Deposit', 'Fast Payouts', 'Mobile Friendly'],
+        'starlight-spins-resort' => ['Live Dealer', 'High Roller'],
+        'emerald-mirage-club' => ['High Roller', 'Fast Payouts'],
+        'celestial-fortune-hall' => ['High Roller', 'Live Dealer'],
+        'aurora-vault-casino' => ['Fast Payouts', 'Mobile Friendly'],
+        'quantum-spin-lounge' => ['Mobile Friendly', 'Fast Payouts'],
+        'imperial-halo-casino' => ['High Roller', 'Live Dealer'],
+        'obsidian-crown-club' => ['Crypto Casinos', 'High Roller'],
+        'mirage-of-millions' => ['High Roller', 'Live Dealer'],
+        'luminous-ledger-casino' => ['Fast Payouts', 'Low Deposit'],
+        'neon-mirage-casino' => ['Crypto Casinos', 'Live Dealer'],
+        'azure-spire-casino' => ['Live Dealer', 'High Roller'],
+        'lucky-horizon-lounge' => ['Low Deposit', 'Mobile Friendly'],
+        'starlit-crown-casino' => ['High Roller', 'Fast Payouts'],
+        'golden-drift-resort' => ['Live Dealer', 'Low Deposit'],
+    ];
+
+    $fetchCasinoId = $database->prepare('SELECT id FROM casinos WHERE slug = :slug LIMIT 1');
+    $fetchTagId = $database->prepare('SELECT id FROM casino_tags WHERE name = :name AND type = :type LIMIT 1');
+    $insertTagLink = $database->prepare("{$insertIgnore} casino_tag_links (casino_id, tag_id, is_primary) VALUES (:casino_id, :tag_id, :is_primary)");
+
+    foreach ($casinoCategoryMap as $casinoSlug => $categories) {
+        $fetchCasinoId->execute([':slug' => $casinoSlug]);
+        $casinoId = $fetchCasinoId->fetchColumn();
+
+        if ($casinoId === false) {
+            continue;
+        }
+
+        foreach (array_values($categories) as $index => $categoryName) {
+            $fetchTagId->execute([':name' => $categoryName, ':type' => 'category']);
+            $tagId = $fetchTagId->fetchColumn();
+
+            if ($tagId === false) {
+                continue;
+            }
+
+            $insertTagLink->execute([
+                ':casino_id' => $casinoId,
+                ':tag_id' => $tagId,
+                ':is_primary' => $index === 0 ? 1 : 0,
+            ]);
+        }
+    }
 }

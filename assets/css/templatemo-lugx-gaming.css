@@ -1320,6 +1320,10 @@ All Casinos Page Style
   letter-spacing: 0.2px;
 }
 
+.casino-filter-bar .filter-summary {
+  font-weight: 600;
+}
+
 .casino-filter-bar .trending-filter {
   margin-bottom: 0;
   text-align: left;
