@@ -2128,6 +2128,38 @@ body {
   font-weight: 600;
 }
 
+/*
+---------------------------------------------
+Pagination
+---------------------------------------------
+*/
+.pagination {
+  gap: 8px;
+}
+
+.pagination .page-link {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
+  font-weight: 600;
+  padding: 10px 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+.pagination .page-link:hover,
+.pagination .page-link:focus {
+  color: #ee626b;
+  border-color: #ee626b;
+  box-shadow: 0 10px 20px rgba(238, 98, 107, 0.15);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #ee626b;
+  border-color: #ee626b;
+  color: #fff;
+  box-shadow: 0 14px 24px rgba(238, 98, 107, 0.35);
+}
+
 @media (max-width: 991px) {
   .platform-card {
     height: auto;
