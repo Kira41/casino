@@ -11,10 +11,32 @@ $categorySlug = isset($_GET['category']) ? trim((string) $_GET['category']) : ''
 $casinos = $categorySlug === ''
     ? fetchCasinosWithCategories($database)
     : fetchCasinosByCategory($database, $categorySlug);
+$allCasinos = $casinos;
+
+$casinosPerPage = 9;
+$totalCasinos = count($allCasinos);
+$totalPages = (int) max(1, ceil($totalCasinos / $casinosPerPage));
+$currentPage = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+
+if ($currentPage > $totalPages) {
+    $currentPage = $totalPages;
+}
+
+$offset = ($currentPage - 1) * $casinosPerPage;
+$casinos = array_slice($allCasinos, $offset, $casinosPerPage);
+
+$paginationQueryParams = [];
+if ($categorySlug !== '') {
+    $paginationQueryParams['category'] = $categorySlug;
+}
+$paginationBase = 'all-casinos.php';
+$buildPageUrl = static function (int $page) use ($paginationBase, $paginationQueryParams): string {
+    return $paginationBase . '?' . http_build_query(array_merge($paginationQueryParams, ['page' => $page]));
+};
 $categoryLabel = $categorySlug !== '' ? ucwords(str_replace('-', ' ', $categorySlug)) : '';
 $allCategories = [];
 
-foreach ($casinos as $casino) {
+foreach ($allCasinos as $casino) {
     foreach ($casino['categories'] ?? [] as $categoryName) {
         $slug = slugifyTag((string) $categoryName);
         if ($slug === '') {
@@ -26,8 +48,8 @@ foreach ($casinos as $casino) {
 }
 
 ksort($allCategories);
-if ($categorySlug !== '' && !empty($casinos)) {
-    foreach ($casinos[0]['categories'] ?? [] as $categoryName) {
+if ($categorySlug !== '' && !empty($allCasinos)) {
+    foreach ($allCasinos[0]['categories'] ?? [] as $categoryName) {
         if (slugifyTag((string) $categoryName) === slugifyTag($categorySlug)) {
             $categoryLabel = $categoryName;
             break;
@@ -69,7 +91,7 @@ include __DIR__ . '/partials/header.php';
         </div>
         <div class="col-lg-4">
           <div class="casino-grid-meta d-flex flex-wrap gap-2 justify-content-lg-end">
-            <span class="badge-soft"><i class="fa fa-database" aria-hidden="true"></i><?= count($casinos) ?> casinos</span>
+            <span class="badge-soft"><i class="fa fa-database" aria-hidden="true"></i><?= $totalCasinos ?> casinos</span>
             <?php if (!empty($allCategories)): ?>
               <span class="badge-soft"><i class="fa fa-th-large" aria-hidden="true"></i><?= count($allCategories) ?> categories</span>
             <?php endif; ?>
@@ -92,7 +114,7 @@ include __DIR__ . '/partials/header.php';
         </ul>
       </div>
       <div class="trending-box row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" data-layout-mode="fitRows">
-        <?php if (empty($casinos)): ?>
+        <?php if ($totalCasinos === 0): ?>
           <div class="col-12">
             <div class="alert alert-warning mb-0" role="alert">
               No casinos found for this category. <a href="all-casinos.php" class="alert-link">View all casinos</a>.
@@ -150,6 +172,29 @@ include __DIR__ . '/partials/header.php';
           </div>
         <?php endforeach; ?>
       </div>
+      <?php if ($totalPages > 1): ?>
+        <nav aria-label="Casino pagination">
+          <ul class="pagination justify-content-center mt-4">
+            <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+              <a class="page-link" href="<?= htmlspecialchars($buildPageUrl(max(1, $currentPage - 1)), ENT_QUOTES, 'UTF-8') ?>" aria-label="Previous page">
+                Previous
+              </a>
+            </li>
+            <?php for ($page = 1; $page <= $totalPages; $page += 1): ?>
+              <li class="page-item <?= $page === $currentPage ? 'active' : '' ?>">
+                <a class="page-link" href="<?= htmlspecialchars($buildPageUrl($page), ENT_QUOTES, 'UTF-8') ?>">
+                  <?= $page ?>
+                </a>
+              </li>
+            <?php endfor; ?>
+            <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+              <a class="page-link" href="<?= htmlspecialchars($buildPageUrl(min($totalPages, $currentPage + 1)), ENT_QUOTES, 'UTF-8') ?>" aria-label="Next page">
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
+      <?php endif; ?>
     </div>
   </div>
 
