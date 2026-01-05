@@ -1291,6 +1291,128 @@ All Casinos Page Style
   color: #ee626b;
 }
 
+.casino-grid-header {
+  margin-bottom: 25px;
+}
+
+.casino-filter-bar {
+  background: #f8f9fb;
+  border: 1px solid #e3e6ed;
+  border-radius: 18px;
+  padding: 15px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.casino-filter-bar .filter-label {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.casino-filter-bar .trending-filter {
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.casino-grid-meta .badge-soft {
+  background: #eef4ff;
+  border: 1px solid #dbe6ff;
+  color: #0b3d91;
+}
+
+.casino-card {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #eef0f6;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.casino-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.casino-card__thumb {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(120deg, #f7faff 0%, #fef6f8 100%);
+}
+
+.casino-card__image {
+  display: block;
+}
+
+.casino-card__image img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.casino-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #0071f8;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(0, 113, 248, 0.25);
+}
+
+.casino-card__body {
+  padding: 16px 16px 18px;
+}
+
+.casino-card__title {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.casino-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.casino-card__rating i {
+  color: #f5a623;
+  margin-right: 2px;
+}
+
+.casino-card__pill {
+  display: inline-block;
+  background: #eef4ff;
+  color: #0b3d91;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.casino-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.casino-card__tag {
+  background: #f6f7fb;
+  border: 1px solid #e7eaf0;
+  color: #374151;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .trending-box .item  {
   background-color: #eeeeee;
   position: relative;
@@ -1423,6 +1545,10 @@ All Casinos Page Style
   color: #a0a0a0;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.pagination-summary {
+  font-weight: 600;
 }
 
 .pagination-hidden {

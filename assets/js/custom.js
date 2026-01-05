@@ -86,6 +86,7 @@ function setupIsotopeFilters() {
 		this.itemsPerPage = parseInt(container.getAttribute('data-items-per-page'), 10);
 		this.itemsPerPage = isNaN(this.itemsPerPage) ? 8 : this.itemsPerPage;
 		this.controls = document.querySelector('[data-pagination-controls-for="' + this.scope + '"]');
+		this.summary = document.querySelector('[data-pagination-summary-for="' + this.scope + '"]');
 		this.currentPage = 1;
 		this.isActive = !!this.controls;
 
@@ -157,6 +158,7 @@ function setupIsotopeFilters() {
 		}
 
 		this.renderControls(totalPages);
+		this.renderSummary(eligibleItems.length, startIndex, endIndex);
 	};
 
 	PaginationController.prototype.renderControls = function(totalPages) {
@@ -205,6 +207,21 @@ function setupIsotopeFilters() {
 
 		listItem.appendChild(anchor);
 		return listItem;
+	};
+
+	PaginationController.prototype.renderSummary = function(totalItems, startIndex, endIndex) {
+		if (!this.summary) {
+			return;
+		}
+
+		if (totalItems === 0) {
+			this.summary.textContent = 'Showing 0 casinos';
+			return;
+		}
+
+		var safeStart = Math.min(startIndex + 1, totalItems);
+		var safeEnd = Math.min(endIndex, totalItems);
+		this.summary.textContent = 'Showing ' + safeStart + '–' + safeEnd + ' of ' + totalItems + ' casinos';
 	};
 
 	function setupPagination() {
