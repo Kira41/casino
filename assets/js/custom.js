@@ -32,45 +32,52 @@
 		}
 	})
 
-	function setupIsotopeFilters() {
-		document.querySelectorAll('.trending-box').forEach(function(elem) {
-			var filtersElem = elem.closest('.trending') ? elem.closest('.trending').querySelector('.trending-filter') : null;
-			var rdn_events_list = new Isotope(elem, {
-				itemSelector: '.trending-items',
-				layoutMode: 'masonry'
-			});
-			rdn_events_list._activeFilter = '*';
-			elem._isotopeInstance = rdn_events_list;
+function setupIsotopeFilters() {
+	document.querySelectorAll('.trending-box').forEach(function(elem) {
+		var layoutMode = elem.getAttribute('data-layout-mode') || 'masonry';
+		var isotopeOptions = {
+			itemSelector: '.trending-items',
+			layoutMode: layoutMode
+		};
 
-			if (filtersElem) {
-				filtersElem.addEventListener('click', function(event) {
-					if (!matchesSelector(event.target, 'a')) {
-						return;
-					}
-					event.preventDefault();
-					var filterValue = event.target.getAttribute('data-filter');
-					rdn_events_list._activeFilter = filterValue || '*';
-					rdn_events_list.arrange({
-						filter: filterValue
-					});
-					var activeItem = filtersElem.querySelector('.is_active');
-					if (activeItem) {
-						activeItem.classList.remove('is_active');
-					}
-					event.target.classList.add('is_active');
-				});
-			}
+		if (layoutMode === 'fitRows') {
+			isotopeOptions.percentPosition = true;
+		}
 
-			rdn_events_list.on('arrangeComplete', function() {
-				if (this._paginationUpdateInProgress) {
+		var filtersElem = elem.closest('.trending') ? elem.closest('.trending').querySelector('.trending-filter') : null;
+		var rdn_events_list = new Isotope(elem, isotopeOptions);
+		rdn_events_list._activeFilter = '*';
+		elem._isotopeInstance = rdn_events_list;
+
+		if (filtersElem) {
+			filtersElem.addEventListener('click', function(event) {
+				if (!matchesSelector(event.target, 'a')) {
 					return;
 				}
-				document.dispatchEvent(new CustomEvent('pagination:refresh', {
-					detail: { container: elem }
-				}));
+				event.preventDefault();
+				var filterValue = event.target.getAttribute('data-filter');
+				rdn_events_list._activeFilter = filterValue || '*';
+				rdn_events_list.arrange({
+					filter: filterValue
+				});
+				var activeItem = filtersElem.querySelector('.is_active');
+				if (activeItem) {
+					activeItem.classList.remove('is_active');
+				}
+				event.target.classList.add('is_active');
 			});
+		}
+
+		rdn_events_list.on('arrangeComplete', function() {
+			if (this._paginationUpdateInProgress) {
+				return;
+			}
+			document.dispatchEvent(new CustomEvent('pagination:refresh', {
+				detail: { container: elem }
+			}));
 		});
-	}
+	});
+}
 
 	function PaginationController(container) {
 		this.container = container;
