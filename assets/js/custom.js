@@ -39,6 +39,7 @@
 				itemSelector: '.trending-items',
 				layoutMode: 'masonry'
 			});
+			rdn_events_list._activeFilter = '*';
 			elem._isotopeInstance = rdn_events_list;
 
 			if (filtersElem) {
@@ -48,6 +49,7 @@
 					}
 					event.preventDefault();
 					var filterValue = event.target.getAttribute('data-filter');
+					rdn_events_list._activeFilter = filterValue || '*';
 					rdn_events_list.arrange({
 						filter: filterValue
 					});
@@ -60,6 +62,9 @@
 			}
 
 			rdn_events_list.on('arrangeComplete', function() {
+				if (this._paginationUpdateInProgress) {
+					return;
+				}
 				document.dispatchEvent(new CustomEvent('pagination:refresh', {
 					detail: { container: elem }
 				}));
@@ -84,9 +89,27 @@
 		this.setPage(1);
 	}
 
+	PaginationController.prototype.getActiveFilter = function() {
+		if (this.container._isotopeInstance && this.container._isotopeInstance._activeFilter) {
+			return this.container._isotopeInstance._activeFilter;
+		}
+
+		return '*';
+	};
+
+	PaginationController.prototype.matchesCurrentFilter = function(item) {
+		var filterValue = this.getActiveFilter();
+		if (!filterValue || filterValue === '*') {
+			return true;
+		}
+
+		return matchesSelector(item, filterValue);
+	};
+
 	PaginationController.prototype.getEligibleItems = function() {
+		var self = this;
 		return this.items.filter(function(item) {
-			return !item.classList.contains('isotope-hidden');
+			return self.matchesCurrentFilter(item);
 		});
 	};
 
@@ -111,7 +134,18 @@
 			}
 		});
 
-		if (this.container._isotopeInstance && typeof this.container._isotopeInstance.layout === 'function') {
+		if (this.container._isotopeInstance && typeof this.container._isotopeInstance.arrange === 'function') {
+			var instance = this.container._isotopeInstance;
+			instance._paginationUpdateInProgress = true;
+			instance.arrange({
+				filter: function(itemElem) {
+					var filterValue = instance._activeFilter || '*';
+					var matchesFilter = !filterValue || filterValue === '*' ? true : matchesSelector(itemElem, filterValue);
+					return matchesFilter && !itemElem.classList.contains('pagination-hidden');
+				}
+			});
+			instance._paginationUpdateInProgress = false;
+		} else if (this.container._isotopeInstance && typeof this.container._isotopeInstance.layout === 'function') {
 			this.container._isotopeInstance.layout();
 		}
 
