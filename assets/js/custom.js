@@ -47,6 +47,13 @@ function setupIsotopeFilters() {
 		var filtersElem = elem.closest('.trending') ? elem.closest('.trending').querySelector('.trending-filter') : null;
 		var rdn_events_list = new Isotope(elem, isotopeOptions);
 		var activeClassName = 'is_active';
+		var getFilterMode = function() {
+			if (!filtersElem) {
+				return 'isotope';
+			}
+
+			return filtersElem.getAttribute('data-filter-mode') || 'isotope';
+		};
 		var applyFilter = function(control) {
 			if (!control) {
 				return;
@@ -64,11 +71,21 @@ function setupIsotopeFilters() {
 
 			filtersElem.querySelectorAll('[data-filter]').forEach(function(filterNode) {
 				filterNode.classList.remove(activeClassName);
-				filterNode.setAttribute('aria-pressed', 'false');
+				if (filterNode.hasAttribute('aria-pressed')) {
+					filterNode.setAttribute('aria-pressed', 'false');
+				}
+				if (filterNode.hasAttribute('aria-current')) {
+					filterNode.setAttribute('aria-current', 'false');
+				}
 			});
 
 			control.classList.add(activeClassName);
-			control.setAttribute('aria-pressed', 'true');
+			if (control.hasAttribute('aria-pressed')) {
+				control.setAttribute('aria-pressed', 'true');
+			}
+			if (control.hasAttribute('aria-current')) {
+				control.setAttribute('aria-current', 'page');
+			}
 		};
 
 		elem._isotopeInstance = rdn_events_list;
@@ -82,6 +99,12 @@ function setupIsotopeFilters() {
 			filtersElem.addEventListener('click', function(event) {
 				var control = event.target.closest('[data-filter]');
 				if (!control || !filtersElem.contains(control)) {
+					return;
+				}
+
+				var filterMode = getFilterMode();
+				var filterUrl = control.getAttribute('data-filter-url') || control.getAttribute('href');
+				if (filterMode === 'server' && filterUrl) {
 					return;
 				}
 

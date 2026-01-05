@@ -8,13 +8,18 @@ $database = getDatabase();
 $activePage = 'all';
 $casinoDirectory = fetchCasinoDirectory($database);
 $categorySlug = isset($_GET['category']) ? trim((string) $_GET['category']) : '';
-$casinos = $categorySlug === ''
-    ? fetchCasinosWithCategories($database)
-    : fetchCasinosByCategory($database, $categorySlug);
-$allCasinos = $casinos;
+$normalizedCategorySlug = slugifyTag($categorySlug);
+$allCasinos = fetchCasinosWithCategories($database);
+$filteredCasinos = $normalizedCategorySlug === ''
+    ? $allCasinos
+    : array_values(array_filter(
+        $allCasinos,
+        static fn(array $casino): bool => casinoHasCategory($casino, $normalizedCategorySlug)
+    ));
 
 $casinosPerPage = 9;
-$totalCasinos = count($allCasinos);
+$totalCasinos = count($filteredCasinos);
+$totalTrackedCasinos = count($allCasinos);
 $totalPages = (int) max(1, ceil($totalCasinos / $casinosPerPage));
 $currentPage = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 
@@ -23,17 +28,24 @@ if ($currentPage > $totalPages) {
 }
 
 $offset = ($currentPage - 1) * $casinosPerPage;
-$casinos = array_slice($allCasinos, $offset, $casinosPerPage);
+$casinos = array_slice($filteredCasinos, $offset, $casinosPerPage);
 
 $paginationQueryParams = [];
-if ($categorySlug !== '') {
-    $paginationQueryParams['category'] = $categorySlug;
+if ($normalizedCategorySlug !== '') {
+    $paginationQueryParams['category'] = $normalizedCategorySlug;
 }
 $paginationBase = 'all-casinos.php';
 $buildPageUrl = static function (int $page) use ($paginationBase, $paginationQueryParams): string {
     return $paginationBase . '?' . http_build_query(array_merge($paginationQueryParams, ['page' => $page]));
 };
-$categoryLabel = $categorySlug !== '' ? ucwords(str_replace('-', ' ', $categorySlug)) : '';
+$buildCategoryUrl = static function (?string $category) use ($paginationBase): string {
+    if ($category === null || $category === '') {
+        return $paginationBase;
+    }
+
+    return $paginationBase . '?' . http_build_query(['category' => $category]);
+};
+$categoryLabel = $normalizedCategorySlug !== '' ? ucwords(str_replace('-', ' ', $normalizedCategorySlug)) : '';
 $categoryStats = [];
 
 foreach ($allCasinos as $casino) {
@@ -55,13 +67,9 @@ foreach ($allCasinos as $casino) {
 }
 
 ksort($categoryStats);
-if ($categorySlug !== '' && !empty($allCasinos)) {
-    foreach ($allCasinos[0]['categories'] ?? [] as $categoryName) {
-        if (slugifyTag((string) $categoryName) === slugifyTag($categorySlug)) {
-            $categoryLabel = $categoryName;
-            break;
-        }
-    }
+
+if ($normalizedCategorySlug !== '' && isset($categoryStats[$normalizedCategorySlug])) {
+    $categoryLabel = $categoryStats[$normalizedCategorySlug]['name'];
 }
 $pageTitle = 'Lugx Gaming - All Casinos Page';
 
@@ -98,7 +106,13 @@ include __DIR__ . '/partials/header.php';
         </div>
         <div class="col-lg-4">
           <div class="casino-grid-meta d-flex flex-wrap gap-2 justify-content-lg-end">
-            <span class="badge-soft"><i class="fa fa-database" aria-hidden="true"></i><?= $totalCasinos ?> casinos</span>
+            <span class="badge-soft">
+              <i class="fa fa-database" aria-hidden="true"></i>
+              <?= $totalCasinos ?> <?= $categoryLabel !== '' ? htmlspecialchars($categoryLabel, ENT_QUOTES, 'UTF-8') . ' ' : '' ?>casinos
+            </span>
+            <?php if ($totalTrackedCasinos !== $totalCasinos): ?>
+              <span class="badge-soft"><i class="fa fa-archive" aria-hidden="true"></i>Total: <?= $totalTrackedCasinos ?></span>
+            <?php endif; ?>
             <?php if (!empty($categoryStats)): ?>
               <span class="badge-soft"><i class="fa fa-th-large" aria-hidden="true"></i><?= count($categoryStats) ?> categories</span>
             <?php endif; ?>
@@ -106,30 +120,37 @@ include __DIR__ . '/partials/header.php';
         </div>
       </div>
       <div class="casino-filter-bar">
-        <span class="filter-label text-muted">Filter by category</span>
-        <ul class="trending-filter flex-wrap" aria-label="Filter casinos by category">
+        <div class="filter-label text-muted d-flex flex-column flex-sm-row align-items-sm-center gap-1 mb-0">
+          <span>Filter by category</span>
+          <span class="filter-summary text-secondary small">
+            Showing <?= $totalCasinos ?> of <?= $totalTrackedCasinos ?> casinos<?= $categoryLabel !== '' ? ' in ' . htmlspecialchars($categoryLabel, ENT_QUOTES, 'UTF-8') : '' ?>
+          </span>
+        </div>
+        <ul class="trending-filter flex-wrap" data-filter-mode="server" aria-label="Filter casinos by category">
           <li>
-            <button
-              type="button"
-              class="<?= $categorySlug === '' ? 'is_active' : '' ?>"
+            <a
+              class="<?= $normalizedCategorySlug === '' ? 'is_active' : '' ?>"
               data-filter="*"
-              aria-pressed="<?= $categorySlug === '' ? 'true' : 'false' ?>"
+              data-filter-url="<?= htmlspecialchars($buildCategoryUrl(null), ENT_QUOTES, 'UTF-8') ?>"
+              href="<?= htmlspecialchars($buildCategoryUrl(null), ENT_QUOTES, 'UTF-8') ?>"
+              aria-current="<?= $normalizedCategorySlug === '' ? 'page' : 'false' ?>"
             >
               <span class="filter-name">Show All</span>
-              <span class="filter-count"><?= $totalCasinos ?></span>
-            </button>
+              <span class="filter-count"><?= $totalTrackedCasinos ?></span>
+            </a>
           </li>
           <?php foreach ($categoryStats as $categorySlugKey => $categoryMeta): ?>
             <li>
-              <button
-                type="button"
-                class="<?= $categorySlug !== '' && $categorySlugKey === slugifyTag($categorySlug) ? 'is_active' : '' ?>"
+              <a
+                class="<?= $normalizedCategorySlug !== '' && $categorySlugKey === $normalizedCategorySlug ? 'is_active' : '' ?>"
                 data-filter=".category-<?= htmlspecialchars($categorySlugKey, ENT_QUOTES, 'UTF-8') ?>"
-                aria-pressed="<?= $categorySlug !== '' && $categorySlugKey === slugifyTag($categorySlug) ? 'true' : 'false' ?>"
+                data-filter-url="<?= htmlspecialchars($buildCategoryUrl($categorySlugKey), ENT_QUOTES, 'UTF-8') ?>"
+                href="<?= htmlspecialchars($buildCategoryUrl($categorySlugKey), ENT_QUOTES, 'UTF-8') ?>"
+                aria-current="<?= $normalizedCategorySlug !== '' && $categorySlugKey === $normalizedCategorySlug ? 'page' : 'false' ?>"
               >
                 <span class="filter-name"><?= htmlspecialchars($categoryMeta['name'], ENT_QUOTES, 'UTF-8') ?></span>
                 <span class="filter-count"><?= $categoryMeta['count'] ?></span>
-              </button>
+              </a>
             </li>
           <?php endforeach; ?>
         </ul>
@@ -145,15 +166,13 @@ include __DIR__ . '/partials/header.php';
         <?php foreach ($casinos as $casino): ?>
           <?php
             $categoryClasses = ['trending-items'];
-            $filterMap = [
-                'adventure' => 'category-adventure',
-                'action' => 'category-action',
-                'strategy' => 'category-strategy',
-                'racing' => 'category-racing',
-            ];
-            foreach ($casino['categories'] as $categoryName) {
-                $slug = slugifyTag($categoryName);
-                $categoryClasses[] = $filterMap[$slug] ?? 'category-' . $slug;
+            foreach ($casino['categories'] ?? [] as $categoryName) {
+                $slug = slugifyTag((string) $categoryName);
+                if ($slug === '') {
+                    continue;
+                }
+
+                $categoryClasses[] = 'category-' . $slug;
             }
             $classString = implode(' ', array_unique($categoryClasses));
             $minDepositLabel = formatMinDeposit(is_numeric($casino['min_deposit_usd']) ? (int) $casino['min_deposit_usd'] : null);
