@@ -12,6 +12,20 @@ $casinos = $categorySlug === ''
     ? fetchCasinosWithCategories($database)
     : fetchCasinosByCategory($database, $categorySlug);
 $categoryLabel = $categorySlug !== '' ? ucwords(str_replace('-', ' ', $categorySlug)) : '';
+$allCategories = [];
+
+foreach ($casinos as $casino) {
+    foreach ($casino['categories'] ?? [] as $categoryName) {
+        $slug = slugifyTag((string) $categoryName);
+        if ($slug === '') {
+            continue;
+        }
+
+        $allCategories[$slug] = $categoryName;
+    }
+}
+
+ksort($allCategories);
 if ($categorySlug !== '' && !empty($casinos)) {
     foreach ($casinos[0]['categories'] ?? [] as $categoryName) {
         if (slugifyTag((string) $categoryName) === slugifyTag($categorySlug)) {
@@ -45,21 +59,39 @@ include __DIR__ . '/partials/header.php';
 
   <div class="section trending">
     <div class="container">
-      <ul class="trending-filter">
-        <li>
-          <a class="is_active" href="#!" data-filter="*">Show All</a>
-        </li>
-        <li>
-          <a href="#!" data-filter=".adv">Adventure</a>
-        </li>
-        <li>
-          <a href="#!" data-filter=".str">Strategy</a>
-        </li>
-        <li>
-          <a href="#!" data-filter=".rac">Racing</a>
-        </li>
-      </ul>
-      <div class="trending-box row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4" data-pagination-scope="all-casinos" data-items-per-page="4" data-layout-mode="fitRows">
+      <div class="row align-items-center justify-content-between g-3 casino-grid-header">
+        <div class="col-lg-8">
+          <div class="section-heading mb-0">
+            <h6>Casino Library</h6>
+            <h2 class="mb-2">Explore every casino we track</h2>
+            <p class="lead text-muted mb-0">Filter by category and paginate through our verified listings.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="casino-grid-meta d-flex flex-wrap gap-2 justify-content-lg-end">
+            <span class="badge-soft"><i class="fa fa-database" aria-hidden="true"></i><?= count($casinos) ?> casinos</span>
+            <?php if (!empty($allCategories)): ?>
+              <span class="badge-soft"><i class="fa fa-th-large" aria-hidden="true"></i><?= count($allCategories) ?> categories</span>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+      <div class="casino-filter-bar">
+        <span class="filter-label text-muted">Filter by category</span>
+        <ul class="trending-filter flex-wrap" aria-label="Filter casinos by category">
+          <li>
+            <a class="is_active" href="#!" data-filter="*">Show All</a>
+          </li>
+          <?php foreach ($allCategories as $categorySlugKey => $categoryName): ?>
+            <li>
+              <a href="#!" data-filter=".category-<?= htmlspecialchars($categorySlugKey, ENT_QUOTES, 'UTF-8') ?>">
+                <?= htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+      <div class="trending-box row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" data-pagination-scope="all-casinos" data-items-per-page="6" data-layout-mode="fitRows">
         <?php if (empty($casinos)): ?>
           <div class="col-12">
             <div class="alert alert-warning mb-0" role="alert">
@@ -71,38 +103,59 @@ include __DIR__ . '/partials/header.php';
           <?php
             $categoryClasses = ['trending-items'];
             $filterMap = [
-                'adventure' => 'adv',
-                'action' => 'adv',
-                'strategy' => 'str',
-                'racing' => 'rac',
+                'adventure' => 'category-adventure',
+                'action' => 'category-action',
+                'strategy' => 'category-strategy',
+                'racing' => 'category-racing',
             ];
             foreach ($casino['categories'] as $categoryName) {
                 $slug = slugifyTag($categoryName);
-                $categoryClasses[] = $filterMap[$slug] ?? substr($slug, 0, 3);
+                $categoryClasses[] = $filterMap[$slug] ?? 'category-' . $slug;
             }
             $classString = implode(' ', array_unique($categoryClasses));
             $minDepositLabel = formatMinDeposit(is_numeric($casino['min_deposit_usd']) ? (int) $casino['min_deposit_usd'] : null);
           ?>
           <div class="col <?= htmlspecialchars($classString, ENT_QUOTES, 'UTF-8') ?>" data-casino-id="<?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?>" data-pagination-item>
-            <div class="item h-100 d-flex flex-column">
-              <div class="thumb">
-                <a href="product-details.php?casino=<?= urlencode($casino['slug']) ?>"><img src="<?= htmlspecialchars($casino['thumbnail_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
+            <div class="casino-card h-100 d-flex flex-column">
+              <div class="casino-card__thumb">
+                <a class="casino-card__image" href="product-details.php?casino=<?= urlencode($casino['slug']) ?>">
+                  <img src="<?= htmlspecialchars($casino['thumbnail_image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image>
+                </a>
                 <?php if ($minDepositLabel): ?>
-                  <span class="price" data-casino-card-offer><?= htmlspecialchars($minDepositLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                  <span class="casino-card__badge" data-casino-card-offer><?= htmlspecialchars($minDepositLabel, ENT_QUOTES, 'UTF-8') ?></span>
                 <?php endif; ?>
               </div>
-              <div class="down-content">
-                <span class="category" data-casino-rating aria-label="Rating"><?= renderRatingStars($casino['rating']) ?></span>
-                <h4 data-casino-card-name><?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?></h4>
-                <a href="product-details.php?casino=<?= urlencode($casino['slug']) ?>"><i class="fa fa-shopping-bag"></i></a>
+              <div class="casino-card__body d-flex flex-column flex-grow-1">
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                  <div>
+                    <h4 class="casino-card__title mb-1" data-casino-card-name><?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?></h4>
+                    <div class="casino-card__meta">
+                      <span class="casino-card__rating" data-casino-rating aria-label="Rating"><?= renderRatingStars($casino['rating']) ?></span>
+                      <?php if ($minDepositLabel): ?>
+                        <span class="casino-card__pill">Starts at <?= htmlspecialchars($minDepositLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                      <?php endif; ?>
+                    </div>
+                  </div>
+                  <a class="btn btn-accent btn-sm" href="product-details.php?casino=<?= urlencode($casino['slug']) ?>">Details</a>
+                </div>
+                <?php if (!empty($casino['categories'])): ?>
+                  <div class="casino-card__tags" aria-label="Casino categories">
+                    <?php foreach ($casino['categories'] as $categoryName): ?>
+                      <span class="casino-card__tag"><?= htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') ?></span>
+                    <?php endforeach; ?>
+                  </div>
+                <?php endif; ?>
               </div>
             </div>
           </div>
         <?php endforeach; ?>
       </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <ul class="pagination" data-pagination-controls-for="all-casinos" aria-label="Casino list pagination"></ul>
+      <div class="row align-items-center g-3 mt-2">
+        <div class="col-lg-6">
+          <p class="pagination-summary mb-0 text-muted" data-pagination-summary-for="all-casinos"></p>
+        </div>
+        <div class="col-lg-6">
+          <ul class="pagination justify-content-lg-end" data-pagination-controls-for="all-casinos" aria-label="Casino list pagination"></ul>
         </div>
       </div>
     </div>
