@@ -2160,6 +2160,66 @@ Pagination
   box-shadow: 0 14px 24px rgba(238, 98, 107, 0.35);
 }
 
+.pagination.pagination-bubbles {
+  gap: 12px;
+}
+
+.pagination-bubbles .page-item.pagination-number .page-link {
+  align-items: center;
+  background: linear-gradient(145deg, #ffffff, #f6f8fb);
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.08);
+  color: #1f2937;
+  display: inline-flex;
+  font-weight: 700;
+  height: 48px;
+  justify-content: center;
+  padding: 0;
+  width: 48px;
+}
+
+.pagination-bubbles .page-item.pagination-number .page-link:hover,
+.pagination-bubbles .page-item.pagination-number .page-link:focus {
+  border-color: #ee626b;
+  box-shadow: 0 16px 28px rgba(238, 98, 107, 0.25);
+  color: #ee626b;
+  transform: translateY(-2px);
+}
+
+.pagination-bubbles .page-item.pagination-number.active .page-link {
+  background: #ee626b;
+  border-color: #ee626b;
+  box-shadow: 0 18px 32px rgba(238, 98, 107, 0.35);
+  color: #fff;
+}
+
+.pagination-bubbles .page-item.prev .page-link,
+.pagination-bubbles .page-item.next .page-link {
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  background-color: #f7f8fb;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+.pagination-bubbles .page-item.prev .page-link:hover,
+.pagination-bubbles .page-item.prev .page-link:focus,
+.pagination-bubbles .page-item.next .page-link:hover,
+.pagination-bubbles .page-item.next .page-link:focus {
+  background-color: #fff;
+  border-color: #ee626b;
+  box-shadow: 0 12px 24px rgba(238, 98, 107, 0.15);
+  color: #ee626b;
+}
+
+.pagination-bubbles .page-item.disabled .page-link {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 @media (max-width: 991px) {
   .platform-card {
     height: auto;

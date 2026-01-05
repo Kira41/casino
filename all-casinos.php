@@ -174,20 +174,20 @@ include __DIR__ . '/partials/header.php';
       </div>
       <?php if ($totalPages > 1): ?>
         <nav aria-label="Casino pagination">
-          <ul class="pagination justify-content-center mt-4">
-            <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+          <ul class="pagination pagination-bubbles justify-content-center mt-4">
+            <li class="page-item prev <?= $currentPage <= 1 ? 'disabled' : '' ?>">
               <a class="page-link" href="<?= htmlspecialchars($buildPageUrl(max(1, $currentPage - 1)), ENT_QUOTES, 'UTF-8') ?>" aria-label="Previous page">
                 Previous
               </a>
             </li>
             <?php for ($page = 1; $page <= $totalPages; $page += 1): ?>
-              <li class="page-item <?= $page === $currentPage ? 'active' : '' ?>">
+              <li class="page-item pagination-number <?= $page === $currentPage ? 'active' : '' ?>">
                 <a class="page-link" href="<?= htmlspecialchars($buildPageUrl($page), ENT_QUOTES, 'UTF-8') ?>">
                   <?= $page ?>
                 </a>
               </li>
             <?php endfor; ?>
-            <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+            <li class="page-item next <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
               <a class="page-link" href="<?= htmlspecialchars($buildPageUrl(min($totalPages, $currentPage + 1)), ENT_QUOTES, 'UTF-8') ?>" aria-label="Next page">
                 Next
               </a>
