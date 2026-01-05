@@ -46,26 +46,50 @@ function setupIsotopeFilters() {
 
 		var filtersElem = elem.closest('.trending') ? elem.closest('.trending').querySelector('.trending-filter') : null;
 		var rdn_events_list = new Isotope(elem, isotopeOptions);
-		rdn_events_list._activeFilter = '*';
+		var activeClassName = 'is_active';
+		var applyFilter = function(control) {
+			if (!control) {
+				return;
+			}
+
+			var filterValue = control.getAttribute('data-filter') || '*';
+			rdn_events_list._activeFilter = filterValue;
+			rdn_events_list.arrange({
+				filter: filterValue
+			});
+
+			if (!filtersElem) {
+				return;
+			}
+
+			filtersElem.querySelectorAll('[data-filter]').forEach(function(filterNode) {
+				filterNode.classList.remove(activeClassName);
+				filterNode.setAttribute('aria-pressed', 'false');
+			});
+
+			control.classList.add(activeClassName);
+			control.setAttribute('aria-pressed', 'true');
+		};
+
 		elem._isotopeInstance = rdn_events_list;
 
 		if (filtersElem) {
+			var initialControl = filtersElem.querySelector('.' + activeClassName + '[data-filter]') || filtersElem.querySelector('[data-filter]');
+			if (initialControl) {
+				applyFilter(initialControl);
+			}
+
 			filtersElem.addEventListener('click', function(event) {
-				if (!matchesSelector(event.target, 'a')) {
+				var control = event.target.closest('[data-filter]');
+				if (!control || !filtersElem.contains(control)) {
 					return;
 				}
+
 				event.preventDefault();
-				var filterValue = event.target.getAttribute('data-filter');
-				rdn_events_list._activeFilter = filterValue || '*';
-				rdn_events_list.arrange({
-					filter: filterValue
-				});
-				var activeItem = filtersElem.querySelector('.is_active');
-				if (activeItem) {
-					activeItem.classList.remove('is_active');
-				}
-				event.target.classList.add('is_active');
+				applyFilter(control);
 			});
+		} else {
+			rdn_events_list._activeFilter = '*';
 		}
 	});
 }

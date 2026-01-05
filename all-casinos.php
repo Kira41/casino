@@ -109,17 +109,27 @@ include __DIR__ . '/partials/header.php';
         <span class="filter-label text-muted">Filter by category</span>
         <ul class="trending-filter flex-wrap" aria-label="Filter casinos by category">
           <li>
-            <a class="<?= $categorySlug === '' ? 'is_active' : '' ?>" href="#!" data-filter="*">
+            <button
+              type="button"
+              class="<?= $categorySlug === '' ? 'is_active' : '' ?>"
+              data-filter="*"
+              aria-pressed="<?= $categorySlug === '' ? 'true' : 'false' ?>"
+            >
               <span class="filter-name">Show All</span>
               <span class="filter-count"><?= $totalCasinos ?></span>
-            </a>
+            </button>
           </li>
           <?php foreach ($categoryStats as $categorySlugKey => $categoryMeta): ?>
             <li>
-              <a class="<?= $categorySlug !== '' && $categorySlugKey === slugifyTag($categorySlug) ? 'is_active' : '' ?>" href="#!" data-filter=".category-<?= htmlspecialchars($categorySlugKey, ENT_QUOTES, 'UTF-8') ?>">
+              <button
+                type="button"
+                class="<?= $categorySlug !== '' && $categorySlugKey === slugifyTag($categorySlug) ? 'is_active' : '' ?>"
+                data-filter=".category-<?= htmlspecialchars($categorySlugKey, ENT_QUOTES, 'UTF-8') ?>"
+                aria-pressed="<?= $categorySlug !== '' && $categorySlugKey === slugifyTag($categorySlug) ? 'true' : 'false' ?>"
+              >
                 <span class="filter-name"><?= htmlspecialchars($categoryMeta['name'], ENT_QUOTES, 'UTF-8') ?></span>
                 <span class="filter-count"><?= $categoryMeta['count'] ?></span>
-              </a>
+              </button>
             </li>
           <?php endforeach; ?>
         </ul>

@@ -1265,7 +1265,8 @@ All Casinos Page Style
   margin: 5px 8px;
 }
 
-.trending ul.trending-filter li a {
+.trending ul.trending-filter li a,
+.trending ul.trending-filter li button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1278,18 +1279,23 @@ All Casinos Page Style
   padding: 8px 20px;
   border-radius: 25px;
   transition: all .3s;
+  border: none;
+  cursor: pointer;
 }
 
-.trending ul.trending-filter li a.is_active {
+.trending ul.trending-filter li a.is_active,
+.trending ul.trending-filter li button.is_active {
   background-color: #ee626b;
   color: #fff;
 }
 
-.trending ul.trending-filter li a.is_active:hover {
+.trending ul.trending-filter li a.is_active:hover,
+.trending ul.trending-filter li button.is_active:hover {
   color: #fff;
 }
 
-.trending ul.trending-filter li a:hover {
+.trending ul.trending-filter li a:hover,
+.trending ul.trending-filter li button:hover {
   color: #ee626b;
 }
 
