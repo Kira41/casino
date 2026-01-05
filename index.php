@@ -150,7 +150,7 @@ include __DIR__ . '/partials/header.php';
 
   <div class="section trending">
     <div class="container">
-      <div class="row" data-pagination-scope="hot-picks" data-items-per-page="8">
+      <div class="row">
         <div class="col-lg-6">
           <div class="section-heading">
             <h6 data-top-picks-subtitle>Hot Picks</h6>
@@ -163,7 +163,7 @@ include __DIR__ . '/partials/header.php';
           </div>
         </div>
         <?php foreach ($hotPicks as $card): ?>
-          <div class="col-lg-3 col-md-6" data-pagination-item>
+          <div class="col-lg-3 col-md-6">
             <div class="item" data-casino-id="<?= htmlspecialchars($card['slug'], ENT_QUOTES, 'UTF-8') ?>">
               <div class="thumb">
                 <a href="product-details.php?casino=<?= urlencode($card['slug']) ?>"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
@@ -181,17 +181,12 @@ include __DIR__ . '/partials/header.php';
           </div>
         <?php endforeach; ?>
       </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <ul class="pagination" data-pagination-controls-for="hot-picks" aria-label="Hot picks pagination"></ul>
-        </div>
-      </div>
     </div>
   </div>
 
   <div class="section most-played">
     <div class="container">
-      <div class="row" data-pagination-scope="most-played" data-items-per-page="6">
+      <div class="row">
         <div class="col-lg-6">
           <div class="section-heading">
             <h6>Top Casinos</h6>
@@ -204,7 +199,7 @@ include __DIR__ . '/partials/header.php';
           </div>
         </div>
         <?php foreach ($mostPlayed as $card): ?>
-          <div class="col-lg-2 col-md-6 col-sm-6" data-pagination-item>
+          <div class="col-lg-2 col-md-6 col-sm-6">
             <div class="item" data-casino-id="<?= htmlspecialchars($card['slug'], ENT_QUOTES, 'UTF-8') ?>">
               <div class="thumb">
                 <a href="product-details.php?casino=<?= urlencode($card['slug']) ?>"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['name'], ENT_QUOTES, 'UTF-8') ?>" data-casino-card-image></a>
@@ -217,11 +212,6 @@ include __DIR__ . '/partials/header.php';
             </div>
           </div>
         <?php endforeach; ?>
-      </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <ul class="pagination" data-pagination-controls-for="most-played" aria-label="Most played pagination"></ul>
-        </div>
       </div>
     </div>
   </div>

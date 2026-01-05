@@ -64,7 +64,7 @@ include __DIR__ . '/partials/header.php';
           <div class="section-heading mb-0">
             <h6>Casino Library</h6>
             <h2 class="mb-2">Explore every casino we track</h2>
-            <p class="lead text-muted mb-0">Filter by category and paginate through our verified listings.</p>
+            <p class="lead text-muted mb-0">Filter by category and browse our verified listings.</p>
           </div>
         </div>
         <div class="col-lg-4">
@@ -91,7 +91,7 @@ include __DIR__ . '/partials/header.php';
           <?php endforeach; ?>
         </ul>
       </div>
-      <div class="trending-box row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" data-pagination-scope="all-casinos" data-items-per-page="6" data-layout-mode="fitRows">
+      <div class="trending-box row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" data-layout-mode="fitRows">
         <?php if (empty($casinos)): ?>
           <div class="col-12">
             <div class="alert alert-warning mb-0" role="alert">
@@ -115,7 +115,7 @@ include __DIR__ . '/partials/header.php';
             $classString = implode(' ', array_unique($categoryClasses));
             $minDepositLabel = formatMinDeposit(is_numeric($casino['min_deposit_usd']) ? (int) $casino['min_deposit_usd'] : null);
           ?>
-          <div class="col <?= htmlspecialchars($classString, ENT_QUOTES, 'UTF-8') ?>" data-casino-id="<?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?>" data-pagination-item>
+          <div class="col <?= htmlspecialchars($classString, ENT_QUOTES, 'UTF-8') ?>" data-casino-id="<?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?>">
             <div class="casino-card h-100 d-flex flex-column">
               <div class="casino-card__thumb">
                 <a class="casino-card__image" href="product-details.php?casino=<?= urlencode($casino['slug']) ?>">
@@ -149,14 +149,6 @@ include __DIR__ . '/partials/header.php';
             </div>
           </div>
         <?php endforeach; ?>
-      </div>
-      <div class="row align-items-center g-3 mt-2">
-        <div class="col-lg-6">
-          <p class="pagination-summary mb-0 text-muted" data-pagination-summary-for="all-casinos"></p>
-        </div>
-        <div class="col-lg-6">
-          <ul class="pagination justify-content-lg-end" data-pagination-controls-for="all-casinos" aria-label="Casino list pagination"></ul>
-        </div>
       </div>
     </div>
   </div>

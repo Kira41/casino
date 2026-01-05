@@ -1502,59 +1502,6 @@ All Casinos Page Style
   background-color: #0071f8;
 }
 
-.trending ul.pagination,
-.most-played ul.pagination {
-  margin-top: 50px;
-  text-align: center;
-  width: 100%;
-  display: inline-block;
-}
-
-.trending ul.pagination li,
-.most-played ul.pagination li {
-  display: inline-block;
-  margin: 0px 5px;
-}
-
-.trending ul.pagination li a,
-.most-played ul.pagination li a {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  background-color: #eee;
-  color: #1e1e1e;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 50%;
-  transition: all .3s;
-}
-
-.trending ul.pagination li a:hover,
-.trending ul.pagination li a.is_active,
-.most-played ul.pagination li a:hover,
-.most-played ul.pagination li a.is_active {
-  background-color: #0071f8;
-  color: #fff;
-}
-
-.trending ul.pagination li a[aria-disabled="true"],
-.most-played ul.pagination li a[aria-disabled="true"] {
-  background-color: #f4f4f4;
-  color: #a0a0a0;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.pagination-summary {
-  font-weight: 600;
-}
-
-.pagination-hidden {
-  display: none !important;
-}
-
 
 /* 
 ---------------------------------------------
