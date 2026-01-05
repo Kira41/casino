@@ -46,6 +46,14 @@ $games = $casino['games'] ?? [];
 $prosCons = $casino['pros_cons'] ?? ['pros' => [], 'cons' => []];
 $highlights = $casino['highlights'] ?? [];
 $reviewSections = $casino['review_sections'] ?? [];
+$hasReviews = !empty($reviewSections);
+$gameRows = !empty($games)
+    ? $games
+    : [[
+        'game_type' => 'N/A',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ]];
 $relatedCasinos = $categorySlug !== ''
     ? array_values(array_filter($categoryCasinos, static fn($card) => (string) ($card['slug'] ?? '') !== (string) $casino['slug']))
     : fetchCasinoCards($database, 'related');
@@ -160,14 +168,16 @@ include __DIR__ . '/partials/header.php';
                           <th>Game Type</th>
                           <th>Live Dealer</th>
                           <th>Virtual Reality</th>
+                          <th>Reviews</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <?php foreach ($games as $game): ?>
+                        <?php foreach ($gameRows as $game): ?>
                           <tr>
                             <td><?= htmlspecialchars($game['game_type'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td><?= $game['live_dealer_supported'] ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
                             <td><?= $game['virtual_reality_supported'] ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
+                            <td><?= $hasReviews ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
                           </tr>
                         <?php endforeach; ?>
                       </tbody>
