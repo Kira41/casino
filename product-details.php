@@ -101,32 +101,32 @@ include __DIR__ . '/partials/header.php';
           </div>
           <p><i class="fa fa-magic me-2 text-warning"></i><?= htmlspecialchars($casino['short_description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
           <form id="qty" action="#" onsubmit="window.open('<?= htmlspecialchars($casino['cta_url'] ?: '#', ENT_QUOTES, 'UTF-8') ?>','_blank','noopener'); return false;">
-            <button type="submit"><i class="fa fa-arrow-up-right-from-square"></i> Visit Casino</button>
+            <button type="submit"><i class="fa fa-arrow-up-right-from-square me-2"></i><span class="ms-1">Visit Casino</span></button>
           </form>
           <ul class="product-meta-list">
             <li class="product-meta-item">
-              <i class="fa fa-building"></i>
+              <i class="fa fa-building me-2"></i>
               <span class="product-meta-label">Casino Name:</span>
               <span class="product-meta-value"><?= htmlspecialchars($casino['operator'] ?? $casino['name'], ENT_QUOTES, 'UTF-8') ?></span>
             </li>
             <li class="product-meta-item">
-              <i class="fa fa-layer-group"></i>
+              <i class="fa fa-layer-group me-2"></i>
               <span class="product-meta-label">Genre:</span>
               <span class="product-meta-value"><?= htmlspecialchars($genres !== '' ? $genres : 'N/A', ENT_QUOTES, 'UTF-8') ?></span>
             </li>
             <li class="product-meta-item">
-              <i class="fa fa-tags"></i>
+              <i class="fa fa-tags me-2"></i>
               <span class="product-meta-label">Multi-tags:</span>
               <span class="product-meta-value"><?= htmlspecialchars($perks !== '' ? $perks : 'N/A', ENT_QUOTES, 'UTF-8') ?></span>
             </li>
             <li class="product-meta-item">
-              <i class="fa fa-shield-alt"></i>
+              <i class="fa fa-shield-alt me-2"></i>
               <span class="product-meta-label">License:</span>
               <span class="product-meta-value"><?= htmlspecialchars($casino['license'] ?? 'TBD', ENT_QUOTES, 'UTF-8') ?></span>
             </li>
             <?php if ($minDeposit): ?>
               <li class="product-meta-item">
-                <i class="fa fa-credit-card"></i>
+                <i class="fa fa-credit-card me-2"></i>
                 <span class="product-meta-label">Minimum Deposit:</span>
                 <span class="product-meta-value"><?= htmlspecialchars($minDeposit, ENT_QUOTES, 'UTF-8') ?></span>
               </li>
@@ -192,7 +192,7 @@ include __DIR__ . '/partials/header.php';
                         <div class="accordion-item">
                           <h2 class="accordion-header" id="heading-<?= $collapseId ?>">
                             <button class="accordion-button <?= $index === 0 ? '' : 'collapsed' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?= $collapseId ?>" aria-expanded="<?= $index === 0 ? 'true' : 'false' ?>" aria-controls="collapse-<?= $collapseId ?>">
-                              <i class="fa fa-info-circle text-warning"></i>
+                              <i class="fa fa-info-circle text-warning me-2"></i>
                               <span><?= htmlspecialchars($section['title'], ENT_QUOTES, 'UTF-8') ?></span>
                             </button>
                           </h2>
@@ -222,26 +222,26 @@ include __DIR__ . '/partials/header.php';
                       <div class="accordion-item">
                         <h2 class="accordion-header" id="headingProsCons">
                           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProsCons" aria-expanded="false" aria-controls="collapseProsCons">
-                            <i class="fa fa-balance-scale text-muted"></i>
-                            <span>Pros &amp; Cons</span>
+                            <i class="fa fa-balance-scale text-muted me-2"></i>
+                            <span class="ms-1">Pros &amp; Cons</span>
                           </button>
                         </h2>
                         <div id="collapseProsCons" class="accordion-collapse collapse" aria-labelledby="headingProsCons" data-bs-parent="#reviewsAccordion">
                           <div class="accordion-body">
                             <div class="row g-4">
                               <div class="col-md-6">
-                                <h6 class="pros-cons-heading text-success"><i class="fa fa-thumbs-up"></i><span>Pros</span></h6>
+                                <h6 class="pros-cons-heading text-success"><i class="fa fa-thumbs-up me-2"></i><span>Pros</span></h6>
                                 <ul class="list-with-icons pros mb-0">
                                   <?php foreach ($prosCons['pros'] as $pro): ?>
-                                    <li><i class="fa fa-check text-success"></i><span><?= htmlspecialchars($pro, ENT_QUOTES, 'UTF-8') ?></span></li>
+                                    <li><i class="fa fa-check text-success me-2"></i><span><?= htmlspecialchars($pro, ENT_QUOTES, 'UTF-8') ?></span></li>
                                   <?php endforeach; ?>
                                 </ul>
                               </div>
                               <div class="col-md-6">
-                                <h6 class="pros-cons-heading text-danger"><i class="fa fa-thumbs-down"></i><span>Cons</span></h6>
+                                <h6 class="pros-cons-heading text-danger"><i class="fa fa-thumbs-down me-2"></i><span>Cons</span></h6>
                                 <ul class="list-with-icons cons mb-0">
                                   <?php foreach ($prosCons['cons'] as $con): ?>
-                                    <li><i class="fa fa-times text-danger"></i><span><?= htmlspecialchars($con, ENT_QUOTES, 'UTF-8') ?></span></li>
+                                    <li><i class="fa fa-times text-danger me-2"></i><span><?= htmlspecialchars($con, ENT_QUOTES, 'UTF-8') ?></span></li>
                                   <?php endforeach; ?>
                                 </ul>
                               </div>
@@ -295,8 +295,8 @@ include __DIR__ . '/partials/header.php';
           <h4>Subscribe now for platform changelogs</h4>
           <p>We pair sign-in activity with our recommendations engine to keep picks current—opt in to get the latest review drops.</p>
           <div class="d-flex flex-wrap gap-2">
-            <span class="badge-soft"><i class="fa fa-database" aria-hidden="true"></i>Trusted data updates</span>
-            <span class="badge-soft"><i class="fa fa-star" aria-hidden="true"></i>Personalized picks</span>
+            <span class="badge-soft"><i class="fa fa-database me-2" aria-hidden="true"></i>Trusted data updates</span>
+            <span class="badge-soft"><i class="fa fa-star me-2" aria-hidden="true"></i>Personalized picks</span>
           </div>
         </div>
         <div class="col-lg-5">
