@@ -365,8 +365,13 @@
   }
 
   function buildResultCard(casino) {
-    const card = document.createElement('div');
+    const card = document.createElement('button');
     card.className = 'search-result-card';
+    card.type = 'button';
+    card.setAttribute(
+      'data-casino-slug',
+      casino.slug || slugifyCasinoName(casino.name || '')
+    );
 
     const thumb = document.createElement('div');
     thumb.className = 'search-result-thumb';
@@ -423,6 +428,14 @@
     renderSearchResults(trimmedTerm);
   }
 
+  function navigateToCasinoDetail(slug, baseHref = 'product-details.php') {
+    const selectedSlug = slug || 'lucky-star-crypto-casino';
+    const url = new URL(baseHref, window.location.href);
+    url.searchParams.set('casino', selectedSlug);
+    sessionStorage.setItem('selectedCasino', selectedSlug);
+    window.location.href = url.toString();
+  }
+
   if (searchForm && searchInput) {
     searchForm.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -434,6 +447,14 @@
     });
 
     handleSearch(searchInput.value || '');
+  }
+
+  if (searchResultsContainer) {
+    searchResultsContainer.addEventListener('click', (event) => {
+      const card = event.target.closest('[data-casino-slug]');
+      if (!card) return;
+      navigateToCasinoDetail(card.getAttribute('data-casino-slug'));
+    });
   }
 
   function attachCasinoLinkHandlers() {
@@ -448,19 +469,15 @@
         const name = heading?.textContent?.trim();
         const slug = name ? slugifyCasinoName(name) : 'lucky-star-crypto-casino';
 
-        const url = new URL(link.href, window.location.href);
-        url.searchParams.set('casino', slug);
-        sessionStorage.setItem('selectedCasino', slug);
-
         event.preventDefault();
-        window.location.href = url.toString();
+        navigateToCasinoDetail(slug, link.href);
       });
     });
   }
 
   function getSelectedCasinoSlug() {
     const params = new URLSearchParams(window.location.search);
-    const urlSlug = params.get('slug');
+    const urlSlug = params.get('casino') || params.get('slug');
     return (
       urlSlug ||
       sessionStorage.getItem('selectedCasino') ||
