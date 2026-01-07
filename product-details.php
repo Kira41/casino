@@ -13,7 +13,11 @@ $categoryCasinos = $categorySlug !== '' ? fetchCasinosByCategory($database, $cat
 $casino = null;
 
 if ($slug !== '') {
-    $casino = fetchCasinoBySlug($database, $slug);
+    if (ctype_digit($slug)) {
+        $casino = fetchCasinoById($database, (int) $slug);
+    } else {
+        $casino = fetchCasinoBySlug($database, $slug);
+    }
 } elseif (!empty($categoryCasinos)) {
     $firstCategoryCasino = $categoryCasinos[0]['slug'] ?? '';
     $casino = $firstCategoryCasino !== '' ? fetchCasinoBySlug($database, (string) $firstCategoryCasino) : null;
