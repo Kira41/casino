@@ -365,13 +365,11 @@
   }
 
   function buildResultCard(casino) {
-    const card = document.createElement('button');
+    const slug = casino.slug || slugifyCasinoName(casino.name || '');
+    const card = document.createElement('a');
     card.className = 'search-result-card';
-    card.type = 'button';
-    card.setAttribute(
-      'data-casino-slug',
-      casino.slug || slugifyCasinoName(casino.name || '')
-    );
+    card.href = `product-details.php?casino=${encodeURIComponent(slug)}`;
+    card.setAttribute('data-casino-slug', slug);
 
     const thumb = document.createElement('div');
     thumb.className = 'search-result-thumb';
