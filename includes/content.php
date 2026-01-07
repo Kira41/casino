@@ -123,7 +123,7 @@ function casinoHasCategory(array $casino, string $categorySlug): bool
 function fetchCasinoDirectory(PDO $database): array
 {
     $statement = $database->query(
-        'SELECT name, slug, COALESCE(thumbnail_image, hero_image, "") AS thumbnail FROM casinos ORDER BY name ASC'
+        'SELECT id, name, slug, COALESCE(thumbnail_image, hero_image, "") AS thumbnail FROM casinos ORDER BY name ASC'
     );
 
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];

@@ -366,9 +366,14 @@
 
   function buildResultCard(casino) {
     const slug = casino.slug || slugifyCasinoName(casino.name || '');
+    const casinoId = casino.id ? String(casino.id) : '';
     const card = document.createElement('a');
     card.className = 'search-result-card';
-    card.href = 'product-details.php';
+    const casinoParam = casinoId || slug;
+    card.href = `product-details.php?casino=${encodeURIComponent(casinoParam)}`;
+    if (casinoId) {
+      card.setAttribute('data-casino-id', casinoId);
+    }
     card.setAttribute('data-casino-slug', slug);
 
     const thumb = document.createElement('div');
@@ -451,7 +456,9 @@
     searchResultsContainer.addEventListener('click', (event) => {
       const card = event.target.closest('[data-casino-slug]');
       if (!card) return;
-      navigateToCasinoDetail(card.getAttribute('data-casino-slug'));
+      const casinoId = card.getAttribute('data-casino-id');
+      const casinoSlug = card.getAttribute('data-casino-slug');
+      navigateToCasinoDetail(casinoId || casinoSlug);
     });
   }
 
