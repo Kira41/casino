@@ -217,6 +217,22 @@ function fetchCasinoBySlug(PDO $database, string $slug): ?array
     $statement->execute([':slug' => $slug]);
 
     $casino = $statement->fetch(PDO::FETCH_ASSOC);
+
+    return hydrateCasinoDetails($database, $casino ?: null);
+}
+
+function fetchCasinoById(PDO $database, int $casinoId): ?array
+{
+    $statement = $database->prepare('SELECT * FROM casinos WHERE id = :id LIMIT 1');
+    $statement->execute([':id' => $casinoId]);
+
+    $casino = $statement->fetch(PDO::FETCH_ASSOC);
+
+    return hydrateCasinoDetails($database, $casino ?: null);
+}
+
+function hydrateCasinoDetails(PDO $database, ?array $casino): ?array
+{
     if (!$casino) {
         return null;
     }

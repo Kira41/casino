@@ -35,11 +35,11 @@ include __DIR__ . '/partials/header.php';
           </div>
         </div>
         <div class="col-lg-4 offset-lg-2">
-          <div class="right-image">
+          <a class="right-image d-inline-block" href="product-details.php?casino=1">
             <img src="assets/images/banner-image.jpg" alt="">
             <span class="price">minimum deposit $22</span>
             <span class="offer">TOP 1</span>
-          </div>
+          </a>
         </div>
       </div>
     </div>

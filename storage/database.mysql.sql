@@ -146,9 +146,10 @@ CREATE TABLE IF NOT EXISTS casino_highlights (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed reference data from the existing HTML content
-INSERT IGNORE INTO casinos (slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description, cta_url)
+INSERT IGNORE INTO casinos (id, slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description, cta_url)
 VALUES
     (
+        1,
         'lucky-star-crypto-casino',
         'Lucky Star Crypto Casino',
         'Lucky Star Entertainment Group',
@@ -162,6 +163,7 @@ VALUES
         'https://luckystar.example.com'
     ),
     (
+        2,
         'nova-royale-casino',
         'Nova Royale Casino',
         NULL,
@@ -175,6 +177,7 @@ VALUES
         'https://novaroyale.example.com'
     ),
     (
+        3,
         'starlight-spins-resort',
         'Starlight Spins Resort',
         NULL,
@@ -188,6 +191,7 @@ VALUES
         'https://starlightspins.example.com'
     ),
     (
+        4,
         'emerald-mirage-club',
         'Emerald Mirage Club',
         NULL,
@@ -201,6 +205,7 @@ VALUES
         'https://emeraldmirage.example.com'
     ),
     (
+        5,
         'celestial-fortune-hall',
         'Celestial Fortune Hall',
         NULL,
@@ -214,6 +219,7 @@ VALUES
         'https://celestialfortune.example.com'
     ),
     (
+        6,
         'aurora-vault-casino',
         'Aurora Vault Casino',
         NULL,
@@ -227,6 +233,7 @@ VALUES
         'https://auroravault.example.com'
     ),
     (
+        7,
         'quantum-spin-lounge',
         'Quantum Spin Lounge',
         NULL,
@@ -240,6 +247,7 @@ VALUES
         'https://quantumspin.example.com'
     ),
     (
+        8,
         'imperial-halo-casino',
         'Imperial Halo Casino',
         NULL,
@@ -253,6 +261,7 @@ VALUES
         'https://imperialhalo.example.com'
     ),
     (
+        9,
         'obsidian-crown-club',
         'Obsidian Crown Club',
         NULL,
@@ -266,6 +275,7 @@ VALUES
         'https://obsidiancrown.example.com'
     ),
     (
+        10,
         'mirage-of-millions',
         'Mirage of Millions',
         NULL,
@@ -279,6 +289,7 @@ VALUES
         'https://mirageofmillions.example.com'
     ),
     (
+        11,
         'luminous-ledger-casino',
         'Luminous Ledger Casino',
         NULL,
@@ -292,6 +303,7 @@ VALUES
         'https://luminousledger.example.com'
     ),
     (
+        12,
         'neon-mirage-casino',
         'Neon Mirage Casino',
         NULL,
@@ -305,6 +317,7 @@ VALUES
         'https://neonmirage.example.com'
     ),
     (
+        13,
         'azure-spire-casino',
         'Azure Spire Casino',
         NULL,
@@ -318,6 +331,7 @@ VALUES
         'https://azurespire.example.com'
     ),
     (
+        14,
         'lucky-horizon-lounge',
         'Lucky Horizon Lounge',
         NULL,
@@ -331,6 +345,7 @@ VALUES
         'https://luckyhorizon.example.com'
     ),
     (
+        15,
         'starlit-crown-casino',
         'Starlit Crown Casino',
         NULL,
@@ -344,6 +359,7 @@ VALUES
         'https://starlitcrown.example.com'
     ),
     (
+        16,
         'golden-drift-resort',
         'Golden Drift Resort',
         NULL,
