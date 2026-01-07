@@ -368,7 +368,7 @@
     const slug = casino.slug || slugifyCasinoName(casino.name || '');
     const card = document.createElement('a');
     card.className = 'search-result-card';
-    card.href = `product-details.php?casino=${encodeURIComponent(slug)}`;
+    card.href = 'product-details.php';
     card.setAttribute('data-casino-slug', slug);
 
     const thumb = document.createElement('div');
