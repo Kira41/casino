@@ -58,7 +58,7 @@ function fetchCategoryCards(PDO $database, string $section): array
 function fetchCasinos(PDO $database): array
 {
     $statement = $database->query(
-        'SELECT id, slug, name, thumbnail_image, min_deposit_usd, rating FROM casinos ORDER BY name ASC'
+        'SELECT id, slug, name, thumbnail_image, min_deposit_usd, rating, is_top1 FROM casinos ORDER BY name ASC'
     );
 
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -291,6 +291,14 @@ function hydrateCasinoDetails(PDO $database, ?array $casino): ?array
 function fetchFirstCasino(PDO $database): ?array
 {
     $statement = $database->query('SELECT slug FROM casinos ORDER BY id ASC LIMIT 1');
+    $slug = $statement->fetchColumn();
+
+    return $slug ? fetchCasinoBySlug($database, (string) $slug) : null;
+}
+
+function fetchTopCasino(PDO $database): ?array
+{
+    $statement = $database->query('SELECT slug FROM casinos WHERE is_top1 = 1 ORDER BY id ASC LIMIT 1');
     $slug = $statement->fetchColumn();
 
     return $slug ? fetchCasinoBySlug($database, (string) $slug) : null;

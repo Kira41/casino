@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS casinos (
     rating TINYINT UNSIGNED NOT NULL DEFAULT 0 CHECK (rating BETWEEN 0 AND 5),
     short_description TEXT,
     cta_url TEXT,
+    is_top1 TINYINT(1) NOT NULL DEFAULT 0 CHECK (is_top1 IN (0, 1)),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
