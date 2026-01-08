@@ -9,22 +9,38 @@ $activePage = 'home';
 $casinoDirectory = fetchCasinoDirectory($database);
 $hotPicks = fetchCasinoCards($database, 'hot_picks');
 $mostPlayed = fetchCasinoCards($database, 'most_played');
+$topFeaturedCards = fetchCasinoCards($database, 'top_1');
 $categories = fetchCategoryCards($database, 'top_categories');
-$topCasino = fetchTopCasino($database) ?? fetchFirstCasino($database);
-$topCasinoImage = $topCasino['hero_image'] ?? '';
-if ($topCasinoImage === '') {
-    $topCasinoImage = $topCasino['thumbnail_image'] ?? '';
+$topFeaturedCard = $topFeaturedCards[0] ?? null;
+
+if ($topFeaturedCard !== null) {
+    $topCasinoImage = $topFeaturedCard['image_path'] ?? '';
+    $topCasinoName = $topFeaturedCard['name'] ?? 'Top Casino';
+    $topCasinoSlug = $topFeaturedCard['slug'] ?? '';
+    $topCasinoMinDeposit = $topFeaturedCard['min_deposit_label'] ?: formatMinDeposit(
+        isset($topFeaturedCard['min_deposit_usd']) && is_numeric($topFeaturedCard['min_deposit_usd'])
+            ? (int) $topFeaturedCard['min_deposit_usd']
+            : null
+    );
+} else {
+    $topCasino = fetchTopCasino($database) ?? fetchFirstCasino($database);
+    $topCasinoImage = $topCasino['hero_image'] ?? '';
+    if ($topCasinoImage === '') {
+        $topCasinoImage = $topCasino['thumbnail_image'] ?? '';
+    }
+    $topCasinoName = $topCasino['name'] ?? 'Top Casino';
+    $topCasinoSlug = $topCasino['slug'] ?? '';
+    $topCasinoMinDeposit = formatMinDeposit(
+        isset($topCasino['min_deposit_usd']) && is_numeric($topCasino['min_deposit_usd'])
+            ? (int) $topCasino['min_deposit_usd']
+            : null
+    );
 }
+
 if ($topCasinoImage === '') {
     $topCasinoImage = 'assets/images/banner-image.jpg';
 }
-$topCasinoName = $topCasino['name'] ?? 'Top Casino';
-$topCasinoSlug = $topCasino['slug'] ?? '';
-$topCasinoMinDeposit = formatMinDeposit(
-    isset($topCasino['min_deposit_usd']) && is_numeric($topCasino['min_deposit_usd'])
-        ? (int) $topCasino['min_deposit_usd']
-        : null
-);
+
 $topCasinoLink = $topCasinoSlug !== '' ? 'product-details.php?casino=' . urlencode($topCasinoSlug) : 'product-details.php?casino=1';
 $additionalScripts = ['assets/js/casino-detail.js'];
 $pageTitle = 'Lugx Gaming All Casinos HTML5 Template';
