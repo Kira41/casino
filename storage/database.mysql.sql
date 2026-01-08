@@ -153,6 +153,18 @@ CREATE TABLE IF NOT EXISTS casino_payment_methods (
     FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS providers (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    image_path VARCHAR(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS payment_methods (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    image_path VARCHAR(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed reference data from the existing HTML content
 INSERT IGNORE INTO casinos (id, slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description, cta_url)
 VALUES
@@ -1178,5 +1190,27 @@ VALUES
     ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'License: Resort jurisdiction filing', 'fa-shield-alt'),
     ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'Welcome Bonus: Beachside reloads', 'fa-gift'),
     ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'Genres: Live Casino, Low Deposit', 'fa-layer-group');
+
+INSERT IGNORE INTO providers (id, name, image_path)
+VALUES
+    (1, 'NetEnt', 'assets/images/providers/netent.svg'),
+    (2, 'Microgaming', 'assets/images/providers/microgaming.svg'),
+    (3, 'Evolution', 'assets/images/providers/evolution.svg'),
+    (4, 'Play''n GO', 'assets/images/providers/playngo.svg'),
+    (5, 'Pragmatic Play', 'assets/images/providers/pragmatic.svg');
+
+INSERT IGNORE INTO payment_methods (id, name, image_path)
+VALUES
+    (1, 'Wire Transfer', 'assets/images/payment-methods/wire-transfer.svg'),
+    (2, 'Ethereum', 'assets/images/payment-methods/ethereum.svg'),
+    (3, 'Litecoin', 'assets/images/payment-methods/litecoin.svg'),
+    (4, 'Dogecoin', 'assets/images/payment-methods/dogecoin.svg'),
+    (5, 'Tether Wallet', 'assets/images/payment-methods/tether.svg'),
+    (6, 'MiFinity', 'assets/images/payment-methods/mifinity.svg'),
+    (7, 'Revolut', 'assets/images/payment-methods/revolut.svg'),
+    (8, 'Apple Pay', 'assets/images/payment-methods/apple-pay.svg'),
+    (9, 'Google Pay', 'assets/images/payment-methods/google-pay.svg'),
+    (10, 'Binance Pay', 'assets/images/payment-methods/binance-pay.svg'),
+    (11, 'Ripple', 'assets/images/payment-methods/ripple.svg');
 
 COMMIT;

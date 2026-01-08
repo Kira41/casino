@@ -50,7 +50,8 @@ $games = $casino['games'] ?? [];
 $prosCons = $casino['pros_cons'] ?? ['pros' => [], 'cons' => []];
 $highlights = $casino['highlights'] ?? [];
 $reviewSections = $casino['review_sections'] ?? [];
-$paymentMethods = $casino['payment_methods'] ?? [];
+$paymentMethods = fetchPaymentMethodsCatalog($database);
+$providers = fetchProviders($database);
 $hasReviews = !empty($reviewSections);
 $reviewSectionAliases = [
     'general-info' => 'general-information',
@@ -87,6 +88,7 @@ foreach ($reviewSectionOrder as $key => $meta) {
     $section = $reviewSectionsByKey[$key] ?? ['title' => $meta['label'], 'summary' => '', 'points' => []];
     $section['title'] = $meta['label'];
     $section['icon'] = $meta['icon'];
+    $section['key'] = $key;
     $orderedReviewSections[] = $section;
 }
 $gameRows = !empty($games)
@@ -286,8 +288,8 @@ include __DIR__ . '/partials/header.php';
                               <div class="payment-methods-list">
                                 <?php foreach ($paymentMethods as $method): ?>
                                   <div class="payment-method">
-                                    <img src="<?= htmlspecialchars($iconifyBase . $method['icon_key'] . '.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <span><?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    <img src="<?= htmlspecialchars($method['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <span><?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?></span>
                                   </div>
                                 <?php endforeach; ?>
                               </div>
@@ -299,6 +301,8 @@ include __DIR__ . '/partials/header.php';
                       </div>
                       <?php foreach ($orderedReviewSections as $index => $section): ?>
                         <?php $collapseId = 'section-' . $index; ?>
+                        <?php $hasProviderList = $section['key'] === 'software-providers' && !empty($providers); ?>
+                        <?php $hasSectionContent = $hasProviderList || !empty($section['summary']) || !empty($section['points']); ?>
                         <div class="accordion-item">
                           <h2 class="accordion-header" id="heading-<?= $collapseId ?>">
                             <button class="accordion-button <?= $index === 0 ? '' : 'collapsed' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?= $collapseId ?>" aria-expanded="<?= $index === 0 ? 'true' : 'false' ?>" aria-controls="collapse-<?= $collapseId ?>">
@@ -308,6 +312,16 @@ include __DIR__ . '/partials/header.php';
                           </h2>
                           <div id="collapse-<?= $collapseId ?>" class="accordion-collapse collapse <?= $index === 0 ? 'show' : '' ?>" aria-labelledby="heading-<?= $collapseId ?>" data-bs-parent="#reviewsAccordion">
                             <div class="accordion-body">
+                              <?php if ($hasProviderList): ?>
+                                <div class="providers-list mb-3">
+                                  <?php foreach ($providers as $provider): ?>
+                                    <div class="provider-card">
+                                      <img src="<?= htmlspecialchars($provider['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?>">
+                                      <span><?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    </div>
+                                  <?php endforeach; ?>
+                                </div>
+                              <?php endif; ?>
                               <?php if (!empty($section['summary'])): ?>
                                 <p class="mb-3"><?= htmlspecialchars($section['summary'], ENT_QUOTES, 'UTF-8') ?></p>
                               <?php endif; ?>
@@ -325,7 +339,7 @@ include __DIR__ . '/partials/header.php';
                                   <?php endforeach; ?>
                                 </div>
                               <?php endif; ?>
-                              <?php if (empty($section['summary']) && empty($section['points'])): ?>
+                              <?php if (!$hasSectionContent): ?>
                                 <p class="mb-0 text-muted">Details coming soon.</p>
                               <?php endif; ?>
                             </div>
