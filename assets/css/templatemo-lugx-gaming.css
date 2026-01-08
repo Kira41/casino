@@ -1730,9 +1730,11 @@ Single Page Style
 }
 
 .payment-method img {
-  width: 36px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
+  display: block;
+  flex: 0 0 28px;
 }
 
 .related-games .main-button {
