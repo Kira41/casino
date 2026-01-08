@@ -232,21 +232,6 @@ include __DIR__ . '/partials/header.php';
                       </tbody>
                     </table>
                   </div>
-                  <?php if (!empty($paymentMethods)): ?>
-                    <div class="banking-methods">
-                      <h6 class="mb-3">
-                        <i class="fa fa-credit-card text-warning me-2" aria-hidden="true"></i>Banking Methods
-                      </h6>
-                      <div class="payment-methods-list">
-                        <?php foreach ($paymentMethods as $method): ?>
-                          <div class="payment-method">
-                            <img src="<?= htmlspecialchars($iconifyBase . $method['icon_key'] . '.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?>">
-                            <span><?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?></span>
-                          </div>
-                        <?php endforeach; ?>
-                      </div>
-                    </div>
-                  <?php endif; ?>
                 </div>
                 <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                   <div class="review-panel">
@@ -283,6 +268,28 @@ include __DIR__ . '/partials/header.php';
                           </div>
                         </div>
                       <?php endforeach; ?>
+                      <?php if (!empty($paymentMethods)): ?>
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="headingBankingMethods">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBankingMethods" aria-expanded="false" aria-controls="collapseBankingMethods">
+                              <i class="fa fa-credit-card text-warning me-2" aria-hidden="true"></i>
+                              <span class="ms-1">Banking Methods</span>
+                            </button>
+                          </h2>
+                          <div id="collapseBankingMethods" class="accordion-collapse collapse" aria-labelledby="headingBankingMethods" data-bs-parent="#reviewsAccordion">
+                            <div class="accordion-body">
+                              <div class="payment-methods-list">
+                                <?php foreach ($paymentMethods as $method): ?>
+                                  <div class="payment-method">
+                                    <img src="<?= htmlspecialchars($iconifyBase . $method['icon_key'] . '.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <span><?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                  </div>
+                                <?php endforeach; ?>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      <?php endif; ?>
                       <div class="accordion-item">
                         <h2 class="accordion-header" id="headingProsCons">
                           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProsCons" aria-expanded="false" aria-controls="collapseProsCons">
