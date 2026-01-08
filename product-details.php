@@ -126,6 +126,26 @@ $tableHeaderIcons = [
     'Virtual Reality' => 'mdi:virtual-reality',
     'Reviews' => 'mdi:star-circle',
 ];
+$deviceSupportGroups = [
+    [
+        'label' => 'Mobile',
+        'icon' => 'fa-mobile-alt',
+        'items' => [
+            ['label' => 'Android', 'icon' => 'fab fa-android'],
+            ['label' => 'iOS', 'icon' => 'fab fa-apple'],
+        ],
+    ],
+    [
+        'label' => 'Desktop',
+        'icon' => 'fa-desktop',
+        'items' => [
+            ['label' => 'Chrome', 'icon' => 'fab fa-chrome'],
+            ['label' => 'Safari', 'icon' => 'fab fa-safari'],
+            ['label' => 'Firefox', 'icon' => 'fab fa-firefox-browser'],
+            ['label' => 'Edge', 'icon' => 'fab fa-edge'],
+        ],
+    ],
+];
 $relatedCasinos = $categorySlug !== ''
     ? array_values(array_filter($categoryCasinos, static fn($card) => (string) ($card['slug'] ?? '') !== (string) $casino['slug']))
     : fetchCasinoCards($database, 'related');
@@ -318,6 +338,28 @@ include __DIR__ . '/partials/header.php';
                                     <div class="provider-card">
                                       <img src="<?= htmlspecialchars($provider['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?>">
                                       <span><?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    </div>
+                                  <?php endforeach; ?>
+                                </div>
+                              <?php endif; ?>
+                              <?php if ($section['key'] === 'devices'): ?>
+                                <div class="row g-3 mb-3">
+                                  <?php foreach ($deviceSupportGroups as $group): ?>
+                                    <div class="col-md-6">
+                                      <div class="bg-light border rounded-3 p-3 h-100">
+                                        <div class="d-flex align-items-center gap-2 text-uppercase small fw-semibold text-muted mb-2">
+                                          <i class="fa <?= htmlspecialchars($group['icon'], ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
+                                          <span><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                          <?php foreach ($group['items'] as $item): ?>
+                                            <span class="badge bg-white text-dark border d-inline-flex align-items-center gap-2">
+                                              <i class="<?= htmlspecialchars($item['icon'], ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
+                                              <span><?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                            </span>
+                                          <?php endforeach; ?>
+                                        </div>
+                                      </div>
                                     </div>
                                   <?php endforeach; ?>
                                 </div>
