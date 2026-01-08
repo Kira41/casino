@@ -27,7 +27,27 @@ function fetchCasinoCards(PDO $database, string $section): array
     );
     $statement->execute([':section' => $section]);
 
-    return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $cards = $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $uniqueCards = [];
+    $seen = [];
+
+    foreach ($cards as $card) {
+        $slug = strtolower(trim((string) ($card['slug'] ?? '')));
+        $title = strtolower(trim((string) ($card['title'] ?? '')));
+        $key = $slug !== '' ? $slug : $title;
+
+        if ($key !== '' && isset($seen[$key])) {
+            continue;
+        }
+
+        if ($key !== '') {
+            $seen[$key] = true;
+        }
+
+        $uniqueCards[] = $card;
+    }
+
+    return $uniqueCards;
 }
 
 function fetchCategoryCards(PDO $database, string $section): array
@@ -156,12 +176,25 @@ function fetchCasinoProsCons(PDO $database, int $casinoId): array
 
     $pros = [];
     $cons = [];
+    $seenPros = [];
+    $seenCons = [];
 
     foreach ($statement->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+        $content = trim((string) ($row['content'] ?? ''));
+        $contentKey = strtolower($content);
+
         if ($row['type'] === 'pro') {
-            $pros[] = $row['content'];
+            if ($contentKey === '' || isset($seenPros[$contentKey])) {
+                continue;
+            }
+            $seenPros[$contentKey] = true;
+            $pros[] = $content;
         } elseif ($row['type'] === 'con') {
-            $cons[] = $row['content'];
+            if ($contentKey === '' || isset($seenCons[$contentKey])) {
+                continue;
+            }
+            $seenCons[$contentKey] = true;
+            $cons[] = $content;
         }
     }
 
