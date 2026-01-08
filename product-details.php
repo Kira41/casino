@@ -50,6 +50,7 @@ $games = $casino['games'] ?? [];
 $prosCons = $casino['pros_cons'] ?? ['pros' => [], 'cons' => []];
 $highlights = $casino['highlights'] ?? [];
 $reviewSections = $casino['review_sections'] ?? [];
+$paymentMethods = $casino['payment_methods'] ?? [];
 $hasReviews = !empty($reviewSections);
 $gameRows = !empty($games)
     ? $games
@@ -58,6 +59,34 @@ $gameRows = !empty($games)
         'live_dealer_supported' => false,
         'virtual_reality_supported' => false,
     ]];
+$iconifyBase = 'https://api.iconify.design/';
+$iconAccent = '#b33aa4';
+$gameTypeIcons = [
+    'roulette' => 'mdi:casino',
+    'slots' => 'mdi:slot-machine',
+    'blackjack' => 'mdi:cards',
+    'video-poker' => 'mdi:cards-playing-outline',
+    'scratch-cards' => 'mdi:ticket-percent-outline',
+    'keno' => 'mdi:chart-bubble',
+    'craps' => 'mdi:dice-multiple',
+    'bingo' => 'mdi:grid',
+    'baccarat' => 'mdi:cards-playing',
+    'poker' => 'mdi:cards-playing-outline',
+    'live-shows' => 'mdi:account-voice',
+    'crash-games' => 'mdi:rocket-launch',
+    'live-roulette' => 'mdi:casino',
+    'live-blackjack' => 'mdi:cards',
+    'table-games' => 'mdi:table-furniture',
+    'game-shows' => 'mdi:television-classic',
+    'high-roller-tables' => 'mdi:diamond-stone',
+    'live-dealer' => 'mdi:account-group',
+];
+$tableHeaderIcons = [
+    'Game Type' => 'mdi:cards-playing-outline',
+    'Live Dealer' => 'mdi:account-group',
+    'Virtual Reality' => 'mdi:virtual-reality',
+    'Reviews' => 'mdi:star-circle',
+];
 $relatedCasinos = $categorySlug !== ''
     ? array_values(array_filter($categoryCasinos, static fn($card) => (string) ($card['slug'] ?? '') !== (string) $casino['slug']))
     : fetchCasinoCards($database, 'related');
@@ -169,16 +198,32 @@ include __DIR__ . '/partials/header.php';
                     <table class="table">
                       <thead>
                         <tr>
-                          <th>Game Type</th>
-                          <th>Live Dealer</th>
-                          <th>Virtual Reality</th>
-                          <th>Reviews</th>
+                          <?php foreach ($tableHeaderIcons as $label => $iconKey): ?>
+                            <th>
+                              <span class="d-inline-flex align-items-center gap-2">
+                                <img class="table-header-icon" src="<?= htmlspecialchars($iconifyBase . $iconKey . '.svg?color=' . urlencode($iconAccent), ENT_QUOTES, 'UTF-8') ?>" alt="">
+                                <span><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
+                              </span>
+                            </th>
+                          <?php endforeach; ?>
                         </tr>
                       </thead>
                       <tbody>
                         <?php foreach ($gameRows as $game): ?>
+                          <?php
+                          $gameTypeLabel = (string) $game['game_type'];
+                          $gameTypeSlug = strtolower(trim($gameTypeLabel));
+                          $gameTypeSlug = preg_replace('/[^a-z0-9]+/', '-', $gameTypeSlug) ?? '';
+                          $gameTypeSlug = trim($gameTypeSlug, '-');
+                          $gameTypeIconKey = $gameTypeIcons[$gameTypeSlug] ?? 'mdi:casino';
+                          ?>
                           <tr>
-                            <td><?= htmlspecialchars($game['game_type'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td>
+                              <div class="d-flex align-items-center gap-2">
+                                <img class="game-type-icon" src="<?= htmlspecialchars($iconifyBase . $gameTypeIconKey . '.svg?color=' . urlencode($iconAccent), ENT_QUOTES, 'UTF-8') ?>" alt="">
+                                <span><?= htmlspecialchars($gameTypeLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                              </div>
+                            </td>
                             <td><?= $game['live_dealer_supported'] ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
                             <td><?= $game['virtual_reality_supported'] ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
                             <td><?= $hasReviews ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' ?></td>
@@ -187,6 +232,21 @@ include __DIR__ . '/partials/header.php';
                       </tbody>
                     </table>
                   </div>
+                  <?php if (!empty($paymentMethods)): ?>
+                    <div class="banking-methods">
+                      <h6 class="mb-3">
+                        <i class="fa fa-credit-card text-warning me-2" aria-hidden="true"></i>Banking Methods
+                      </h6>
+                      <div class="payment-methods-list">
+                        <?php foreach ($paymentMethods as $method): ?>
+                          <div class="payment-method">
+                            <img src="<?= htmlspecialchars($iconifyBase . $method['icon_key'] . '.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?>">
+                            <span><?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                          </div>
+                        <?php endforeach; ?>
+                      </div>
+                    </div>
+                  <?php endif; ?>
                 </div>
                 <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                   <div class="review-panel">
