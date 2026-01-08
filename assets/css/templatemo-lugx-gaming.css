@@ -1717,11 +1717,29 @@ Single Page Style
   gap: 16px;
 }
 
+.providers-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 .payment-method {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+.provider-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -1735,6 +1753,14 @@ Single Page Style
   object-fit: contain;
   display: block;
   flex: 0 0 28px;
+}
+
+.provider-card img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+  flex: 0 0 40px;
 }
 
 .related-games .main-button {

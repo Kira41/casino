@@ -198,6 +198,28 @@ function fetchCasinoPaymentMethods(PDO $database, int $casinoId): array
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 
+function fetchPaymentMethodsCatalog(PDO $database): array
+{
+    if (!tableExists($database, 'payment_methods')) {
+        return [];
+    }
+
+    $statement = $database->query('SELECT name, image_path FROM payment_methods ORDER BY id ASC');
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
+function fetchProviders(PDO $database): array
+{
+    if (!tableExists($database, 'providers')) {
+        return [];
+    }
+
+    $statement = $database->query('SELECT name, image_path FROM providers ORDER BY id ASC');
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
 function fetchCasinoReviewSections(PDO $database, int $casinoId): array
 {
     $statement = $database->prepare(
