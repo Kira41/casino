@@ -654,6 +654,46 @@ VALUES
     ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'Support', 'On-call agents for live tables and hospitality perks.'),
     ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'Game Portfolio', 'Live roulette, poker corners, and beachy slot picks.');
 
+INSERT INTO casino_review_sections (casino_id, title, summary)
+SELECT
+    c.id,
+    'General Information',
+    CONCAT('Snapshot of ', c.name, ' including operator, licensing, and key requirements.')
+FROM casinos c
+WHERE NOT EXISTS (
+    SELECT 1 FROM casino_review_sections s WHERE s.casino_id = c.id AND s.title = 'General Information'
+);
+
+INSERT INTO casino_review_sections (casino_id, title, summary)
+SELECT
+    c.id,
+    'Devices',
+    'Supported device options for playing on mobile and desktop.'
+FROM casinos c
+WHERE NOT EXISTS (
+    SELECT 1 FROM casino_review_sections s WHERE s.casino_id = c.id AND s.title = 'Devices'
+);
+
+INSERT INTO casino_review_sections (casino_id, title, summary)
+SELECT
+    c.id,
+    'Software Providers',
+    'Curated studio mix delivering slots, tables, and live dealer experiences.'
+FROM casinos c
+WHERE NOT EXISTS (
+    SELECT 1 FROM casino_review_sections s WHERE s.casino_id = c.id AND s.title = 'Software Providers'
+);
+
+INSERT INTO casino_review_sections (casino_id, title, summary)
+SELECT
+    c.id,
+    'Additional Info',
+    'Extra notes on promotions, security, and responsible play features.'
+FROM casinos c
+WHERE NOT EXISTS (
+    SELECT 1 FROM casino_review_sections s WHERE s.casino_id = c.id AND s.title = 'Additional Info'
+);
+
 INSERT IGNORE INTO casino_review_points (review_section_id, icon, content)
 VALUES
     ((SELECT id FROM casino_review_sections WHERE title = 'Banking' AND casino_id = (SELECT id FROM casinos WHERE slug = 'lucky-star-crypto-casino')), 'fa-university text-primary', 'Deposits clear instantly through popular crypto wallets to keep players moving.'),
@@ -754,6 +794,172 @@ VALUES
     ((SELECT id FROM casino_review_sections WHERE title = 'Support' AND casino_id = (SELECT id FROM casinos WHERE slug = 'golden-drift-resort')), 'fa-plane', 'Hosts can coordinate events or table access on request.'),
     ((SELECT id FROM casino_review_sections WHERE title = 'Game Portfolio' AND casino_id = (SELECT id FROM casinos WHERE slug = 'golden-drift-resort')), 'fa-anchor', 'Live roulette anchors the floor with beach-inspired branding.'),
     ((SELECT id FROM casino_review_sections WHERE title = 'Game Portfolio' AND casino_id = (SELECT id FROM casinos WHERE slug = 'golden-drift-resort')), 'fa-flag-checkered', 'Poker corners and slots round out the resort experience.');
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-building text-info',
+    CONCAT('Operator: ', COALESCE(c.operator, c.name))
+FROM casino_review_sections s
+JOIN casinos c ON c.id = s.casino_id
+WHERE s.title = 'General Information'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = CONCAT('Operator: ', COALESCE(c.operator, c.name))
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-shield-alt text-warning',
+    CONCAT('License: ', COALESCE(c.license, 'TBD'))
+FROM casino_review_sections s
+JOIN casinos c ON c.id = s.casino_id
+WHERE s.title = 'General Information'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = CONCAT('License: ', COALESCE(c.license, 'TBD'))
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-credit-card text-success',
+    CASE
+        WHEN c.min_deposit_usd IS NULL THEN 'Minimum Deposit: TBD'
+        ELSE CONCAT('Minimum Deposit: $', c.min_deposit_usd)
+    END
+FROM casino_review_sections s
+JOIN casinos c ON c.id = s.casino_id
+WHERE s.title = 'General Information'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = CASE
+            WHEN c.min_deposit_usd IS NULL THEN 'Minimum Deposit: TBD'
+            ELSE CONCAT('Minimum Deposit: $', c.min_deposit_usd)
+        END
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-star text-warning',
+    CONCAT('Rating: ', COALESCE(c.rating, 0), ' / 5')
+FROM casino_review_sections s
+JOIN casinos c ON c.id = s.casino_id
+WHERE s.title = 'General Information'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = CONCAT('Rating: ', COALESCE(c.rating, 0), ' / 5')
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-mobile text-success',
+    'Mobile: iOS and Android browsers supported.'
+FROM casino_review_sections s
+WHERE s.title = 'Devices'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'Mobile: iOS and Android browsers supported.'
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-desktop text-info',
+    'Desktop: Chrome, Safari, and Edge supported.'
+FROM casino_review_sections s
+WHERE s.title = 'Devices'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'Desktop: Chrome, Safari, and Edge supported.'
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-cubes text-primary',
+    'Evolution and Pragmatic Play lead the live dealer lineup.'
+FROM casino_review_sections s
+WHERE s.title = 'Software Providers'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'Evolution and Pragmatic Play lead the live dealer lineup.'
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-gamepad text-success',
+    'Play''n GO and NetEnt fuel the slot catalogue.'
+FROM casino_review_sections s
+WHERE s.title = 'Software Providers'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'Play''n GO and NetEnt fuel the slot catalogue.'
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-dice text-warning',
+    'New studios rotate in regularly to keep the library fresh.'
+FROM casino_review_sections s
+WHERE s.title = 'Software Providers'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'New studios rotate in regularly to keep the library fresh.'
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-lock text-success',
+    'SSL-secured payments and data protection.'
+FROM casino_review_sections s
+WHERE s.title = 'Additional Info'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'SSL-secured payments and data protection.'
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-heart text-danger',
+    'Responsible gaming tools and customizable limits.'
+FROM casino_review_sections s
+WHERE s.title = 'Additional Info'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'Responsible gaming tools and customizable limits.'
+  );
+
+INSERT INTO casino_review_points (review_section_id, icon, content)
+SELECT
+    s.id,
+    'fa-gift text-warning',
+    'Promotions refresh regularly with seasonal campaigns.'
+FROM casino_review_sections s
+WHERE s.title = 'Additional Info'
+  AND NOT EXISTS (
+      SELECT 1 FROM casino_review_points p
+      WHERE p.review_section_id = s.id
+        AND p.content = 'Promotions refresh regularly with seasonal campaigns.'
+  );
 
 INSERT IGNORE INTO casino_pros_cons (casino_id, type, content)
 VALUES
