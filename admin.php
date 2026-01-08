@@ -198,6 +198,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $minDepositRaw = isset($_POST['min_deposit_usd']) ? trim((string) $_POST['min_deposit_usd']) : '';
     $minDeposit = $minDepositRaw === '' ? null : (int) $minDepositRaw;
     $rating = isset($_POST['rating']) ? (int) $_POST['rating'] : 0;
+    $isTop1 = isset($_POST['is_top1']) ? 1 : 0;
     $shortDescription = isset($_POST['short_description']) ? trim((string) $_POST['short_description']) : '';
     $ctaUrl = isset($_POST['cta_url']) ? trim((string) $_POST['cta_url']) : '';
     $heroImageInput = isset($_POST['hero_image']) ? trim((string) $_POST['hero_image']) : '';
@@ -246,7 +247,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     if ($errors === []) {
         if ($casinoId > 0) {
             $statement = $database->prepare(
-                'UPDATE casinos SET slug = :slug, name = :name, operator = :operator, license = :license, headline_bonus = :headline_bonus, min_deposit_usd = :min_deposit_usd, hero_image = :hero_image, thumbnail_image = :thumbnail_image, rating = :rating, short_description = :short_description, cta_url = :cta_url WHERE id = :id'
+                'UPDATE casinos SET slug = :slug, name = :name, operator = :operator, license = :license, headline_bonus = :headline_bonus, min_deposit_usd = :min_deposit_usd, hero_image = :hero_image, thumbnail_image = :thumbnail_image, rating = :rating, short_description = :short_description, cta_url = :cta_url, is_top1 = :is_top1 WHERE id = :id'
             );
             $statement->execute([
                 ':slug' => $slug,
@@ -260,11 +261,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
                 ':rating' => $rating,
                 ':short_description' => $shortDescription,
                 ':cta_url' => $ctaUrl,
+                ':is_top1' => $isTop1,
                 ':id' => $casinoId,
             ]);
         } else {
             $statement = $database->prepare(
-                'INSERT INTO casinos (slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description, cta_url) VALUES (:slug, :name, :operator, :license, :headline_bonus, :min_deposit_usd, :hero_image, :thumbnail_image, :rating, :short_description, :cta_url)'
+                'INSERT INTO casinos (slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description, cta_url, is_top1) VALUES (:slug, :name, :operator, :license, :headline_bonus, :min_deposit_usd, :hero_image, :thumbnail_image, :rating, :short_description, :cta_url, :is_top1)'
             );
             $statement->execute([
                 ':slug' => $slug,
@@ -278,8 +280,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
                 ':rating' => $rating,
                 ':short_description' => $shortDescription,
                 ':cta_url' => $ctaUrl,
+                ':is_top1' => $isTop1,
             ]);
             $casinoId = (int) $database->lastInsertId();
+        }
+
+        if ($isTop1 === 1) {
+            $clearTopStatement = $database->prepare('UPDATE casinos SET is_top1 = 0 WHERE id <> :id');
+            $clearTopStatement->execute([':id' => $casinoId]);
         }
 
         updateCasinoTags($database, $casinoId, 'category', $categories);
@@ -322,6 +330,7 @@ $formValues = [
     'hero_image' => $editCasino['hero_image'] ?? '',
     'thumbnail_image' => $editCasino['thumbnail_image'] ?? '',
     'rating' => $editCasino['rating'] ?? 0,
+    'is_top1' => $editCasino['is_top1'] ?? 0,
     'short_description' => $editCasino['short_description'] ?? '',
     'cta_url' => $editCasino['cta_url'] ?? '',
     'categories' => isset($editCasino['categories']) ? implode(', ', $editCasino['categories']) : '',
@@ -396,6 +405,11 @@ include __DIR__ . '/partials/html-head.php';
                                 <label class="form-label" for="rating">Rating (0-5)</label>
                                 <input type="number" class="form-control" id="rating" name="rating" min="0" max="5" value="<?= htmlspecialchars((string) $formValues['rating'], ENT_QUOTES, 'UTF-8') ?>">
                             </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="is_top1" name="is_top1" value="1" <?= (int) $formValues['is_top1'] === 1 ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="is_top1">Set as Top 1 casino</label>
+                                <div class="form-text">Only one casino can hold the Top 1 spot at a time.</div>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label" for="cta_url">CTA URL</label>
                                 <input type="url" class="form-control" id="cta_url" name="cta_url" value="<?= htmlspecialchars((string) $formValues['cta_url'], ENT_QUOTES, 'UTF-8') ?>">
@@ -442,6 +456,7 @@ include __DIR__ . '/partials/html-head.php';
                                     <th>Name</th>
                                     <th>Slug</th>
                                     <th>Rating</th>
+                                    <th>Top 1</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
@@ -451,6 +466,7 @@ include __DIR__ . '/partials/html-head.php';
                                         <td><?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?></td>
                                         <td><?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?></td>
                                         <td><?= (int) $casino['rating'] ?>/5</td>
+                                        <td><?= (int) ($casino['is_top1'] ?? 0) === 1 ? 'Yes' : '—' ?></td>
                                         <td class="d-flex gap-2">
                                             <a class="btn btn-sm btn-outline-primary" href="admin.php?edit=<?= (int) $casino['id'] ?>">Edit</a>
                                             <form method="post" onsubmit="return confirm('Delete this casino?');">

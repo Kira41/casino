@@ -10,6 +10,22 @@ $casinoDirectory = fetchCasinoDirectory($database);
 $hotPicks = fetchCasinoCards($database, 'hot_picks');
 $mostPlayed = fetchCasinoCards($database, 'most_played');
 $categories = fetchCategoryCards($database, 'top_categories');
+$topCasino = fetchTopCasino($database) ?? fetchFirstCasino($database);
+$topCasinoImage = $topCasino['hero_image'] ?? '';
+if ($topCasinoImage === '') {
+    $topCasinoImage = $topCasino['thumbnail_image'] ?? '';
+}
+if ($topCasinoImage === '') {
+    $topCasinoImage = 'assets/images/banner-image.jpg';
+}
+$topCasinoName = $topCasino['name'] ?? 'Top Casino';
+$topCasinoSlug = $topCasino['slug'] ?? '';
+$topCasinoMinDeposit = formatMinDeposit(
+    isset($topCasino['min_deposit_usd']) && is_numeric($topCasino['min_deposit_usd'])
+        ? (int) $topCasino['min_deposit_usd']
+        : null
+);
+$topCasinoLink = $topCasinoSlug !== '' ? 'product-details.php?casino=' . urlencode($topCasinoSlug) : 'product-details.php?casino=1';
 $additionalScripts = ['assets/js/casino-detail.js'];
 $pageTitle = 'Lugx Gaming All Casinos HTML5 Template';
 
@@ -35,9 +51,11 @@ include __DIR__ . '/partials/header.php';
           </div>
         </div>
         <div class="col-lg-4 offset-lg-2">
-          <a class="right-image d-inline-block" href="product-details.php?casino=1">
-            <img src="assets/images/banner-image.jpg" alt="">
-            <span class="price">minimum deposit $22</span>
+          <a class="right-image d-inline-block" href="<?= htmlspecialchars($topCasinoLink, ENT_QUOTES, 'UTF-8') ?>">
+            <img src="<?= htmlspecialchars($topCasinoImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($topCasinoName, ENT_QUOTES, 'UTF-8') ?>">
+            <?php if ($topCasinoMinDeposit !== ''): ?>
+              <span class="price"><?= htmlspecialchars($topCasinoMinDeposit, ENT_QUOTES, 'UTF-8') ?></span>
+            <?php endif; ?>
             <span class="offer">TOP 1</span>
           </a>
         </div>

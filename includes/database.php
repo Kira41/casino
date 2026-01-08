@@ -95,6 +95,7 @@ function initializeTables(PDO $database): void
     }
 
     ensureCasinoCategorySeeds($database);
+    ensureTopCasinoColumn($database);
 }
 
 function ensureMetadataTable(PDO $database): void
@@ -146,6 +147,54 @@ function tableExists(PDO $database, string $table): bool
     $statement = $database->prepare('SELECT 1 FROM information_schema.tables WHERE table_name = :table LIMIT 1');
     $statement->execute([':table' => $table]);
     return (bool) $statement->fetchColumn();
+}
+
+function columnExists(PDO $database, string $table, string $column): bool
+{
+    $driver = $database->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+    if ($driver === 'sqlite') {
+        $statement = $database->prepare('PRAGMA table_info(' . $table . ')');
+        $statement->execute();
+        $columns = $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        foreach ($columns as $columnInfo) {
+            if (($columnInfo['name'] ?? null) === $column) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    if ($driver === 'mysql') {
+        $statement = $database->prepare('SHOW COLUMNS FROM `' . $table . '` LIKE :column');
+        $statement->execute([':column' => $column]);
+        return (bool) $statement->fetchColumn();
+    }
+
+    $statement = $database->prepare(
+        'SELECT 1 FROM information_schema.columns WHERE table_name = :table AND column_name = :column LIMIT 1'
+    );
+    $statement->execute([':table' => $table, ':column' => $column]);
+    return (bool) $statement->fetchColumn();
+}
+
+function ensureTopCasinoColumn(PDO $database): void
+{
+    if (!tableExists($database, 'casinos')) {
+        return;
+    }
+
+    if (columnExists($database, 'casinos', 'is_top1')) {
+        return;
+    }
+
+    $driver = $database->getAttribute(PDO::ATTR_DRIVER_NAME);
+    $columnType = $driver === 'sqlite' ? 'INTEGER' : 'TINYINT(1)';
+
+    $database->exec(sprintf(
+        'ALTER TABLE casinos ADD COLUMN is_top1 %s NOT NULL DEFAULT 0',
+        $columnType
+    ));
 }
 
 function removeDuplicateSeedData(PDO $database): void
