@@ -237,7 +237,7 @@ function fetchPaymentMethodsCatalog(PDO $database): array
         return [];
     }
 
-    $statement = $database->query('SELECT name, image_path FROM payment_methods ORDER BY id ASC');
+    $statement = $database->query('SELECT id, name, image_path FROM payment_methods ORDER BY id ASC');
 
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
@@ -248,7 +248,7 @@ function fetchProviders(PDO $database): array
         return [];
     }
 
-    $statement = $database->query('SELECT name, image_path FROM providers ORDER BY id ASC');
+    $statement = $database->query('SELECT id, name, image_path FROM providers ORDER BY id ASC');
 
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
