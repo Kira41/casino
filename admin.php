@@ -203,6 +203,54 @@ function handleImageUpload(string $fieldName, string $slug, array &$errors): ?st
     return 'assets/images/casinos/' . $filename;
 }
 
+function handleCatalogImageUpload(string $fieldName, string $slug, string $folder, array &$errors): ?string
+{
+    if (!isset($_FILES[$fieldName]) || !is_array($_FILES[$fieldName])) {
+        return null;
+    }
+
+    $file = $_FILES[$fieldName];
+
+    if ($file['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        $errors[] = 'Image upload failed. Please try again.';
+        return null;
+    }
+
+    $imageInfo = getimagesize($file['tmp_name']);
+    if ($imageInfo === false) {
+        $errors[] = 'Uploaded file is not a valid image.';
+        return null;
+    }
+
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $extension = strtolower($extension);
+    $allowed = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+    if (!in_array($extension, $allowed, true)) {
+        $errors[] = 'Only JPG, PNG, SVG, or WebP images are allowed.';
+        return null;
+    }
+
+    $targetDir = __DIR__ . '/assets/images/' . $folder;
+    if (!is_dir($targetDir)) {
+        mkdir($targetDir, 0775, true);
+    }
+
+    $safeSlug = slugifyValue($slug);
+    $filename = sprintf('%s-%s.%s', $safeSlug, bin2hex(random_bytes(4)), $extension);
+    $targetPath = $targetDir . '/' . $filename;
+
+    if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+        $errors[] = 'Unable to save uploaded image.';
+        return null;
+    }
+
+    return 'assets/images/' . $folder . '/' . $filename;
+}
+
 function fetchFeaturedSectionSelections(PDO $database, string $section): array
 {
     $statement = $database->prepare(
@@ -432,12 +480,98 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_featured_sections') {
     $actionError = implode(' ', $errors);
 }
 
+if (isset($_POST['action']) && $_POST['action'] === 'save_provider') {
+    $name = isset($_POST['provider_name']) ? trim((string) $_POST['provider_name']) : '';
+    $imagePathInput = isset($_POST['provider_image']) ? trim((string) $_POST['provider_image']) : '';
+    $errors = [];
+
+    if ($name === '') {
+        $errors[] = 'Provider name is required.';
+    }
+
+    if (!tableExists($database, 'providers')) {
+        $errors[] = 'Providers catalog is not available.';
+    }
+
+    $upload = handleCatalogImageUpload('provider_image_upload', $name ?: 'provider', 'providers', $errors);
+    $imagePath = $upload ?? $imagePathInput;
+
+    if ($imagePath === '') {
+        $errors[] = 'Provider image URL or upload is required.';
+    }
+
+    if ($errors === []) {
+        $statement = $database->prepare('INSERT INTO providers (name, image_path) VALUES (:name, :image_path)');
+        $statement->execute([
+            ':name' => $name,
+            ':image_path' => $imagePath,
+        ]);
+        header('Location: admin.php?status=' . urlencode('Provider added.'));
+        exit;
+    }
+
+    $actionError = implode(' ', $errors);
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'save_payment_method') {
+    $name = isset($_POST['payment_name']) ? trim((string) $_POST['payment_name']) : '';
+    $imagePathInput = isset($_POST['payment_image']) ? trim((string) $_POST['payment_image']) : '';
+    $errors = [];
+
+    if ($name === '') {
+        $errors[] = 'Payment method name is required.';
+    }
+
+    if (!tableExists($database, 'payment_methods')) {
+        $errors[] = 'Payment methods catalog is not available.';
+    }
+
+    $upload = handleCatalogImageUpload('payment_image_upload', $name ?: 'payment', 'payment-methods', $errors);
+    $imagePath = $upload ?? $imagePathInput;
+
+    if ($imagePath === '') {
+        $errors[] = 'Payment method image URL or upload is required.';
+    }
+
+    if ($errors === []) {
+        $statement = $database->prepare('INSERT INTO payment_methods (name, image_path) VALUES (:name, :image_path)');
+        $statement->execute([
+            ':name' => $name,
+            ':image_path' => $imagePath,
+        ]);
+        header('Location: admin.php?status=' . urlencode('Payment method added.'));
+        exit;
+    }
+
+    $actionError = implode(' ', $errors);
+}
+
 if (isset($_POST['action']) && $_POST['action'] === 'delete_casino') {
     $casinoId = isset($_POST['casino_id']) ? (int) $_POST['casino_id'] : 0;
     if ($casinoId > 0) {
         $statement = $database->prepare('DELETE FROM casinos WHERE id = :id');
         $statement->execute([':id' => $casinoId]);
         header('Location: admin.php?status=' . urlencode('Casino deleted.'));
+        exit;
+    }
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'delete_provider') {
+    $providerId = isset($_POST['provider_id']) ? (int) $_POST['provider_id'] : 0;
+    if ($providerId > 0) {
+        $statement = $database->prepare('DELETE FROM providers WHERE id = :id');
+        $statement->execute([':id' => $providerId]);
+        header('Location: admin.php?status=' . urlencode('Provider deleted.'));
+        exit;
+    }
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'delete_payment_method') {
+    $paymentId = isset($_POST['payment_id']) ? (int) $_POST['payment_id'] : 0;
+    if ($paymentId > 0) {
+        $statement = $database->prepare('DELETE FROM payment_methods WHERE id = :id');
+        $statement->execute([':id' => $paymentId]);
+        header('Location: admin.php?status=' . urlencode('Payment method deleted.'));
         exit;
     }
 }
@@ -472,6 +606,8 @@ $featuredSelections = [];
 foreach ($featuredSections as $section => $config) {
     $featuredSelections[$section] = fetchFeaturedSectionSelections($database, $section);
 }
+$providers = fetchProviders($database);
+$paymentMethodsCatalog = fetchPaymentMethodsCatalog($database);
 
 include __DIR__ . '/partials/html-head.php';
 ?>
@@ -646,6 +782,112 @@ include __DIR__ . '/partials/html-head.php';
                             </div>
                             <button type="submit" class="btn btn-brand">Save Featured Sections</button>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Software Providers</h5>
+                        <form method="post" enctype="multipart/form-data" class="mb-4">
+                            <input type="hidden" name="action" value="save_provider">
+                            <div class="mb-3">
+                                <label class="form-label" for="provider_name">Provider Name</label>
+                                <input type="text" class="form-control" id="provider_name" name="provider_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="provider_image">Provider Image URL</label>
+                                <input type="text" class="form-control" id="provider_image" name="provider_image">
+                                <input type="file" class="form-control mt-2" name="provider_image_upload" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-brand w-100">Add Provider</button>
+                        </form>
+                        <?php if (!empty($providers)): ?>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Image</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($providers as $provider): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?></td>
+                                            <td>
+                                                <img src="<?= htmlspecialchars($provider['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?>" style="max-height: 40px;">
+                                            </td>
+                                            <td>
+                                                <form method="post" onsubmit="return confirm('Delete this provider?');">
+                                                    <input type="hidden" name="action" value="delete_provider">
+                                                    <input type="hidden" name="provider_id" value="<?= (int) ($provider['id'] ?? 0) ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted">No providers added yet.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Payment Methods</h5>
+                        <form method="post" enctype="multipart/form-data" class="mb-4">
+                            <input type="hidden" name="action" value="save_payment_method">
+                            <div class="mb-3">
+                                <label class="form-label" for="payment_name">Payment Method Name</label>
+                                <input type="text" class="form-control" id="payment_name" name="payment_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="payment_image">Payment Method Image URL</label>
+                                <input type="text" class="form-control" id="payment_image" name="payment_image">
+                                <input type="file" class="form-control mt-2" name="payment_image_upload" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-brand w-100">Add Payment Method</button>
+                        </form>
+                        <?php if (!empty($paymentMethodsCatalog)): ?>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Image</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($paymentMethodsCatalog as $method): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?></td>
+                                            <td>
+                                                <img src="<?= htmlspecialchars($method['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?>" style="max-height: 40px;">
+                                            </td>
+                                            <td>
+                                                <form method="post" onsubmit="return confirm('Delete this payment method?');">
+                                                    <input type="hidden" name="action" value="delete_payment_method">
+                                                    <input type="hidden" name="payment_id" value="<?= (int) ($method['id'] ?? 0) ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted">No payment methods added yet.</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
