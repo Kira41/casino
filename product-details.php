@@ -98,6 +98,20 @@ $gameRows = !empty($games)
         'live_dealer_supported' => false,
         'virtual_reality_supported' => false,
     ]];
+$uniqueGameRows = [];
+$seenGameTypes = [];
+foreach ($gameRows as $gameRow) {
+    $gameTypeKey = strtolower(trim((string) ($gameRow['game_type'] ?? '')));
+    if ($gameTypeKey === '') {
+        continue;
+    }
+    if (isset($seenGameTypes[$gameTypeKey])) {
+        continue;
+    }
+    $seenGameTypes[$gameTypeKey] = true;
+    $uniqueGameRows[] = $gameRow;
+}
+$gameRows = !empty($uniqueGameRows) ? $uniqueGameRows : $gameRows;
 $iconifyBase = 'https://api.iconify.design/';
 $iconAccent = '#b33aa4';
 $gameTypeIcons = [
