@@ -12,6 +12,17 @@ $pageTitle = 'Casino Admin';
 const ADMIN_USER = 'shiva';
 const ADMIN_PASS = 'Shiva@41';
 
+$featuredSections = [
+    'hot_picks' => [
+        'label' => 'Hot Picks',
+        'slots' => 4,
+    ],
+    'most_played' => [
+        'label' => 'Top Casinos',
+        'slots' => 6,
+    ],
+];
+
 $loginError = '';
 $actionMessage = '';
 $actionError = '';
@@ -188,6 +199,45 @@ function handleImageUpload(string $fieldName, string $slug, array &$errors): ?st
     return 'assets/images/casinos/' . $filename;
 }
 
+function fetchFeaturedSectionSelections(PDO $database, string $section): array
+{
+    $statement = $database->prepare(
+        'SELECT casino_id, position FROM casino_cards WHERE section = :section ORDER BY position ASC, id ASC'
+    );
+    $statement->execute([':section' => $section]);
+
+    $selections = [];
+    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+        $position = (int) ($row['position'] ?? 0);
+        $casinoId = (int) ($row['casino_id'] ?? 0);
+        if ($position > 0 && $casinoId > 0) {
+            $selections[$position] = $casinoId;
+        }
+    }
+
+    return $selections;
+}
+
+function fetchCasinoCardSources(PDO $database, array $casinoIds): array
+{
+    if ($casinoIds === []) {
+        return [];
+    }
+
+    $placeholders = implode(',', array_fill(0, count($casinoIds), '?'));
+    $statement = $database->prepare(
+        "SELECT id, name, thumbnail_image, hero_image, rating, min_deposit_usd FROM casinos WHERE id IN ({$placeholders})"
+    );
+    $statement->execute(array_values($casinoIds));
+
+    $sources = [];
+    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+        $sources[(int) $row['id']] = $row;
+    }
+
+    return $sources;
+}
+
 if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $casinoId = isset($_POST['casino_id']) ? (int) $_POST['casino_id'] : 0;
     $name = isset($_POST['name']) ? trim((string) $_POST['name']) : '';
@@ -302,6 +352,90 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $actionError = implode(' ', $errors);
 }
 
+if (isset($_POST['action']) && $_POST['action'] === 'save_featured_sections') {
+    $errors = [];
+    $selectionsBySection = [];
+
+    foreach ($featuredSections as $section => $config) {
+        $sectionSelections = [];
+        for ($slot = 1; $slot <= (int) $config['slots']; $slot += 1) {
+            $fieldName = $section . '_slot_' . $slot;
+            $casinoId = isset($_POST[$fieldName]) ? (int) $_POST[$fieldName] : 0;
+            if ($casinoId > 0) {
+                $sectionSelections[$slot] = $casinoId;
+            }
+        }
+
+        if (count($sectionSelections) !== count(array_unique($sectionSelections))) {
+            $errors[] = sprintf('%s selections must be unique.', $config['label']);
+        }
+
+        $selectionsBySection[$section] = $sectionSelections;
+    }
+
+    if ($errors === []) {
+        $database->beginTransaction();
+        try {
+            foreach ($featuredSections as $section => $config) {
+                $deleteStatement = $database->prepare('DELETE FROM casino_cards WHERE section = :section');
+                $deleteStatement->execute([':section' => $section]);
+
+                $sectionSelections = $selectionsBySection[$section] ?? [];
+                if ($sectionSelections === []) {
+                    continue;
+                }
+
+                $sources = fetchCasinoCardSources($database, array_values($sectionSelections));
+                $insertStatement = $database->prepare(
+                    'INSERT INTO casino_cards (casino_id, section, title, image_path, min_deposit_label, rating, price_label, position)
+                    VALUES (:casino_id, :section, :title, :image_path, :min_deposit_label, :rating, :price_label, :position)'
+                );
+
+                foreach ($sectionSelections as $position => $casinoId) {
+                    if (!isset($sources[$casinoId])) {
+                        throw new RuntimeException('A selected casino could not be found.');
+                    }
+
+                    $source = $sources[$casinoId];
+                    $imagePath = (string) ($source['thumbnail_image'] ?? '');
+                    if ($imagePath === '') {
+                        $imagePath = (string) ($source['hero_image'] ?? '');
+                    }
+
+                    $rating = is_numeric($source['rating'] ?? null) ? (int) $source['rating'] : null;
+                    $minDepositLabel = formatMinDeposit(
+                        isset($source['min_deposit_usd']) && is_numeric($source['min_deposit_usd'])
+                            ? (int) $source['min_deposit_usd']
+                            : null
+                    );
+
+                    $insertStatement->execute([
+                        ':casino_id' => $casinoId,
+                        ':section' => $section,
+                        ':title' => $source['name'] ?? '',
+                        ':image_path' => $imagePath,
+                        ':min_deposit_label' => $minDepositLabel,
+                        ':rating' => $rating,
+                        ':price_label' => null,
+                        ':position' => $position,
+                    ]);
+                }
+            }
+
+            $database->commit();
+            header('Location: admin.php?status=' . urlencode('Featured sections updated.'));
+            exit;
+        } catch (Throwable $error) {
+            if ($database->inTransaction()) {
+                $database->rollBack();
+            }
+            $errors[] = 'Unable to update featured sections. Please try again.';
+        }
+    }
+
+    $actionError = implode(' ', $errors);
+}
+
 if (isset($_POST['action']) && $_POST['action'] === 'delete_casino') {
     $casinoId = isset($_POST['casino_id']) ? (int) $_POST['casino_id'] : 0;
     if ($casinoId > 0) {
@@ -339,6 +473,10 @@ $formValues = [
 ];
 
 $casinos = fetchCasinos($database);
+$featuredSelections = [];
+foreach ($featuredSections as $section => $config) {
+    $featuredSelections[$section] = fetchFeaturedSectionSelections($database, $section);
+}
 
 include __DIR__ . '/partials/html-head.php';
 ?>
@@ -480,6 +618,44 @@ include __DIR__ . '/partials/html-head.php';
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Homepage Featured Sections</h5>
+                        <p class="text-muted">Choose which casinos appear in the Hot Picks and Top Casinos sections on the homepage.</p>
+                        <form method="post">
+                            <input type="hidden" name="action" value="save_featured_sections">
+                            <div class="row g-3">
+                                <?php foreach ($featuredSections as $section => $config): ?>
+                                    <div class="col-lg-6">
+                                        <h6 class="mb-2"><?= htmlspecialchars($config['label'], ENT_QUOTES, 'UTF-8') ?></h6>
+                                        <?php for ($slot = 1; $slot <= (int) $config['slots']; $slot += 1): ?>
+                                            <?php
+                                            $fieldName = $section . '_slot_' . $slot;
+                                            $selectedId = $featuredSelections[$section][$slot] ?? 0;
+                                            ?>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">Slot <?= (int) $slot ?></label>
+                                                <select class="form-select" id="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>" name="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">
+                                                    <option value="0">-- None --</option>
+                                                    <?php foreach ($casinos as $casino): ?>
+                                                        <option value="<?= (int) $casino['id'] ?>" <?= (int) $selectedId === (int) $casino['id'] ? 'selected' : '' ?>>
+                                                            <?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        <?php endfor; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <button type="submit" class="btn btn-brand">Save Featured Sections</button>
+                        </form>
                     </div>
                 </div>
             </div>
