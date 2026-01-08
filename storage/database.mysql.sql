@@ -166,6 +166,15 @@ CREATE TABLE IF NOT EXISTS payment_methods (
     image_path VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS casino_provider_links (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    casino_id BIGINT UNSIGNED NOT NULL,
+    provider_id BIGINT UNSIGNED NOT NULL,
+    UNIQUE KEY casino_provider_unique (casino_id, provider_id),
+    FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE,
+    FOREIGN KEY (provider_id) REFERENCES providers(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed reference data from the existing HTML content
 INSERT IGNORE INTO casinos (id, slug, name, operator, license, headline_bonus, min_deposit_usd, hero_image, thumbnail_image, rating, short_description, cta_url)
 VALUES

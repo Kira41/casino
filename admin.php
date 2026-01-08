@@ -155,6 +155,99 @@ function updateCasinoTags(PDO $database, int $casinoId, string $type, array $tag
     }
 }
 
+function updateCasinoPaymentMethods(PDO $database, int $casinoId, array $paymentMethodIds): void
+{
+    if (!tableExists($database, 'casino_payment_methods') || !tableExists($database, 'payment_methods')) {
+        return;
+    }
+
+    $deleteStatement = $database->prepare('DELETE FROM casino_payment_methods WHERE casino_id = :casino_id');
+    $deleteStatement->execute([':casino_id' => $casinoId]);
+
+    if ($paymentMethodIds === []) {
+        return;
+    }
+
+    $placeholders = implode(',', array_fill(0, count($paymentMethodIds), '?'));
+    $fetchStatement = $database->prepare(
+        "SELECT name, image_path FROM payment_methods WHERE id IN ({$placeholders}) ORDER BY id ASC"
+    );
+    $fetchStatement->execute($paymentMethodIds);
+
+    $insertStatement = $database->prepare(
+        'INSERT INTO casino_payment_methods (casino_id, method_name, icon_key) VALUES (:casino_id, :method_name, :icon_key)'
+    );
+
+    foreach ($fetchStatement->fetchAll(PDO::FETCH_ASSOC) ?: [] as $method) {
+        $insertStatement->execute([
+            ':casino_id' => $casinoId,
+            ':method_name' => $method['name'],
+            ':icon_key' => $method['image_path'],
+        ]);
+    }
+}
+
+function updateCasinoProviders(PDO $database, int $casinoId, array $providerIds): void
+{
+    if (!tableExists($database, 'casino_provider_links')) {
+        return;
+    }
+
+    $deleteStatement = $database->prepare('DELETE FROM casino_provider_links WHERE casino_id = :casino_id');
+    $deleteStatement->execute([':casino_id' => $casinoId]);
+
+    if ($providerIds === []) {
+        return;
+    }
+
+    $insertStatement = $database->prepare(
+        'INSERT INTO casino_provider_links (casino_id, provider_id) VALUES (:casino_id, :provider_id)'
+    );
+
+    foreach ($providerIds as $providerId) {
+        $insertStatement->execute([
+            ':casino_id' => $casinoId,
+            ':provider_id' => $providerId,
+        ]);
+    }
+}
+
+function seedCasinoReviewSections(PDO $database, int $casinoId, string $casinoName): void
+{
+    if (!tableExists($database, 'casino_review_sections')) {
+        return;
+    }
+
+    $defaults = [
+        'Banking Methods' => 'Payment options overview for deposits and withdrawals.',
+        'General Information' => sprintf('Snapshot of %s including operator, licensing, and key requirements.', $casinoName),
+        'Support' => 'Support channels, response times, and help center highlights.',
+        'Devices' => 'Supported device options for playing on mobile and desktop.',
+        'Software Providers' => 'Curated studio mix delivering slots, tables, and live dealer experiences.',
+        'Additional Info' => 'Extra notes on promotions, security, and responsible play features.',
+    ];
+
+    $checkStatement = $database->prepare(
+        'SELECT id FROM casino_review_sections WHERE casino_id = :casino_id AND title = :title LIMIT 1'
+    );
+    $insertStatement = $database->prepare(
+        'INSERT INTO casino_review_sections (casino_id, title, summary) VALUES (:casino_id, :title, :summary)'
+    );
+
+    foreach ($defaults as $title => $summary) {
+        $checkStatement->execute([':casino_id' => $casinoId, ':title' => $title]);
+        if ($checkStatement->fetchColumn() !== false) {
+            continue;
+        }
+
+        $insertStatement->execute([
+            ':casino_id' => $casinoId,
+            ':title' => $title,
+            ':summary' => $summary,
+        ]);
+    }
+}
+
 function handleImageUpload(string $fieldName, string $slug, array &$errors): ?string
 {
     if (!isset($_FILES[$fieldName]) || !is_array($_FILES[$fieldName])) {
@@ -292,6 +385,7 @@ function fetchCasinoCardSources(PDO $database, array $casinoIds): array
 
 if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $casinoId = isset($_POST['casino_id']) ? (int) $_POST['casino_id'] : 0;
+    $existingCasino = $casinoId > 0 ? fetchCasinoById($database, $casinoId) : null;
     $name = isset($_POST['name']) ? trim((string) $_POST['name']) : '';
     $slug = isset($_POST['slug']) ? trim((string) $_POST['slug']) : '';
     $operator = isset($_POST['operator']) ? trim((string) $_POST['operator']) : '';
@@ -308,8 +402,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $categories = normalizeTagList((string) ($_POST['categories'] ?? ''));
     $genres = normalizeTagList((string) ($_POST['genres'] ?? ''));
     $perks = normalizeTagList((string) ($_POST['perks'] ?? ''));
+    $paymentMethodIds = array_map('intval', (array) ($_POST['payment_methods'] ?? []));
+    $paymentMethodIds = array_values(array_filter($paymentMethodIds, static fn(int $id): bool => $id > 0));
+    $providerIds = array_map('intval', (array) ($_POST['providers'] ?? []));
+    $providerIds = array_values(array_filter($providerIds, static fn(int $id): bool => $id > 0));
 
     $errors = [];
+    $isNewCasino = $casinoId <= 0;
 
     if ($name === '') {
         $errors[] = 'Casino name is required.';
@@ -333,6 +432,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
 
     if ($heroImage === '' && $thumbnailImage === '') {
         $errors[] = 'Provide at least one casino image.';
+    }
+
+    if ($isNewCasino && $paymentMethodIds === []) {
+        $errors[] = 'Select at least one payment method.';
+    }
+
+    if ($isNewCasino && $providerIds === []) {
+        $errors[] = 'Select at least one software provider.';
     }
 
     if ($errors === []) {
@@ -387,6 +494,19 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         updateCasinoTags($database, $casinoId, 'category', $categories);
         updateCasinoTags($database, $casinoId, 'genre', $genres);
         updateCasinoTags($database, $casinoId, 'perk', $perks);
+        if ($isNewCasino) {
+            seedCasinoReviewSections($database, $casinoId, $name);
+        }
+
+        $existingPaymentMethods = $existingCasino['payment_methods'] ?? [];
+        if ($paymentMethodIds !== [] || $isNewCasino || $existingPaymentMethods === []) {
+            updateCasinoPaymentMethods($database, $casinoId, $paymentMethodIds);
+        }
+
+        $existingProviders = $existingCasino['providers'] ?? [];
+        if ($providerIds !== [] || $isNewCasino || $existingProviders === []) {
+            updateCasinoProviders($database, $casinoId, $providerIds);
+        }
 
         $actionMessage = $casinoId > 0 ? 'Casino saved successfully.' : 'Casino created successfully.';
         header('Location: admin.php?status=' . urlencode($actionMessage));
@@ -599,6 +719,8 @@ $formValues = [
     'categories' => isset($editCasino['categories']) ? implode(', ', $editCasino['categories']) : '',
     'genres' => isset($editCasino['genres']) ? implode(', ', $editCasino['genres']) : '',
     'perks' => isset($editCasino['perks']) ? implode(', ', $editCasino['perks']) : '',
+    'payment_methods' => [],
+    'providers' => [],
 ];
 
 $casinos = fetchCasinos($database);
@@ -608,6 +730,25 @@ foreach ($featuredSections as $section => $config) {
 }
 $providers = fetchProviders($database);
 $paymentMethodsCatalog = fetchPaymentMethodsCatalog($database);
+
+if ($editCasino) {
+    $selectedPaymentMethodNames = array_map(
+        static fn(array $method): string => (string) ($method['method_name'] ?? ''),
+        $editCasino['payment_methods'] ?? []
+    );
+    $selectedPaymentMethodNames = array_filter($selectedPaymentMethodNames, static fn(string $name): bool => $name !== '');
+    foreach ($paymentMethodsCatalog as $method) {
+        if (in_array($method['name'], $selectedPaymentMethodNames, true)) {
+            $formValues['payment_methods'][] = (int) $method['id'];
+        }
+    }
+
+    foreach ($editCasino['providers'] ?? [] as $provider) {
+        if (isset($provider['id'])) {
+            $formValues['providers'][] = (int) $provider['id'];
+        }
+    }
+}
 
 include __DIR__ . '/partials/html-head.php';
 ?>
@@ -703,6 +844,48 @@ include __DIR__ . '/partials/html-head.php';
                             <div class="mb-3">
                                 <label class="form-label" for="perks">Perks (comma separated)</label>
                                 <input type="text" class="form-control" id="perks" name="perks" value="<?= htmlspecialchars((string) $formValues['perks'], ENT_QUOTES, 'UTF-8') ?>">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Methods</label>
+                                <?php if (!empty($paymentMethodsCatalog)): ?>
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <?php foreach ($paymentMethodsCatalog as $method): ?>
+                                            <?php $methodId = (int) ($method['id'] ?? 0); ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="payment_methods[]"
+                                                       id="payment-method-<?= $methodId ?>"
+                                                       value="<?= $methodId ?>"
+                                                       <?= in_array($methodId, $formValues['payment_methods'], true) ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="payment-method-<?= $methodId ?>">
+                                                    <?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted mb-0">No payment methods available.</p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Software Providers</label>
+                                <?php if (!empty($providers)): ?>
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <?php foreach ($providers as $provider): ?>
+                                            <?php $providerId = (int) ($provider['id'] ?? 0); ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="providers[]"
+                                                       id="provider-<?= $providerId ?>"
+                                                       value="<?= $providerId ?>"
+                                                       <?= in_array($providerId, $formValues['providers'], true) ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="provider-<?= $providerId ?>">
+                                                    <?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted mb-0">No providers available.</p>
+                                <?php endif; ?>
                             </div>
                             <button type="submit" class="btn btn-brand w-100">Save Casino</button>
                         </form>

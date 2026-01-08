@@ -50,10 +50,15 @@ $games = $casino['games'] ?? [];
 $prosCons = $casino['pros_cons'] ?? ['pros' => [], 'cons' => []];
 $highlights = $casino['highlights'] ?? [];
 $reviewSections = $casino['review_sections'] ?? [];
-$paymentMethods = fetchPaymentMethodsCatalog($database);
-$providers = fetchProviders($database);
+$paymentMethods = $casino['payment_methods'] ?? [];
+$providers = $casino['providers'] ?? [];
+if (empty($providers)) {
+    $providers = fetchProviders($database);
+}
 $hasReviews = !empty($reviewSections);
 $reviewSectionAliases = [
+    'banking-methods' => 'banking-methods',
+    'banking' => 'banking-methods',
     'general-info' => 'general-information',
     'general-information' => 'general-information',
     'support' => 'support',
@@ -64,6 +69,7 @@ $reviewSectionAliases = [
     'additional-information' => 'additional-info',
 ];
 $reviewSectionOrder = [
+    'banking-methods' => ['label' => 'Banking Methods', 'icon' => 'fa-credit-card text-warning'],
     'general-information' => ['label' => 'General Information', 'icon' => 'fa-info-circle text-warning'],
     'support' => ['label' => 'Support', 'icon' => 'fa-headset text-warning'],
     'devices' => ['label' => 'Devices', 'icon' => 'fa-desktop text-warning'],
@@ -309,34 +315,11 @@ include __DIR__ . '/partials/header.php';
                 <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                   <div class="review-panel">
                     <div class="accordion review-accordion" id="reviewsAccordion">
-                      <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingBankingMethods">
-                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBankingMethods" aria-expanded="false" aria-controls="collapseBankingMethods">
-                            <i class="fa fa-credit-card text-warning me-2" aria-hidden="true"></i>
-                            <span class="ms-1">Banking Methods</span>
-                          </button>
-                        </h2>
-                        <div id="collapseBankingMethods" class="accordion-collapse collapse" aria-labelledby="headingBankingMethods" data-bs-parent="#reviewsAccordion">
-                          <div class="accordion-body">
-                            <?php if (!empty($paymentMethods)): ?>
-                              <div class="payment-methods-list">
-                                <?php foreach ($paymentMethods as $method): ?>
-                                  <div class="payment-method">
-                                    <img src="<?= htmlspecialchars($method['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <span><?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?></span>
-                                  </div>
-                                <?php endforeach; ?>
-                              </div>
-                            <?php else: ?>
-                              <p class="mb-0 text-muted">Details coming soon.</p>
-                            <?php endif; ?>
-                          </div>
-                        </div>
-                      </div>
                       <?php foreach ($orderedReviewSections as $index => $section): ?>
                         <?php $collapseId = 'section-' . $index; ?>
+                        <?php $hasPaymentList = $section['key'] === 'banking-methods' && !empty($paymentMethods); ?>
                         <?php $hasProviderList = $section['key'] === 'software-providers' && !empty($providers); ?>
-                        <?php $hasSectionContent = $hasProviderList || !empty($section['summary']) || !empty($section['points']); ?>
+                        <?php $hasSectionContent = $hasPaymentList || $hasProviderList || !empty($section['summary']) || !empty($section['points']); ?>
                         <div class="accordion-item">
                           <h2 class="accordion-header" id="heading-<?= $collapseId ?>">
                             <button class="accordion-button <?= $index === 0 ? '' : 'collapsed' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?= $collapseId ?>" aria-expanded="<?= $index === 0 ? 'true' : 'false' ?>" aria-controls="collapse-<?= $collapseId ?>">
@@ -346,6 +329,26 @@ include __DIR__ . '/partials/header.php';
                           </h2>
                           <div id="collapse-<?= $collapseId ?>" class="accordion-collapse collapse <?= $index === 0 ? 'show' : '' ?>" aria-labelledby="heading-<?= $collapseId ?>" data-bs-parent="#reviewsAccordion">
                             <div class="accordion-body">
+                              <?php if ($section['key'] === 'banking-methods'): ?>
+                                <?php if (!empty($paymentMethods)): ?>
+                                  <div class="payment-methods-list">
+                                    <?php foreach ($paymentMethods as $method): ?>
+                                      <?php
+                                      $methodName = (string) ($method['method_name'] ?? ($method['name'] ?? ''));
+                                      $iconKey = (string) ($method['icon_key'] ?? '');
+                                      $isImage = $iconKey !== '' && (str_contains($iconKey, '/') || str_starts_with($iconKey, 'http'));
+                                      $iconSrc = $isImage ? $iconKey : ($iconKey !== '' ? $iconifyBase . $iconKey . '.svg?color=' . urlencode($iconAccent) : '');
+                                      ?>
+                                      <div class="payment-method">
+                                        <?php if ($iconSrc !== ''): ?>
+                                          <img src="<?= htmlspecialchars($iconSrc, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($methodName, ENT_QUOTES, 'UTF-8') ?>">
+                                        <?php endif; ?>
+                                        <span><?= htmlspecialchars($methodName, ENT_QUOTES, 'UTF-8') ?></span>
+                                      </div>
+                                    <?php endforeach; ?>
+                                  </div>
+                                <?php endif; ?>
+                              <?php endif; ?>
                               <?php if ($hasProviderList): ?>
                                 <div class="providers-list mb-3">
                                   <?php foreach ($providers as $provider): ?>
