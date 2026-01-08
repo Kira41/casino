@@ -166,8 +166,12 @@ function columnExists(PDO $database, string $table, string $column): bool
     }
 
     if ($driver === 'mysql') {
-        $statement = $database->prepare('SHOW COLUMNS FROM `' . $table . '` LIKE :column');
-        $statement->execute([':column' => $column]);
+        $columnLike = $database->quote($column);
+        if ($columnLike === false) {
+            return false;
+        }
+
+        $statement = $database->query("SHOW COLUMNS FROM `{$table}` LIKE {$columnLike}");
         return (bool) $statement->fetchColumn();
     }
 
