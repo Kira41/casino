@@ -188,6 +188,16 @@ function fetchCasinoGameModes(PDO $database, int $casinoId): array
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 
+function fetchCasinoPaymentMethods(PDO $database, int $casinoId): array
+{
+    $statement = $database->prepare(
+        'SELECT method_name, icon_key FROM casino_payment_methods WHERE casino_id = :casino_id ORDER BY id ASC'
+    );
+    $statement->execute([':casino_id' => $casinoId]);
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
 function fetchCasinoReviewSections(PDO $database, int $casinoId): array
 {
     $statement = $database->prepare(
@@ -250,6 +260,7 @@ function hydrateCasinoDetails(PDO $database, ?array $casino): ?array
     $casino['pros_cons'] = fetchCasinoProsCons($database, $casinoId);
     $casino['highlights'] = fetchCasinoHighlights($database, $casinoId);
     $casino['games'] = fetchCasinoGameModes($database, $casinoId);
+    $casino['payment_methods'] = fetchCasinoPaymentMethods($database, $casinoId);
     $casino['review_sections'] = fetchCasinoReviewSections($database, $casinoId);
 
     return $casino;
