@@ -367,7 +367,7 @@ include __DIR__ . '/partials/header.php';
                               <?php if (!empty($section['summary'])): ?>
                                 <p class="mb-3"><?= htmlspecialchars($section['summary'], ENT_QUOTES, 'UTF-8') ?></p>
                               <?php endif; ?>
-                              <?php if (!empty($section['points']) && $section['key'] !== 'devices'): ?>
+                              <?php if (!empty($section['points']) && $section['key'] !== 'devices' && $section['key'] !== 'software-providers'): ?>
                                 <div class="row g-3 align-items-start">
                                   <?php foreach ($section['points'] as $point): ?>
                                     <div class="col-md-6">
