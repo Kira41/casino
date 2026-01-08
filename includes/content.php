@@ -253,6 +253,24 @@ function fetchProviders(PDO $database): array
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 
+function fetchCasinoProviders(PDO $database, int $casinoId): array
+{
+    if (!tableExists($database, 'casino_provider_links') || !tableExists($database, 'providers')) {
+        return [];
+    }
+
+    $statement = $database->prepare(
+        'SELECT p.id, p.name, p.image_path
+        FROM casino_provider_links l
+        INNER JOIN providers p ON p.id = l.provider_id
+        WHERE l.casino_id = :casino_id
+        ORDER BY p.name ASC'
+    );
+    $statement->execute([':casino_id' => $casinoId]);
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
 function fetchCasinoReviewSections(PDO $database, int $casinoId): array
 {
     $statement = $database->prepare(
@@ -316,6 +334,7 @@ function hydrateCasinoDetails(PDO $database, ?array $casino): ?array
     $casino['highlights'] = fetchCasinoHighlights($database, $casinoId);
     $casino['games'] = fetchCasinoGameModes($database, $casinoId);
     $casino['payment_methods'] = fetchCasinoPaymentMethods($database, $casinoId);
+    $casino['providers'] = fetchCasinoProviders($database, $casinoId);
     $casino['review_sections'] = fetchCasinoReviewSections($database, $casinoId);
 
     return $casino;

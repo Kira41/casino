@@ -96,6 +96,7 @@ function initializeTables(PDO $database): void
 
     ensureCasinoCategorySeeds($database);
     ensureTopCasinoColumn($database);
+    ensureCasinoProviderLinks($database);
 }
 
 function ensureMetadataTable(PDO $database): void
@@ -199,6 +200,24 @@ function ensureTopCasinoColumn(PDO $database): void
         'ALTER TABLE casinos ADD COLUMN is_top1 %s NOT NULL DEFAULT 0',
         $columnType
     ));
+}
+
+function ensureCasinoProviderLinks(PDO $database): void
+{
+    if (tableExists($database, 'casino_provider_links')) {
+        return;
+    }
+
+    $database->exec(
+        'CREATE TABLE IF NOT EXISTS casino_provider_links (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            casino_id BIGINT UNSIGNED NOT NULL,
+            provider_id BIGINT UNSIGNED NOT NULL,
+            UNIQUE KEY casino_provider_unique (casino_id, provider_id),
+            FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE,
+            FOREIGN KEY (provider_id) REFERENCES providers(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
 }
 
 function removeDuplicateSeedData(PDO $database): void
