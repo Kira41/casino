@@ -52,6 +52,43 @@ $highlights = $casino['highlights'] ?? [];
 $reviewSections = $casino['review_sections'] ?? [];
 $paymentMethods = $casino['payment_methods'] ?? [];
 $hasReviews = !empty($reviewSections);
+$reviewSectionAliases = [
+    'general-info' => 'general-information',
+    'general-information' => 'general-information',
+    'support' => 'support',
+    'devices' => 'devices',
+    'software-providers' => 'software-providers',
+    'software-provider' => 'software-providers',
+    'additional-info' => 'additional-info',
+    'additional-information' => 'additional-info',
+];
+$reviewSectionOrder = [
+    'general-information' => ['label' => 'General Information', 'icon' => 'fa-info-circle text-warning'],
+    'support' => ['label' => 'Support', 'icon' => 'fa-headset text-warning'],
+    'devices' => ['label' => 'Devices', 'icon' => 'fa-desktop text-warning'],
+    'software-providers' => ['label' => 'Software Providers', 'icon' => 'fa-cubes text-warning'],
+    'additional-info' => ['label' => 'Additional Info', 'icon' => 'fa-plus-circle text-warning'],
+];
+$reviewSectionsByKey = [];
+foreach ($reviewSections as $section) {
+    $key = strtolower(trim((string) $section['title']));
+    $key = preg_replace('/[^a-z0-9]+/', '-', $key) ?? '';
+    $key = trim($key, '-');
+    $canonicalKey = $reviewSectionAliases[$key] ?? $key;
+    if ($canonicalKey === '') {
+        continue;
+    }
+    if (!isset($reviewSectionsByKey[$canonicalKey])) {
+        $reviewSectionsByKey[$canonicalKey] = $section;
+    }
+}
+$orderedReviewSections = [];
+foreach ($reviewSectionOrder as $key => $meta) {
+    $section = $reviewSectionsByKey[$key] ?? ['title' => $meta['label'], 'summary' => '', 'points' => []];
+    $section['title'] = $meta['label'];
+    $section['icon'] = $meta['icon'];
+    $orderedReviewSections[] = $section;
+}
 $gameRows = !empty($games)
     ? $games
     : [[
@@ -236,12 +273,36 @@ include __DIR__ . '/partials/header.php';
                 <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                   <div class="review-panel">
                     <div class="accordion review-accordion" id="reviewsAccordion">
-                      <?php foreach ($reviewSections as $index => $section): ?>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingBankingMethods">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBankingMethods" aria-expanded="false" aria-controls="collapseBankingMethods">
+                            <i class="fa fa-credit-card text-warning me-2" aria-hidden="true"></i>
+                            <span class="ms-1">Banking Methods</span>
+                          </button>
+                        </h2>
+                        <div id="collapseBankingMethods" class="accordion-collapse collapse" aria-labelledby="headingBankingMethods" data-bs-parent="#reviewsAccordion">
+                          <div class="accordion-body">
+                            <?php if (!empty($paymentMethods)): ?>
+                              <div class="payment-methods-list">
+                                <?php foreach ($paymentMethods as $method): ?>
+                                  <div class="payment-method">
+                                    <img src="<?= htmlspecialchars($iconifyBase . $method['icon_key'] . '.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <span><?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                  </div>
+                                <?php endforeach; ?>
+                              </div>
+                            <?php else: ?>
+                              <p class="mb-0 text-muted">Details coming soon.</p>
+                            <?php endif; ?>
+                          </div>
+                        </div>
+                      </div>
+                      <?php foreach ($orderedReviewSections as $index => $section): ?>
                         <?php $collapseId = 'section-' . $index; ?>
                         <div class="accordion-item">
                           <h2 class="accordion-header" id="heading-<?= $collapseId ?>">
                             <button class="accordion-button <?= $index === 0 ? '' : 'collapsed' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?= $collapseId ?>" aria-expanded="<?= $index === 0 ? 'true' : 'false' ?>" aria-controls="collapse-<?= $collapseId ?>">
-                              <i class="fa fa-info-circle text-warning me-2"></i>
+                              <i class="fa <?= htmlspecialchars($section['icon'] ?? 'fa-info-circle text-warning', ENT_QUOTES, 'UTF-8') ?> me-2"></i>
                               <span><?= htmlspecialchars($section['title'], ENT_QUOTES, 'UTF-8') ?></span>
                             </button>
                           </h2>
@@ -264,32 +325,13 @@ include __DIR__ . '/partials/header.php';
                                   <?php endforeach; ?>
                                 </div>
                               <?php endif; ?>
+                              <?php if (empty($section['summary']) && empty($section['points'])): ?>
+                                <p class="mb-0 text-muted">Details coming soon.</p>
+                              <?php endif; ?>
                             </div>
                           </div>
                         </div>
                       <?php endforeach; ?>
-                      <?php if (!empty($paymentMethods)): ?>
-                        <div class="accordion-item">
-                          <h2 class="accordion-header" id="headingBankingMethods">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBankingMethods" aria-expanded="false" aria-controls="collapseBankingMethods">
-                              <i class="fa fa-credit-card text-warning me-2" aria-hidden="true"></i>
-                              <span class="ms-1">Banking Methods</span>
-                            </button>
-                          </h2>
-                          <div id="collapseBankingMethods" class="accordion-collapse collapse" aria-labelledby="headingBankingMethods" data-bs-parent="#reviewsAccordion">
-                            <div class="accordion-body">
-                              <div class="payment-methods-list">
-                                <?php foreach ($paymentMethods as $method): ?>
-                                  <div class="payment-method">
-                                    <img src="<?= htmlspecialchars($iconifyBase . $method['icon_key'] . '.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <span><?= htmlspecialchars($method['method_name'], ENT_QUOTES, 'UTF-8') ?></span>
-                                  </div>
-                                <?php endforeach; ?>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      <?php endif; ?>
                       <div class="accordion-item">
                         <h2 class="accordion-header" id="headingProsCons">
                           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProsCons" aria-expanded="false" aria-controls="collapseProsCons">
