@@ -6,7 +6,6 @@ if (!isset($activePage)) {
 $navItems = [
     ['label' => 'Home', 'href' => 'index.php', 'key' => 'home'],
     ['label' => 'All Casinos', 'href' => 'all-casinos.php', 'key' => 'all'],
-    ['label' => 'Product Details', 'href' => 'product-details.php', 'key' => 'product'],
     ['label' => 'Contact Us', 'href' => 'contact.php', 'key' => 'contact'],
     ['label' => 'VIP & Loyalty Insights', 'href' => 'vip-loyalty-insights.php', 'key' => 'vip'],
 ];
