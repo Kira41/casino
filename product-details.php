@@ -203,26 +203,7 @@ $tableHeaderIcons = [
     'Virtual Reality' => 'mdi:virtual-reality',
     'Reviews' => 'mdi:star-circle',
 ];
-$deviceSupportGroups = [
-    [
-        'label' => 'Mobile',
-        'icon' => 'fa-mobile-alt',
-        'items' => [
-            ['label' => 'Android', 'icon' => 'fab fa-android'],
-            ['label' => 'iOS', 'icon' => 'fab fa-apple'],
-        ],
-    ],
-    [
-        'label' => 'Desktop',
-        'icon' => 'fa-desktop',
-        'items' => [
-            ['label' => 'Chrome', 'icon' => 'fab fa-chrome'],
-            ['label' => 'Safari', 'icon' => 'fab fa-safari'],
-            ['label' => 'Firefox', 'icon' => 'fab fa-firefox-browser'],
-            ['label' => 'Edge', 'icon' => 'fab fa-edge'],
-        ],
-    ],
-];
+$deviceSupportGroups = buildDeviceSupportGroups($casino['devices'] ?? []);
 $relatedCasinos = $categorySlug !== ''
     ? array_values(array_filter($categoryCasinos, static fn($card) => (string) ($card['slug'] ?? '') !== (string) $casino['slug']))
     : fetchCasinoCards($database, 'related');

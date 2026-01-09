@@ -271,6 +271,94 @@ function fetchCasinoProviders(PDO $database, int $casinoId): array
     return $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 
+function getDeviceSupportCatalog(): array
+{
+    return [
+        'mobile' => [
+            'label' => 'Mobile',
+            'icon' => 'fa-mobile-alt',
+            'items' => [
+                'android' => ['label' => 'Android', 'icon' => 'fab fa-android'],
+                'ios' => ['label' => 'iOS', 'icon' => 'fab fa-apple'],
+            ],
+        ],
+        'desktop' => [
+            'label' => 'Desktop',
+            'icon' => 'fa-desktop',
+            'items' => [
+                'chrome' => ['label' => 'Chrome', 'icon' => 'fab fa-chrome'],
+                'safari' => ['label' => 'Safari', 'icon' => 'fab fa-safari'],
+                'firefox' => ['label' => 'Firefox', 'icon' => 'fab fa-firefox-browser'],
+                'edge' => ['label' => 'Edge', 'icon' => 'fab fa-edge'],
+            ],
+        ],
+    ];
+}
+
+function buildDeviceSupportGroups(array $selectedDevices): array
+{
+    $catalog = getDeviceSupportCatalog();
+    $hasSelections = false;
+    foreach ($selectedDevices as $devices) {
+        if (!empty($devices)) {
+            $hasSelections = true;
+            break;
+        }
+    }
+
+    $groups = [];
+    foreach ($catalog as $groupKey => $group) {
+        $groupItems = [];
+        $selectedKeys = $selectedDevices[$groupKey] ?? [];
+        foreach ($group['items'] as $deviceKey => $device) {
+            if (!$hasSelections || in_array($deviceKey, $selectedKeys, true)) {
+                $groupItems[] = [
+                    'label' => $device['label'],
+                    'icon' => $device['icon'],
+                ];
+            }
+        }
+
+        if ($groupItems !== []) {
+            $groups[] = [
+                'label' => $group['label'],
+                'icon' => $group['icon'],
+                'items' => $groupItems,
+            ];
+        }
+    }
+
+    return $groups;
+}
+
+function fetchCasinoDevices(PDO $database, int $casinoId): array
+{
+    if (!tableExists($database, 'casino_devices')) {
+        return [];
+    }
+
+    $statement = $database->prepare(
+        'SELECT device_group, device_key FROM casino_devices WHERE casino_id = :casino_id ORDER BY id ASC'
+    );
+    $statement->execute([':casino_id' => $casinoId]);
+
+    $devices = [];
+    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+        $group = (string) ($row['device_group'] ?? '');
+        $key = (string) ($row['device_key'] ?? '');
+        if ($group === '' || $key === '') {
+            continue;
+        }
+        $devices[$group][] = $key;
+    }
+
+    foreach ($devices as $group => $keys) {
+        $devices[$group] = array_values(array_unique($keys));
+    }
+
+    return $devices;
+}
+
 function fetchCasinoReviewSections(PDO $database, int $casinoId): array
 {
     $statement = $database->prepare(
@@ -335,6 +423,7 @@ function hydrateCasinoDetails(PDO $database, ?array $casino): ?array
     $casino['games'] = fetchCasinoGameModes($database, $casinoId);
     $casino['payment_methods'] = fetchCasinoPaymentMethods($database, $casinoId);
     $casino['providers'] = fetchCasinoProviders($database, $casinoId);
+    $casino['devices'] = fetchCasinoDevices($database, $casinoId);
     $casino['review_sections'] = fetchCasinoReviewSections($database, $casinoId);
 
     return $casino;

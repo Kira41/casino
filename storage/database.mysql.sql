@@ -130,6 +130,14 @@ CREATE TABLE IF NOT EXISTS casino_review_points (
     FOREIGN KEY (review_section_id) REFERENCES casino_review_sections(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS casino_devices (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    casino_id BIGINT UNSIGNED NOT NULL,
+    device_group VARCHAR(50) NOT NULL,
+    device_key VARCHAR(50) NOT NULL,
+    FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS casino_pros_cons (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     casino_id BIGINT UNSIGNED NOT NULL,

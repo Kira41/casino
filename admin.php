@@ -38,6 +38,7 @@ $gameTypeOptions = [
     ['label' => 'Bingo'],
     ['label' => 'Baccarat'],
 ];
+$deviceSupportCatalog = getDeviceSupportCatalog();
 
 $loginError = '';
 $actionMessage = '';
@@ -263,6 +264,62 @@ function updateCasinoGameModes(PDO $database, int $casinoId, array $gameModes): 
     }
 }
 
+function updateCasinoProsCons(PDO $database, int $casinoId, array $pros, array $cons): void
+{
+    if (!tableExists($database, 'casino_pros_cons')) {
+        return;
+    }
+
+    $deleteStatement = $database->prepare('DELETE FROM casino_pros_cons WHERE casino_id = :casino_id');
+    $deleteStatement->execute([':casino_id' => $casinoId]);
+
+    $insertStatement = $database->prepare(
+        'INSERT INTO casino_pros_cons (casino_id, type, content) VALUES (:casino_id, :type, :content)'
+    );
+
+    foreach (['pro' => $pros, 'con' => $cons] as $type => $items) {
+        foreach ($items as $item) {
+            $content = trim((string) $item);
+            if ($content === '') {
+                continue;
+            }
+            $insertStatement->execute([
+                ':casino_id' => $casinoId,
+                ':type' => $type,
+                ':content' => $content,
+            ]);
+        }
+    }
+}
+
+function updateCasinoDevices(PDO $database, int $casinoId, array $devices): void
+{
+    if (!tableExists($database, 'casino_devices')) {
+        return;
+    }
+
+    $deleteStatement = $database->prepare('DELETE FROM casino_devices WHERE casino_id = :casino_id');
+    $deleteStatement->execute([':casino_id' => $casinoId]);
+
+    if ($devices === []) {
+        return;
+    }
+
+    $insertStatement = $database->prepare(
+        'INSERT INTO casino_devices (casino_id, device_group, device_key) VALUES (:casino_id, :device_group, :device_key)'
+    );
+
+    foreach ($devices as $groupKey => $deviceKeys) {
+        foreach ($deviceKeys as $deviceKey) {
+            $insertStatement->execute([
+                ':casino_id' => $casinoId,
+                ':device_group' => $groupKey,
+                ':device_key' => $deviceKey,
+            ]);
+        }
+    }
+}
+
 function seedCasinoReviewSections(PDO $database, int $casinoId, string $casinoName): void
 {
     if (!tableExists($database, 'casino_review_sections')) {
@@ -450,6 +507,26 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $heroImageInput = isset($_POST['hero_image']) ? trim((string) $_POST['hero_image']) : '';
     $thumbnailImageInput = isset($_POST['thumbnail_image']) ? trim((string) $_POST['thumbnail_image']) : '';
 
+    $deviceCatalog = getDeviceSupportCatalog();
+    $deviceInput = (array) ($_POST['devices'] ?? []);
+    $deviceSelections = [];
+    foreach ($deviceCatalog as $groupKey => $group) {
+        $selectedKeys = array_map('strval', (array) ($deviceInput[$groupKey] ?? []));
+        $allowedKeys = array_keys($group['items']);
+        $filtered = array_values(array_filter(
+            array_unique($selectedKeys),
+            static fn(string $key): bool => in_array($key, $allowedKeys, true)
+        ));
+        if ($filtered !== []) {
+            $deviceSelections[$groupKey] = $filtered;
+        }
+    }
+
+    $pros = array_map('trim', (array) ($_POST['pros'] ?? []));
+    $pros = array_values(array_filter($pros, static fn(string $value): bool => $value !== ''));
+    $cons = array_map('trim', (array) ($_POST['cons'] ?? []));
+    $cons = array_values(array_filter($cons, static fn(string $value): bool => $value !== ''));
+
     $categories = normalizeTagList((string) ($_POST['categories'] ?? ''));
     $genres = normalizeTagList((string) ($_POST['genres'] ?? ''));
     $perks = normalizeTagList((string) ($_POST['perks'] ?? ''));
@@ -520,6 +597,18 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         $errors[] = 'Select at least one software provider.';
     }
 
+    if ($isNewCasino && $deviceSelections === []) {
+        $errors[] = 'Select at least one device option.';
+    }
+
+    if ($isNewCasino && $pros === []) {
+        $errors[] = 'Add at least one pro.';
+    }
+
+    if ($isNewCasino && $cons === []) {
+        $errors[] = 'Add at least one con.';
+    }
+
     if ($errors === []) {
         $checkStatement = $database->prepare('SELECT id FROM casinos WHERE slug = :slug LIMIT 1');
         $checkStatement->execute([':slug' => $slug]);
@@ -587,6 +676,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         }
 
         updateCasinoGameModes($database, $casinoId, $gameModes);
+        updateCasinoProsCons($database, $casinoId, $pros, $cons);
+        updateCasinoDevices($database, $casinoId, $deviceSelections);
 
         $actionMessage = $casinoId > 0 ? 'Casino saved successfully.' : 'Casino created successfully.';
         header('Location: admin.php?status=' . urlencode($actionMessage));
@@ -830,6 +921,9 @@ $formValues = [
     'payment_methods' => [],
     'providers' => [],
     'game_modes' => [],
+    'pros' => $editCasino['pros_cons']['pros'] ?? [],
+    'cons' => $editCasino['pros_cons']['cons'] ?? [],
+    'devices' => $editCasino['devices'] ?? [],
 ];
 
 $casinos = fetchCasinos($database);
@@ -881,6 +975,14 @@ if ($editCasino) {
             'virtual_reality_supported' => !empty($game['virtual_reality_supported']),
         ];
     }
+}
+
+if ($formValues['pros'] === []) {
+    $formValues['pros'] = [''];
+}
+
+if ($formValues['cons'] === []) {
+    $formValues['cons'] = [''];
 }
 
 include __DIR__ . '/partials/html-head.php';
@@ -1068,6 +1170,85 @@ include __DIR__ . '/partials/html-head.php';
                                 <?php else: ?>
                                     <p class="text-muted mb-0">No providers available.</p>
                                 <?php endif; ?>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Devices</label>
+                                <div class="row g-3">
+                                    <?php foreach ($deviceSupportCatalog as $groupKey => $group): ?>
+                                        <div class="col-md-6">
+                                            <div class="bg-light border rounded-3 p-3 h-100">
+                                                <div class="d-flex align-items-center gap-2 text-uppercase small fw-semibold text-muted mb-2">
+                                                    <i class="fa <?= htmlspecialchars($group['icon'], ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
+                                                    <span><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    <?php foreach ($group['items'] as $deviceKey => $device): ?>
+                                                        <?php
+                                                        $deviceId = sprintf('device-%s-%s', $groupKey, $deviceKey);
+                                                        $isChecked = in_array(
+                                                            $deviceKey,
+                                                            $formValues['devices'][$groupKey] ?? [],
+                                                            true
+                                                        );
+                                                        ?>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                   id="<?= htmlspecialchars($deviceId, ENT_QUOTES, 'UTF-8') ?>"
+                                                                   name="devices[<?= htmlspecialchars($groupKey, ENT_QUOTES, 'UTF-8') ?>][]"
+                                                                   value="<?= htmlspecialchars($deviceKey, ENT_QUOTES, 'UTF-8') ?>"
+                                                                <?= $isChecked ? 'checked' : '' ?>>
+                                                            <label class="form-check-label" for="<?= htmlspecialchars($deviceId, ENT_QUOTES, 'UTF-8') ?>">
+                                                                <i class="<?= htmlspecialchars($device['icon'], ENT_QUOTES, 'UTF-8') ?> me-1" aria-hidden="true"></i>
+                                                                <?= htmlspecialchars($device['label'], ENT_QUOTES, 'UTF-8') ?>
+                                                            </label>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Pros &amp; Cons</label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-success mb-2"><i class="fa fa-thumbs-up me-2"></i>Pros</h6>
+                                        <div data-pros-list>
+                                            <?php foreach ($formValues['pros'] as $pro): ?>
+                                                <div class="input-group mb-2" data-pros-row>
+                                                    <input type="text" class="form-control" name="pros[]"
+                                                           value="<?= htmlspecialchars((string) $pro, ENT_QUOTES, 'UTF-8') ?>"
+                                                           placeholder="Add a pro">
+                                                    <button class="btn btn-outline-danger" type="button" data-remove-row>
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-success" type="button" data-add-pro>
+                                            <i class="fa fa-plus me-1" aria-hidden="true"></i>Add Pro
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-danger mb-2"><i class="fa fa-thumbs-down me-2"></i>Cons</h6>
+                                        <div data-cons-list>
+                                            <?php foreach ($formValues['cons'] as $con): ?>
+                                                <div class="input-group mb-2" data-cons-row>
+                                                    <input type="text" class="form-control" name="cons[]"
+                                                           value="<?= htmlspecialchars((string) $con, ENT_QUOTES, 'UTF-8') ?>"
+                                                           placeholder="Add a con">
+                                                    <button class="btn btn-outline-danger" type="button" data-remove-row>
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-danger" type="button" data-add-con>
+                                            <i class="fa fa-plus me-1" aria-hidden="true"></i>Add Con
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-brand w-100">Save Casino</button>
                         </form>
@@ -1257,5 +1438,66 @@ include __DIR__ . '/partials/html-head.php';
         </div>
     </div>
 </div>
+<?php
+?>
+<template id="pros-row-template">
+    <div class="input-group mb-2" data-pros-row>
+        <input type="text" class="form-control" name="pros[]" placeholder="Add a pro">
+        <button class="btn btn-outline-danger" type="button" data-remove-row>
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+</template>
+<template id="cons-row-template">
+    <div class="input-group mb-2" data-cons-row>
+        <input type="text" class="form-control" name="cons[]" placeholder="Add a con">
+        <button class="btn btn-outline-danger" type="button" data-remove-row>
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+</template>
+<script>
+  (function () {
+    const prosList = document.querySelector("[data-pros-list]");
+    const consList = document.querySelector("[data-cons-list]");
+    const addProButton = document.querySelector("[data-add-pro]");
+    const addConButton = document.querySelector("[data-add-con]");
+    const prosTemplate = document.getElementById("pros-row-template");
+    const consTemplate = document.getElementById("cons-row-template");
+
+    const addRow = (list, template) => {
+      if (!list || !template) {
+        return;
+      }
+      const node = template.content.firstElementChild.cloneNode(true);
+      list.appendChild(node);
+    };
+
+    const bindRemove = (list) => {
+      if (!list) {
+        return;
+      }
+      list.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-remove-row]");
+        if (!button) {
+          return;
+        }
+        const row = button.closest(".input-group");
+        if (row) {
+          row.remove();
+        }
+      });
+    };
+
+    if (addProButton) {
+      addProButton.addEventListener("click", () => addRow(prosList, prosTemplate));
+    }
+    if (addConButton) {
+      addConButton.addEventListener("click", () => addRow(consList, consTemplate));
+    }
+    bindRemove(prosList);
+    bindRemove(consList);
+  })();
+</script>
 <?php
 include __DIR__ . '/partials/footer.php';
