@@ -903,7 +903,6 @@ include __DIR__ . '/partials/html-head.php';
                                     <th>Name</th>
                                     <th>Slug</th>
                                     <th>Rating</th>
-                                    <th>Top 1</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
@@ -913,7 +912,6 @@ include __DIR__ . '/partials/html-head.php';
                                         <td><?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?></td>
                                         <td><?= htmlspecialchars($casino['slug'], ENT_QUOTES, 'UTF-8') ?></td>
                                         <td><?= (int) $casino['rating'] ?>/5</td>
-                                        <td><?= (int) ($casino['is_top1'] ?? 0) === 1 ? 'Yes' : '—' ?></td>
                                         <td class="d-flex gap-2">
                                             <a class="btn btn-sm btn-outline-primary" href="admin.php?edit=<?= (int) $casino['id'] ?>">Edit</a>
                                             <form method="post" onsubmit="return confirm('Delete this casino?');">
