@@ -1374,39 +1374,52 @@ include __DIR__ . '/partials/html-head.php';
                         <form method="post">
                             <input type="hidden" name="action" value="save_featured_sections">
                             <div class="row g-3">
-                                <?php foreach ($featuredSections as $section => $config): ?>
-                                    <?php
-                                    $columnClass = match ((int) $config['slots']) {
-                                        1 => 'col-12 col-lg-3',
-                                        4 => 'col-12 col-lg-4',
-                                        default => 'col-12 col-lg-5',
-                                    };
-                                    ?>
-                                    <div class="<?= htmlspecialchars($columnClass, ENT_QUOTES, 'UTF-8') ?>">
+                                <?php
+                                $featuredColumnGroups = [
+                                    [
+                                        'column_class' => 'col-12 col-lg-6',
+                                        'sections' => ['top_1', 'hot_picks'],
+                                    ],
+                                    [
+                                        'column_class' => 'col-12 col-lg-6',
+                                        'sections' => ['most_played'],
+                                    ],
+                                ];
+                                ?>
+                                <?php foreach ($featuredColumnGroups as $group): ?>
+                                    <div class="<?= htmlspecialchars($group['column_class'], ENT_QUOTES, 'UTF-8') ?>">
                                         <div class="admin-featured-card">
-                                            <h6 class="mb-2"><?= htmlspecialchars($config['label'], ENT_QUOTES, 'UTF-8') ?></h6>
-                                            <?php for ($slot = 1; $slot <= (int) $config['slots']; $slot += 1): ?>
+                                            <?php foreach ($group['sections'] as $sectionIndex => $section): ?>
                                                 <?php
-                                                $fieldName = $section . '_slot_' . $slot;
-                                                $selectedId = $featuredSelections[$section][$slot] ?? 0;
+                                                $config = $featuredSections[$section];
+                                                if ($sectionIndex > 0) {
+                                                    echo '<hr class="my-4">';
+                                                }
                                                 ?>
-                                                <div class="mb-3">
-                                                    <label class="form-label" for="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">Slot <?= (int) $slot ?></label>
-                                                    <select class="form-select" id="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>" name="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">
-                                                        <option value="0">-- None --</option>
-                                                        <?php foreach ($casinos as $casino): ?>
-                                                            <option value="<?= (int) $casino['id'] ?>" <?= (int) $selectedId === (int) $casino['id'] ? 'selected' : '' ?>>
-                                                                <?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                            <?php endfor; ?>
+                                                <h6 class="mb-2"><?= htmlspecialchars($config['label'], ENT_QUOTES, 'UTF-8') ?></h6>
+                                                <?php for ($slot = 1; $slot <= (int) $config['slots']; $slot += 1): ?>
+                                                    <?php
+                                                    $fieldName = $section . '_slot_' . $slot;
+                                                    $selectedId = $featuredSelections[$section][$slot] ?? 0;
+                                                    ?>
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">Slot <?= (int) $slot ?></label>
+                                                        <select class="form-select" id="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>" name="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">
+                                                            <option value="0">-- None --</option>
+                                                            <?php foreach ($casinos as $casino): ?>
+                                                                <option value="<?= (int) $casino['id'] ?>" <?= (int) $selectedId === (int) $casino['id'] ? 'selected' : '' ?>>
+                                                                    <?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                <?php endfor; ?>
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
-                            <button type="submit" class="btn btn-brand">Save Featured Sections</button>
+                            <button type="submit" class="btn btn-brand mt-3">Save Featured Sections</button>
                         </form>
                     </div>
                 </div>
