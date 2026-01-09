@@ -1043,7 +1043,7 @@ include __DIR__ . '/partials/html-head.php';
 
         <div class="row">
             <div class="col-12">
-                <div class="card shadow-sm mb-4 admin-card" id="add-casino">
+                <div class="card shadow-sm mb-4 admin-card" id="add-casino" data-admin-section="add-casino">
                     <div class="card-body">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                             <div>
@@ -1329,7 +1329,7 @@ include __DIR__ . '/partials/html-head.php';
 
         <div class="row">
             <div class="col-12">
-                <div class="card shadow-sm admin-card" id="existing-casinos">
+                <div class="card shadow-sm admin-card d-none" id="existing-casinos" data-admin-section="existing-casinos">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Existing Casinos</h5>
                         <div class="table-responsive">
@@ -1365,7 +1365,7 @@ include __DIR__ . '/partials/html-head.php';
                 </div>
             </div>
         </div>
-        <div class="row mt-4" id="featured-sections">
+        <div class="row mt-4 d-none" id="featured-sections" data-admin-section="featured-sections">
             <div class="col-lg-12">
                 <div class="card shadow-sm admin-card">
                     <div class="card-body">
@@ -1425,8 +1425,8 @@ include __DIR__ . '/partials/html-head.php';
                 </div>
             </div>
         </div>
-        <div class="row mt-4" id="providers">
-            <div class="col-lg-6">
+        <div class="row mt-4">
+            <div class="col-lg-6 d-none" id="providers" data-admin-section="providers">
                 <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Software Providers</h5>
@@ -1478,7 +1478,7 @@ include __DIR__ . '/partials/html-head.php';
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6" id="payment-methods">
+            <div class="col-lg-6 d-none" id="payment-methods" data-admin-section="payment-methods">
                 <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Payment Methods</h5>
@@ -1592,6 +1592,41 @@ include __DIR__ . '/partials/html-head.php';
     }
     bindRemove(prosList);
     bindRemove(consList);
+
+    const navLinks = Array.from(document.querySelectorAll(".admin-menu-links .nav-link"));
+    const sections = Array.from(document.querySelectorAll("[data-admin-section]"));
+
+    const showSection = (sectionId) => {
+      sections.forEach((section) => {
+        const isActive = section.dataset.adminSection === sectionId;
+        section.classList.toggle("d-none", !isActive);
+      });
+      navLinks.forEach((link) => {
+        const linkTarget = (link.getAttribute("href") || "").replace("#", "");
+        link.classList.toggle("active", linkTarget === sectionId);
+      });
+    };
+
+    if (navLinks.length > 0 && sections.length > 0) {
+      navLinks.forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          const targetId = (link.getAttribute("href") || "").replace("#", "");
+          if (!targetId) {
+            return;
+          }
+          showSection(targetId);
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, "", `#${targetId}`);
+          }
+        });
+      });
+
+      const initialHash = window.location.hash.replace("#", "");
+      const defaultSection = "add-casino";
+      const hasInitial = sections.some((section) => section.dataset.adminSection === initialHash);
+      showSection(hasInitial ? initialHash : defaultSection);
+    }
 
     const stepper = document.querySelector("[data-admin-stepper]");
     if (!stepper) {
