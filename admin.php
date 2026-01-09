@@ -1013,250 +1013,323 @@ include __DIR__ . '/partials/html-head.php';
             <div class="alert alert-danger" role="alert"><?= htmlspecialchars($actionError, ENT_QUOTES, 'UTF-8') ?></div>
         <?php endif; ?>
 
+        <div class="admin-menu card shadow-sm admin-card mb-4">
+            <div class="card-body d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-3">
+                <div class="admin-menu-title">
+                    <span class="text-uppercase small fw-semibold text-muted">Admin Menu</span>
+                    <h5 class="mb-0">Quick Navigation</h5>
+                </div>
+                <nav class="admin-menu-links">
+                    <ul class="nav nav-pills flex-wrap gap-2">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#add-casino">Add New Casino</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#existing-casinos">Existing Casinos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#featured-sections">Homepage Featured</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#providers">Providers</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#payment-methods">Payment Methods</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
         <div class="row">
-            <div class="col-lg-5">
-                <div class="card shadow-sm mb-4 admin-card">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4 admin-card" id="add-casino">
                     <div class="card-body">
-                        <h5 class="card-title mb-3"><?= $formValues['id'] ? 'Edit Casino' : 'Add New Casino' ?></h5>
-                        <form method="post" enctype="multipart/form-data">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                            <div>
+                                <h5 class="card-title mb-1"><?= $formValues['id'] ? 'Edit Casino' : 'Add New Casino' ?></h5>
+                                <p class="text-muted mb-0">Complete the details in three guided steps.</p>
+                            </div>
+                            <span class="admin-step-indicator badge bg-light text-dark" data-step-indicator>Step 1 of 3</span>
+                        </div>
+                        <form method="post" enctype="multipart/form-data" data-admin-stepper>
                             <input type="hidden" name="action" value="save_casino">
                             <input type="hidden" name="casino_id" value="<?= (int) $formValues['id'] ?>">
-                            <div class="mb-3">
-                                <label class="form-label" for="name">Casino Name</label>
-                                <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars((string) $formValues['name'], ENT_QUOTES, 'UTF-8') ?>" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="slug">Slug</label>
-                                <input type="text" class="form-control" id="slug" name="slug" value="<?= htmlspecialchars((string) $formValues['slug'], ENT_QUOTES, 'UTF-8') ?>">
-                                <small class="text-muted">Used in URLs. Leave blank to auto-generate.</small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="operator">Operator</label>
-                                <input type="text" class="form-control" id="operator" name="operator" value="<?= htmlspecialchars((string) $formValues['operator'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="license">License</label>
-                                <input type="text" class="form-control" id="license" name="license" value="<?= htmlspecialchars((string) $formValues['license'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="headline_bonus">Headline Bonus</label>
-                                <input type="text" class="form-control" id="headline_bonus" name="headline_bonus" value="<?= htmlspecialchars((string) $formValues['headline_bonus'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="min_deposit_usd">Minimum Deposit (USD)</label>
-                                <input type="number" class="form-control" id="min_deposit_usd" name="min_deposit_usd" min="0" value="<?= htmlspecialchars((string) $formValues['min_deposit_usd'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="rating">Rating (0-5)</label>
-                                <input type="number" class="form-control" id="rating" name="rating" min="0" max="5" value="<?= htmlspecialchars((string) $formValues['rating'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="cta_url">CTA URL</label>
-                                <input type="url" class="form-control" id="cta_url" name="cta_url" value="<?= htmlspecialchars((string) $formValues['cta_url'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="short_description">Short Description</label>
-                                <textarea class="form-control" id="short_description" name="short_description" rows="3"><?= htmlspecialchars((string) $formValues['short_description'], ENT_QUOTES, 'UTF-8') ?></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="hero_image">Hero Image URL</label>
-                                <input type="text" class="form-control" id="hero_image" name="hero_image" value="<?= htmlspecialchars((string) $formValues['hero_image'], ENT_QUOTES, 'UTF-8') ?>">
-                                <input type="file" class="form-control mt-2" name="hero_image_upload" accept="image/*">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="thumbnail_image">Thumbnail Image URL</label>
-                                <input type="text" class="form-control" id="thumbnail_image" name="thumbnail_image" value="<?= htmlspecialchars((string) $formValues['thumbnail_image'], ENT_QUOTES, 'UTF-8') ?>">
-                                <input type="file" class="form-control mt-2" name="thumbnail_image_upload" accept="image/*">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="categories">Categories (comma separated)</label>
-                                <input type="text" class="form-control" id="categories" name="categories" value="<?= htmlspecialchars((string) $formValues['categories'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="genres">Genres (comma separated)</label>
-                                <input type="text" class="form-control" id="genres" name="genres" value="<?= htmlspecialchars((string) $formValues['genres'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="perks">Perks (comma separated)</label>
-                                <input type="text" class="form-control" id="perks" name="perks" value="<?= htmlspecialchars((string) $formValues['perks'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Game Types</label>
-                                <div class="table-responsive">
-                                    <table class="table table-sm align-middle">
-                                        <thead>
-                                        <tr>
-                                            <th>Game Type</th>
-                                            <th>Live Dealer</th>
-                                            <th>Virtual Reality</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php foreach ($gameTypeOptionsForForm as $option): ?>
-                                            <?php
-                                            $gameKey = (string) ($option['key'] ?? '');
-                                            $modeValues = $formValues['game_modes'][$gameKey] ?? [
-                                                'live_dealer_supported' => false,
-                                                'virtual_reality_supported' => false,
-                                            ];
-                                            ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars((string) ($option['label'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
-                                                <td>
-                                                    <div class="form-check m-0">
-                                                        <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][label]" value="<?= htmlspecialchars((string) ($option['label'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-                                                        <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][live_dealer]" value="0">
-                                                        <input class="form-check-input" type="checkbox"
-                                                               id="game-<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>-live"
-                                                               name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][live_dealer]"
-                                                               value="1"
-                                                               <?= !empty($modeValues['live_dealer_supported']) ? 'checked' : '' ?>>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="form-check m-0">
-                                                        <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][virtual_reality]" value="0">
-                                                        <input class="form-check-input" type="checkbox"
-                                                               id="game-<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>-vr"
-                                                               name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][virtual_reality]"
-                                                               value="1"
-                                                               <?= !empty($modeValues['virtual_reality_supported']) ? 'checked' : '' ?>>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+
+                            <ul class="nav nav-pills admin-stepper-nav mb-4" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" type="button" data-step-target="1">General Information</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" type="button" data-step-target="2">Description + Game Types</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" type="button" data-step-target="3">Reviews &amp; Extras</button>
+                                </li>
+                            </ul>
+
+                            <div class="admin-step" data-step="1">
+                                <div class="row g-3">
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="name">Casino Name</label>
+                                        <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars((string) $formValues['name'], ENT_QUOTES, 'UTF-8') ?>" required>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="slug">Slug</label>
+                                        <input type="text" class="form-control" id="slug" name="slug" value="<?= htmlspecialchars((string) $formValues['slug'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <small class="text-muted">Used in URLs. Leave blank to auto-generate.</small>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="operator">Operator</label>
+                                        <input type="text" class="form-control" id="operator" name="operator" value="<?= htmlspecialchars((string) $formValues['operator'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="license">License</label>
+                                        <input type="text" class="form-control" id="license" name="license" value="<?= htmlspecialchars((string) $formValues['license'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="headline_bonus">Headline Bonus</label>
+                                        <input type="text" class="form-control" id="headline_bonus" name="headline_bonus" value="<?= htmlspecialchars((string) $formValues['headline_bonus'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="min_deposit_usd">Minimum Deposit (USD)</label>
+                                        <input type="number" class="form-control" id="min_deposit_usd" name="min_deposit_usd" min="0" value="<?= htmlspecialchars((string) $formValues['min_deposit_usd'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="rating">Rating (0-5)</label>
+                                        <input type="number" class="form-control" id="rating" name="rating" min="0" max="5" value="<?= htmlspecialchars((string) $formValues['rating'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="cta_url">CTA URL</label>
+                                        <input type="url" class="form-control" id="cta_url" name="cta_url" value="<?= htmlspecialchars((string) $formValues['cta_url'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                </div>
+                                <div class="admin-step-actions">
+                                    <span class="text-muted small">Next: Description + Game Types</span>
+                                    <button class="btn btn-brand" type="button" data-step-next>Next</button>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Payment Methods</label>
-                                <?php if (!empty($paymentMethodsCatalog)): ?>
-                                    <div class="d-flex flex-wrap gap-3">
-                                        <?php foreach ($paymentMethodsCatalog as $method): ?>
-                                            <?php $methodId = (int) ($method['id'] ?? 0); ?>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="payment_methods[]"
-                                                       id="payment-method-<?= $methodId ?>"
-                                                       value="<?= $methodId ?>"
-                                                       <?= in_array($methodId, $formValues['payment_methods'], true) ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="payment-method-<?= $methodId ?>">
-                                                    <?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?>
-                                                </label>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php else: ?>
-                                    <p class="text-muted mb-0">No payment methods available.</p>
-                                <?php endif; ?>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Software Providers</label>
-                                <?php if (!empty($providers)): ?>
-                                    <div class="d-flex flex-wrap gap-3">
-                                        <?php foreach ($providers as $provider): ?>
-                                            <?php $providerId = (int) ($provider['id'] ?? 0); ?>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="providers[]"
-                                                       id="provider-<?= $providerId ?>"
-                                                       value="<?= $providerId ?>"
-                                                       <?= in_array($providerId, $formValues['providers'], true) ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="provider-<?= $providerId ?>">
-                                                    <?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?>
-                                                </label>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php else: ?>
-                                    <p class="text-muted mb-0">No providers available.</p>
-                                <?php endif; ?>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Devices</label>
+
+                            <div class="admin-step d-none" data-step="2">
                                 <div class="row g-3">
-                                    <?php foreach ($deviceSupportCatalog as $groupKey => $group): ?>
+                                    <div class="col-12">
+                                        <label class="form-label" for="short_description">Short Description</label>
+                                        <textarea class="form-control" id="short_description" name="short_description" rows="3"><?= htmlspecialchars((string) $formValues['short_description'], ENT_QUOTES, 'UTF-8') ?></textarea>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="hero_image">Hero Image URL</label>
+                                        <input type="text" class="form-control" id="hero_image" name="hero_image" value="<?= htmlspecialchars((string) $formValues['hero_image'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <input type="file" class="form-control mt-2" name="hero_image_upload" accept="image/*">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="thumbnail_image">Thumbnail Image URL</label>
+                                        <input type="text" class="form-control" id="thumbnail_image" name="thumbnail_image" value="<?= htmlspecialchars((string) $formValues['thumbnail_image'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <input type="file" class="form-control mt-2" name="thumbnail_image_upload" accept="image/*">
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="categories">Categories (comma separated)</label>
+                                        <input type="text" class="form-control" id="categories" name="categories" value="<?= htmlspecialchars((string) $formValues['categories'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="genres">Genres (comma separated)</label>
+                                        <input type="text" class="form-control" id="genres" name="genres" value="<?= htmlspecialchars((string) $formValues['genres'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="perks">Perks (comma separated)</label>
+                                        <input type="text" class="form-control" id="perks" name="perks" value="<?= htmlspecialchars((string) $formValues['perks'], ENT_QUOTES, 'UTF-8') ?>">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Game Types</label>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm align-middle">
+                                                <thead>
+                                                <tr>
+                                                    <th>Game Type</th>
+                                                    <th>Live Dealer</th>
+                                                    <th>Virtual Reality</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <?php foreach ($gameTypeOptionsForForm as $option): ?>
+                                                    <?php
+                                                    $gameKey = (string) ($option['key'] ?? '');
+                                                    $modeValues = $formValues['game_modes'][$gameKey] ?? [
+                                                        'live_dealer_supported' => false,
+                                                        'virtual_reality_supported' => false,
+                                                    ];
+                                                    ?>
+                                                    <tr>
+                                                        <td><?= htmlspecialchars((string) ($option['label'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
+                                                        <td>
+                                                            <div class="form-check m-0">
+                                                                <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][label]" value="<?= htmlspecialchars((string) ($option['label'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                                                <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][live_dealer]" value="0">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="game-<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>-live"
+                                                                       name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][live_dealer]"
+                                                                       value="1"
+                                                                       <?= !empty($modeValues['live_dealer_supported']) ? 'checked' : '' ?>>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-check m-0">
+                                                                <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][virtual_reality]" value="0">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="game-<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>-vr"
+                                                                       name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][virtual_reality]"
+                                                                       value="1"
+                                                                       <?= !empty($modeValues['virtual_reality_supported']) ? 'checked' : '' ?>>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="admin-step-actions">
+                                    <button class="btn btn-outline-light" type="button" data-step-prev>Back</button>
+                                    <button class="btn btn-brand" type="button" data-step-next>Next</button>
+                                </div>
+                            </div>
+
+                            <div class="admin-step d-none" data-step="3">
+                                <div class="mb-4">
+                                    <label class="form-label">Payment Methods</label>
+                                    <?php if (!empty($paymentMethodsCatalog)): ?>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <?php foreach ($paymentMethodsCatalog as $method): ?>
+                                                <?php $methodId = (int) ($method['id'] ?? 0); ?>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="payment_methods[]"
+                                                           id="payment-method-<?= $methodId ?>"
+                                                           value="<?= $methodId ?>"
+                                                           <?= in_array($methodId, $formValues['payment_methods'], true) ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="payment-method-<?= $methodId ?>">
+                                                        <?= htmlspecialchars($method['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                    </label>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <p class="text-muted mb-0">No payment methods available.</p>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Software Providers</label>
+                                    <?php if (!empty($providers)): ?>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <?php foreach ($providers as $provider): ?>
+                                                <?php $providerId = (int) ($provider['id'] ?? 0); ?>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="providers[]"
+                                                           id="provider-<?= $providerId ?>"
+                                                           value="<?= $providerId ?>"
+                                                           <?= in_array($providerId, $formValues['providers'], true) ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="provider-<?= $providerId ?>">
+                                                        <?= htmlspecialchars($provider['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                    </label>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <p class="text-muted mb-0">No providers available.</p>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Devices</label>
+                                    <div class="row g-3">
+                                        <?php foreach ($deviceSupportCatalog as $groupKey => $group): ?>
+                                            <div class="col-md-6">
+                                                <div class="bg-light border rounded-3 p-3 h-100">
+                                                    <div class="d-flex align-items-center gap-2 text-uppercase small fw-semibold text-muted mb-2">
+                                                        <i class="fa <?= htmlspecialchars($group['icon'], ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
+                                                        <span><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                                    </div>
+                                                    <div class="d-flex flex-wrap gap-3">
+                                                        <?php foreach ($group['items'] as $deviceKey => $device): ?>
+                                                            <?php
+                                                            $deviceId = sprintf('device-%s-%s', $groupKey, $deviceKey);
+                                                            $isChecked = in_array(
+                                                                $deviceKey,
+                                                                $formValues['devices'][$groupKey] ?? [],
+                                                                true
+                                                            );
+                                                            ?>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="<?= htmlspecialchars($deviceId, ENT_QUOTES, 'UTF-8') ?>"
+                                                                       name="devices[<?= htmlspecialchars($groupKey, ENT_QUOTES, 'UTF-8') ?>][]"
+                                                                       value="<?= htmlspecialchars($deviceKey, ENT_QUOTES, 'UTF-8') ?>"
+                                                                    <?= $isChecked ? 'checked' : '' ?>>
+                                                                <label class="form-check-label" for="<?= htmlspecialchars($deviceId, ENT_QUOTES, 'UTF-8') ?>">
+                                                                    <i class="<?= htmlspecialchars($device['icon'], ENT_QUOTES, 'UTF-8') ?> me-1" aria-hidden="true"></i>
+                                                                    <?= htmlspecialchars($device['label'], ENT_QUOTES, 'UTF-8') ?>
+                                                                </label>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Pros &amp; Cons</label>
+                                    <div class="row g-3">
                                         <div class="col-md-6">
-                                            <div class="bg-light border rounded-3 p-3 h-100">
-                                                <div class="d-flex align-items-center gap-2 text-uppercase small fw-semibold text-muted mb-2">
-                                                    <i class="fa <?= htmlspecialchars($group['icon'], ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
-                                                    <span><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
-                                                </div>
-                                                <div class="d-flex flex-wrap gap-3">
-                                                    <?php foreach ($group['items'] as $deviceKey => $device): ?>
-                                                        <?php
-                                                        $deviceId = sprintf('device-%s-%s', $groupKey, $deviceKey);
-                                                        $isChecked = in_array(
-                                                            $deviceKey,
-                                                            $formValues['devices'][$groupKey] ?? [],
-                                                            true
-                                                        );
-                                                        ?>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                   id="<?= htmlspecialchars($deviceId, ENT_QUOTES, 'UTF-8') ?>"
-                                                                   name="devices[<?= htmlspecialchars($groupKey, ENT_QUOTES, 'UTF-8') ?>][]"
-                                                                   value="<?= htmlspecialchars($deviceKey, ENT_QUOTES, 'UTF-8') ?>"
-                                                                <?= $isChecked ? 'checked' : '' ?>>
-                                                            <label class="form-check-label" for="<?= htmlspecialchars($deviceId, ENT_QUOTES, 'UTF-8') ?>">
-                                                                <i class="<?= htmlspecialchars($device['icon'], ENT_QUOTES, 'UTF-8') ?> me-1" aria-hidden="true"></i>
-                                                                <?= htmlspecialchars($device['label'], ENT_QUOTES, 'UTF-8') ?>
-                                                            </label>
-                                                        </div>
-                                                    <?php endforeach; ?>
-                                                </div>
+                                            <h6 class="text-success mb-2"><i class="fa fa-thumbs-up me-2"></i>Pros</h6>
+                                            <div data-pros-list>
+                                                <?php foreach ($formValues['pros'] as $pro): ?>
+                                                    <div class="input-group mb-2" data-pros-row>
+                                                        <input type="text" class="form-control" name="pros[]"
+                                                               value="<?= htmlspecialchars((string) $pro, ENT_QUOTES, 'UTF-8') ?>"
+                                                               placeholder="Add a pro">
+                                                        <button class="btn btn-outline-danger" type="button" data-remove-row>
+                                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                <?php endforeach; ?>
                                             </div>
+                                            <button class="btn btn-sm btn-outline-success" type="button" data-add-pro>
+                                                <i class="fa fa-plus me-1" aria-hidden="true"></i>Add Pro
+                                            </button>
                                         </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Pros &amp; Cons</label>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <h6 class="text-success mb-2"><i class="fa fa-thumbs-up me-2"></i>Pros</h6>
-                                        <div data-pros-list>
-                                            <?php foreach ($formValues['pros'] as $pro): ?>
-                                                <div class="input-group mb-2" data-pros-row>
-                                                    <input type="text" class="form-control" name="pros[]"
-                                                           value="<?= htmlspecialchars((string) $pro, ENT_QUOTES, 'UTF-8') ?>"
-                                                           placeholder="Add a pro">
-                                                    <button class="btn btn-outline-danger" type="button" data-remove-row>
-                                                        <i class="fa fa-times" aria-hidden="true"></i>
-                                                    </button>
-                                                </div>
-                                            <?php endforeach; ?>
+                                        <div class="col-md-6">
+                                            <h6 class="text-danger mb-2"><i class="fa fa-thumbs-down me-2"></i>Cons</h6>
+                                            <div data-cons-list>
+                                                <?php foreach ($formValues['cons'] as $con): ?>
+                                                    <div class="input-group mb-2" data-cons-row>
+                                                        <input type="text" class="form-control" name="cons[]"
+                                                               value="<?= htmlspecialchars((string) $con, ENT_QUOTES, 'UTF-8') ?>"
+                                                               placeholder="Add a con">
+                                                        <button class="btn btn-outline-danger" type="button" data-remove-row>
+                                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-danger" type="button" data-add-con>
+                                                <i class="fa fa-plus me-1" aria-hidden="true"></i>Add Con
+                                            </button>
                                         </div>
-                                        <button class="btn btn-sm btn-outline-success" type="button" data-add-pro>
-                                            <i class="fa fa-plus me-1" aria-hidden="true"></i>Add Pro
-                                        </button>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6 class="text-danger mb-2"><i class="fa fa-thumbs-down me-2"></i>Cons</h6>
-                                        <div data-cons-list>
-                                            <?php foreach ($formValues['cons'] as $con): ?>
-                                                <div class="input-group mb-2" data-cons-row>
-                                                    <input type="text" class="form-control" name="cons[]"
-                                                           value="<?= htmlspecialchars((string) $con, ENT_QUOTES, 'UTF-8') ?>"
-                                                           placeholder="Add a con">
-                                                    <button class="btn btn-outline-danger" type="button" data-remove-row>
-                                                        <i class="fa fa-times" aria-hidden="true"></i>
-                                                    </button>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-danger" type="button" data-add-con>
-                                            <i class="fa fa-plus me-1" aria-hidden="true"></i>Add Con
-                                        </button>
                                     </div>
                                 </div>
+                                <div class="admin-step-actions">
+                                    <button class="btn btn-outline-light" type="button" data-step-prev>Back</button>
+                                    <button type="submit" class="btn btn-brand">Save Casino</button>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-brand w-100">Save Casino</button>
                         </form>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-7">
-                <div class="card shadow-sm admin-card">
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm admin-card" id="existing-casinos">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Existing Casinos</h5>
                         <div class="table-responsive">
@@ -1292,7 +1365,7 @@ include __DIR__ . '/partials/html-head.php';
                 </div>
             </div>
         </div>
-        <div class="row mt-4">
+        <div class="row mt-4" id="featured-sections">
             <div class="col-lg-12">
                 <div class="card shadow-sm admin-card">
                     <div class="card-body">
@@ -1330,7 +1403,7 @@ include __DIR__ . '/partials/html-head.php';
                 </div>
             </div>
         </div>
-        <div class="row mt-4">
+        <div class="row mt-4" id="providers">
             <div class="col-lg-6">
                 <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
@@ -1383,7 +1456,7 @@ include __DIR__ . '/partials/html-head.php';
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-6" id="payment-methods">
                 <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Payment Methods</h5>
@@ -1497,6 +1570,64 @@ include __DIR__ . '/partials/html-head.php';
     }
     bindRemove(prosList);
     bindRemove(consList);
+
+    const stepper = document.querySelector("[data-admin-stepper]");
+    if (!stepper) {
+      return;
+    }
+
+    const steps = Array.from(stepper.querySelectorAll("[data-step]"));
+    const stepButtons = Array.from(stepper.querySelectorAll("[data-step-target]"));
+    const nextButtons = Array.from(stepper.querySelectorAll("[data-step-next]"));
+    const prevButtons = Array.from(stepper.querySelectorAll("[data-step-prev]"));
+    const stepIndicator = document.querySelector("[data-step-indicator]");
+    let activeStep = 1;
+
+    const setActiveStep = (step) => {
+      activeStep = step;
+      steps.forEach((panel) => {
+        const panelStep = Number(panel.dataset.step || 0);
+        panel.classList.toggle("d-none", panelStep !== step);
+      });
+      stepButtons.forEach((button) => {
+        const buttonStep = Number(button.dataset.stepTarget || 0);
+        button.classList.toggle("active", buttonStep === step);
+      });
+      if (stepIndicator) {
+        stepIndicator.textContent = `Step ${step} of ${steps.length}`;
+      }
+      const focusTarget = stepper.querySelector(`[data-step="${step}"]`);
+      if (focusTarget) {
+        focusTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
+
+    stepButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = Number(button.dataset.stepTarget || 0);
+        if (target) {
+          setActiveStep(target);
+        }
+      });
+    });
+
+    nextButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (activeStep < steps.length) {
+          setActiveStep(activeStep + 1);
+        }
+      });
+    });
+
+    prevButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (activeStep > 1) {
+          setActiveStep(activeStep - 1);
+        }
+      });
+    });
+
+    setActiveStep(activeStep);
   })();
 </script>
 <?php
