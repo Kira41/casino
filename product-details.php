@@ -384,6 +384,44 @@ include __DIR__ . '/partials/header.php';
                                     <?php endforeach; ?>
                                   </div>
                                 <?php endif; ?>
+                                <div class="row g-3 mt-3">
+                                  <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-3">
+                                      <i class="fa fa-clock text-warning mt-1" aria-hidden="true"></i>
+                                      <div>
+                                        <p class="mb-1 fw-semibold">Processing times</p>
+                                        <p class="mb-0 text-muted">Deposits are instant, while withdrawals can take 12–48 hours depending on the provider.</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-3">
+                                      <i class="fa fa-lock text-warning mt-1" aria-hidden="true"></i>
+                                      <div>
+                                        <p class="mb-1 fw-semibold">Security checks</p>
+                                        <p class="mb-0 text-muted">Extra verification keeps payouts secure and helps prevent fraud.</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-3">
+                                      <i class="fa fa-money-bill-wave text-warning mt-1" aria-hidden="true"></i>
+                                      <div>
+                                        <p class="mb-1 fw-semibold">Fees &amp; limits</p>
+                                        <p class="mb-0 text-muted">Check daily limits and possible fees for cards, e-wallets, and bank transfers.</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-3">
+                                      <i class="fa fa-mobile-alt text-warning mt-1" aria-hidden="true"></i>
+                                      <div>
+                                        <p class="mb-1 fw-semibold">Mobile-friendly banking</p>
+                                        <p class="mb-0 text-muted">Popular wallets and instant banking apps are supported for on-the-go play.</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               <?php endif; ?>
                               <?php if ($hasProviderList): ?>
                                 <div class="providers-list mb-3">
