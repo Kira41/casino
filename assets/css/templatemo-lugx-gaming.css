@@ -2484,3 +2484,11 @@ Pagination
   padding: 8px 16px;
   border-radius: 999px;
 }
+
+.review-panel i,
+.review-panel .fa,
+.review-panel .fas,
+.review-panel .far,
+.review-panel .fab {
+  color: #595c5f !important;
+}
