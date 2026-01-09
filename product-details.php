@@ -69,8 +69,8 @@ $reviewSectionAliases = [
     'additional-information' => 'additional-info',
 ];
 $reviewSectionOrder = [
-    'banking-methods' => ['label' => 'Banking Methods', 'icon' => 'fa-credit-card text-warning'],
     'general-information' => ['label' => 'General Information', 'icon' => 'fa-info-circle text-warning'],
+    'banking-methods' => ['label' => 'Banking Methods', 'icon' => 'fa-credit-card text-warning'],
     'support' => ['label' => 'Support', 'icon' => 'fa-headset text-warning'],
     'devices' => ['label' => 'Devices', 'icon' => 'fa-desktop text-warning'],
     'software-providers' => ['label' => 'Software Providers', 'icon' => 'fa-cubes text-warning'],
