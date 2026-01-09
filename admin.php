@@ -27,6 +27,18 @@ $featuredSections = [
     ],
 ];
 
+$gameTypeOptions = [
+    ['label' => 'Roulette'],
+    ['label' => 'Slots'],
+    ['label' => 'Blackjack'],
+    ['label' => 'Video Poker'],
+    ['label' => 'Scratch Cards'],
+    ['label' => 'Keno'],
+    ['label' => 'Craps'],
+    ['label' => 'Bingo'],
+    ['label' => 'Baccarat'],
+];
+
 $loginError = '';
 $actionMessage = '';
 $actionError = '';
@@ -109,6 +121,13 @@ function normalizeTagList(string $raw): array
     $tags = array_map('trim', explode(',', $raw));
     $tags = array_filter($tags, static fn(string $tag): bool => $tag !== '');
     return array_values(array_unique($tags));
+}
+
+function normalizeGameTypeKey(string $value): string
+{
+    $slug = strtolower(trim($value));
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+    return trim($slug, '-');
 }
 
 function insertIgnoreKeyword(PDO $database): string
@@ -208,6 +227,38 @@ function updateCasinoProviders(PDO $database, int $casinoId, array $providerIds)
         $insertStatement->execute([
             ':casino_id' => $casinoId,
             ':provider_id' => $providerId,
+        ]);
+    }
+}
+
+function updateCasinoGameModes(PDO $database, int $casinoId, array $gameModes): void
+{
+    if (!tableExists($database, 'casino_game_modes')) {
+        return;
+    }
+
+    $deleteStatement = $database->prepare('DELETE FROM casino_game_modes WHERE casino_id = :casino_id');
+    $deleteStatement->execute([':casino_id' => $casinoId]);
+
+    if ($gameModes === []) {
+        return;
+    }
+
+    $insertStatement = $database->prepare(
+        'INSERT INTO casino_game_modes (casino_id, game_type, live_dealer_supported, virtual_reality_supported)
+        VALUES (:casino_id, :game_type, :live_dealer_supported, :virtual_reality_supported)'
+    );
+
+    foreach ($gameModes as $mode) {
+        $gameType = trim((string) ($mode['game_type'] ?? ''));
+        if ($gameType === '') {
+            continue;
+        }
+        $insertStatement->execute([
+            ':casino_id' => $casinoId,
+            ':game_type' => $gameType,
+            ':live_dealer_supported' => !empty($mode['live_dealer_supported']) ? 1 : 0,
+            ':virtual_reality_supported' => !empty($mode['virtual_reality_supported']) ? 1 : 0,
         ]);
     }
 }
@@ -406,6 +457,33 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $paymentMethodIds = array_values(array_filter($paymentMethodIds, static fn(int $id): bool => $id > 0));
     $providerIds = array_map('intval', (array) ($_POST['providers'] ?? []));
     $providerIds = array_values(array_filter($providerIds, static fn(int $id): bool => $id > 0));
+    $gameModesInput = (array) ($_POST['game_modes'] ?? []);
+    $gameModes = [];
+    if ($gameModesInput !== []) {
+        foreach ($gameModesInput as $modeInput) {
+            if (!is_array($modeInput)) {
+                continue;
+            }
+            $gameTypeLabel = trim((string) ($modeInput['label'] ?? ''));
+            if ($gameTypeLabel === '') {
+                continue;
+            }
+            $gameModes[] = [
+                'game_type' => $gameTypeLabel,
+                'live_dealer_supported' => !empty($modeInput['live_dealer']),
+                'virtual_reality_supported' => !empty($modeInput['virtual_reality']),
+            ];
+        }
+    } else {
+        foreach ($gameTypeOptions as $option) {
+            $gameTypeLabel = (string) ($option['label'] ?? '');
+            $gameModes[] = [
+                'game_type' => $gameTypeLabel,
+                'live_dealer_supported' => false,
+                'virtual_reality_supported' => false,
+            ];
+        }
+    }
 
     $errors = [];
     $isNewCasino = $casinoId <= 0;
@@ -507,6 +585,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         if ($providerIds !== [] || $isNewCasino || $existingProviders === []) {
             updateCasinoProviders($database, $casinoId, $providerIds);
         }
+
+        updateCasinoGameModes($database, $casinoId, $gameModes);
 
         $actionMessage = $casinoId > 0 ? 'Casino saved successfully.' : 'Casino created successfully.';
         header('Location: admin.php?status=' . urlencode($actionMessage));
@@ -702,6 +782,34 @@ if ($actionMessage === '' && isset($_GET['status'])) {
 
 $editCasinoId = isset($_GET['edit']) ? (int) $_GET['edit'] : 0;
 $editCasino = $editCasinoId > 0 ? fetchCasinoById($database, $editCasinoId) : null;
+$gameTypeOptionsByKey = [];
+foreach ($gameTypeOptions as $option) {
+    $label = (string) ($option['label'] ?? '');
+    $key = normalizeGameTypeKey($label);
+    if ($key === '') {
+        continue;
+    }
+    $gameTypeOptionsByKey[$key] = [
+        'label' => $label,
+        'key' => $key,
+    ];
+}
+if ($editCasino) {
+    foreach ($editCasino['games'] ?? [] as $game) {
+        $label = trim((string) ($game['game_type'] ?? ''));
+        $key = normalizeGameTypeKey($label);
+        if ($label === '' || $key === '') {
+            continue;
+        }
+        if (!isset($gameTypeOptionsByKey[$key])) {
+            $gameTypeOptionsByKey[$key] = [
+                'label' => $label,
+                'key' => $key,
+            ];
+        }
+    }
+}
+$gameTypeOptionsForForm = array_values($gameTypeOptionsByKey);
 
 $formValues = [
     'id' => $editCasino['id'] ?? 0,
@@ -721,6 +829,7 @@ $formValues = [
     'perks' => isset($editCasino['perks']) ? implode(', ', $editCasino['perks']) : '',
     'payment_methods' => [],
     'providers' => [],
+    'game_modes' => [],
 ];
 
 $casinos = fetchCasinos($database);
@@ -747,6 +856,30 @@ if ($editCasino) {
         if (isset($provider['id'])) {
             $formValues['providers'][] = (int) $provider['id'];
         }
+    }
+}
+
+foreach ($gameTypeOptionsForForm as $option) {
+    $key = (string) ($option['key'] ?? '');
+    if ($key === '') {
+        continue;
+    }
+    $formValues['game_modes'][$key] = [
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ];
+}
+
+if ($editCasino) {
+    foreach ($editCasino['games'] ?? [] as $game) {
+        $key = normalizeGameTypeKey((string) ($game['game_type'] ?? ''));
+        if ($key === '' || !isset($formValues['game_modes'][$key])) {
+            continue;
+        }
+        $formValues['game_modes'][$key] = [
+            'live_dealer_supported' => !empty($game['live_dealer_supported']),
+            'virtual_reality_supported' => !empty($game['virtual_reality_supported']),
+        ];
     }
 }
 
@@ -844,6 +977,55 @@ include __DIR__ . '/partials/html-head.php';
                             <div class="mb-3">
                                 <label class="form-label" for="perks">Perks (comma separated)</label>
                                 <input type="text" class="form-control" id="perks" name="perks" value="<?= htmlspecialchars((string) $formValues['perks'], ENT_QUOTES, 'UTF-8') ?>">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Game Types</label>
+                                <div class="table-responsive">
+                                    <table class="table table-sm align-middle">
+                                        <thead>
+                                        <tr>
+                                            <th>Game Type</th>
+                                            <th>Live Dealer</th>
+                                            <th>Virtual Reality</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($gameTypeOptionsForForm as $option): ?>
+                                            <?php
+                                            $gameKey = (string) ($option['key'] ?? '');
+                                            $modeValues = $formValues['game_modes'][$gameKey] ?? [
+                                                'live_dealer_supported' => false,
+                                                'virtual_reality_supported' => false,
+                                            ];
+                                            ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars((string) ($option['label'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td>
+                                                    <div class="form-check m-0">
+                                                        <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][label]" value="<?= htmlspecialchars((string) ($option['label'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                                        <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][live_dealer]" value="0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                               id="game-<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>-live"
+                                                               name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][live_dealer]"
+                                                               value="1"
+                                                               <?= !empty($modeValues['live_dealer_supported']) ? 'checked' : '' ?>>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-check m-0">
+                                                        <input type="hidden" name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][virtual_reality]" value="0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                               id="game-<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>-vr"
+                                                               name="game_modes[<?= htmlspecialchars($gameKey, ENT_QUOTES, 'UTF-8') ?>][virtual_reality]"
+                                                               value="1"
+                                                               <?= !empty($modeValues['virtual_reality_supported']) ? 'checked' : '' ?>>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Payment Methods</label>
