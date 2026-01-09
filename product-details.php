@@ -420,6 +420,9 @@ include __DIR__ . '/partials/header.php';
                               <?php if (!empty($section['summary'])): ?>
                                 <p class="mb-3"><?= htmlspecialchars($section['summary'], ENT_QUOTES, 'UTF-8') ?></p>
                               <?php endif; ?>
+                              <?php if ($section['key'] === 'banking-methods'): ?>
+                                <p class="mt-3 mb-0">Some casinos require KYC verification before any withdrawal.</p>
+                              <?php endif; ?>
                               <?php if (!empty($section['points']) && $section['key'] !== 'devices' && $section['key'] !== 'software-providers'): ?>
                                 <div class="row g-3 align-items-start">
                                   <?php foreach ($section['points'] as $point): ?>
