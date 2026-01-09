@@ -79,11 +79,11 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
         </div>
     </div>
 
-    <div class="section">
+    <div class="section admin-login">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-5">
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm admin-card">
                         <div class="card-body">
                             <h5 class="card-title mb-3">Sign in to manage casinos</h5>
                             <?php if ($loginError !== ''): ?>
@@ -1004,7 +1004,7 @@ include __DIR__ . '/partials/html-head.php';
     </div>
 </div>
 
-<div class="section">
+<div class="section admin-shell">
     <div class="container">
         <?php if ($actionMessage !== ''): ?>
             <div class="alert alert-success" role="alert"><?= htmlspecialchars($actionMessage, ENT_QUOTES, 'UTF-8') ?></div>
@@ -1015,7 +1015,7 @@ include __DIR__ . '/partials/html-head.php';
 
         <div class="row">
             <div class="col-lg-5">
-                <div class="card shadow-sm mb-4">
+                <div class="card shadow-sm mb-4 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3"><?= $formValues['id'] ? 'Edit Casino' : 'Add New Casino' ?></h5>
                         <form method="post" enctype="multipart/form-data">
@@ -1256,7 +1256,7 @@ include __DIR__ . '/partials/html-head.php';
                 </div>
             </div>
             <div class="col-lg-7">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Existing Casinos</h5>
                         <div class="table-responsive">
@@ -1294,7 +1294,7 @@ include __DIR__ . '/partials/html-head.php';
         </div>
         <div class="row mt-4">
             <div class="col-lg-12">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Homepage Featured Sections</h5>
                         <p class="text-muted">Choose which casinos appear in the Top 1, Hot Picks, and Top Casinos sections on the homepage.</p>
@@ -1332,7 +1332,7 @@ include __DIR__ . '/partials/html-head.php';
         </div>
         <div class="row mt-4">
             <div class="col-lg-6">
-                <div class="card shadow-sm h-100">
+                <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Software Providers</h5>
                         <form method="post" enctype="multipart/form-data" class="mb-4">
@@ -1384,7 +1384,7 @@ include __DIR__ . '/partials/html-head.php';
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="card shadow-sm h-100">
+                <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Payment Methods</h5>
                         <form method="post" enctype="multipart/form-data" class="mb-4">

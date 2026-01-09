@@ -2322,3 +2322,77 @@ Pagination
     margin-bottom: 12px;
   }
 }
+
+/* Admin dashboard enhancements */
+.admin-login,
+.admin-shell {
+  background: linear-gradient(180deg, rgba(248, 250, 255, 0.95) 0%, #eef2f7 100%);
+  padding: 40px 0 60px;
+}
+
+.admin-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
+}
+
+.admin-card .card-title {
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+}
+
+.admin-shell .card-body,
+.admin-login .card-body {
+  padding: 24px;
+}
+
+.admin-shell .form-control,
+.admin-shell .form-select,
+.admin-login .form-control,
+.admin-login .form-select {
+  border-radius: 12px;
+  border-color: #d7e0ec;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-shell .form-control:focus,
+.admin-shell .form-select:focus,
+.admin-login .form-control:focus,
+.admin-login .form-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.2);
+}
+
+.admin-shell .table thead th {
+  background-color: #f1f5f9;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  border-bottom: 0;
+}
+
+.admin-shell .table tbody tr {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-shell .table tbody tr:hover {
+  background-color: rgba(99, 102, 241, 0.06);
+}
+
+.admin-shell .btn,
+.admin-login .btn {
+  border-radius: 999px;
+}
+
+.admin-shell .btn-outline-primary,
+.admin-shell .btn-outline-danger,
+.admin-login .btn-outline-light {
+  border-width: 2px;
+}
+
+.admin-shell .bg-light {
+  background-color: #f8fafc !important;
+}
