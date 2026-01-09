@@ -359,7 +359,36 @@ function fetchCasinoDevices(PDO $database, int $casinoId): array
     return $devices;
 }
 
-function fetchCasinoReviewSections(PDO $database, int $casinoId): array
+function buildGeneralInformationPoints(array $casino): array
+{
+    $operator = trim((string) ($casino['operator'] ?? ''));
+    if ($operator === '') {
+        $operator = (string) ($casino['name'] ?? '');
+    }
+
+    $license = trim((string) ($casino['license'] ?? ''));
+    if ($license === '') {
+        $license = 'TBD';
+    }
+
+    $minDepositValue = $casino['min_deposit_usd'] ?? null;
+    $minDeposit = $minDepositValue === null
+        ? 'Minimum Deposit: TBD'
+        : 'Minimum Deposit: $' . number_format((int) $minDepositValue);
+
+    $ratingValue = is_numeric($casino['rating'] ?? null) ? (int) $casino['rating'] : 0;
+    $ratingValue = max(0, min(5, $ratingValue));
+    $rating = 'Rating: ' . $ratingValue . ' / 5';
+
+    return [
+        ['icon' => 'fa-building text-info', 'content' => 'Operator: ' . $operator],
+        ['icon' => 'fa-shield-alt text-warning', 'content' => 'License: ' . $license],
+        ['icon' => 'fa-credit-card text-success', 'content' => $minDeposit],
+        ['icon' => 'fa-star text-warning', 'content' => $rating],
+    ];
+}
+
+function fetchCasinoReviewSections(PDO $database, int $casinoId, ?array $casino = null): array
 {
     $statement = $database->prepare(
         'SELECT id, title, summary FROM casino_review_sections WHERE casino_id = :casino_id ORDER BY id ASC'
@@ -368,14 +397,20 @@ function fetchCasinoReviewSections(PDO $database, int $casinoId): array
 
     $sections = [];
     foreach ($statement->fetchAll(PDO::FETCH_ASSOC) ?: [] as $section) {
-        $pointsStmt = $database->prepare(
-            'SELECT icon, content FROM casino_review_points WHERE review_section_id = :section_id ORDER BY id ASC'
-        );
-        $pointsStmt->execute([':section_id' => $section['id']]);
+        $points = [];
+        if (strtolower((string) $section['title']) === 'general information' && $casino !== null) {
+            $points = buildGeneralInformationPoints($casino);
+        } else {
+            $pointsStmt = $database->prepare(
+                'SELECT icon, content FROM casino_review_points WHERE review_section_id = :section_id ORDER BY id ASC'
+            );
+            $pointsStmt->execute([':section_id' => $section['id']]);
+            $points = $pointsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        }
         $sections[] = [
             'title' => $section['title'],
             'summary' => $section['summary'],
-            'points' => $pointsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [],
+            'points' => $points,
         ];
     }
 
@@ -424,7 +459,7 @@ function hydrateCasinoDetails(PDO $database, ?array $casino): ?array
     $casino['payment_methods'] = fetchCasinoPaymentMethods($database, $casinoId);
     $casino['providers'] = fetchCasinoProviders($database, $casinoId);
     $casino['devices'] = fetchCasinoDevices($database, $casinoId);
-    $casino['review_sections'] = fetchCasinoReviewSections($database, $casinoId);
+    $casino['review_sections'] = fetchCasinoReviewSections($database, $casinoId, $casino);
 
     return $casino;
 }
