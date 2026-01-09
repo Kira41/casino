@@ -1013,8 +1013,8 @@ include __DIR__ . '/partials/html-head.php';
             <div class="alert alert-danger" role="alert"><?= htmlspecialchars($actionError, ENT_QUOTES, 'UTF-8') ?></div>
         <?php endif; ?>
 
-        <div class="admin-menu card shadow-sm admin-card mb-4">
-            <div class="card-body d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-3">
+        <nav class="navbar admin-navbar mb-4">
+            <div class="container-fluid">
                 <div class="admin-menu-title">
                     <span class="text-uppercase small fw-semibold text-muted">Admin Menu</span>
                     <h5 class="mb-0">Quick Navigation</h5>
@@ -1039,7 +1039,7 @@ include __DIR__ . '/partials/html-head.php';
                     </ul>
                 </nav>
             </div>
-        </div>
+        </nav>
 
         <div class="row">
             <div class="col-12">
@@ -1375,25 +1375,34 @@ include __DIR__ . '/partials/html-head.php';
                             <input type="hidden" name="action" value="save_featured_sections">
                             <div class="row g-3">
                                 <?php foreach ($featuredSections as $section => $config): ?>
-                                    <div class="col-lg-6">
-                                        <h6 class="mb-2"><?= htmlspecialchars($config['label'], ENT_QUOTES, 'UTF-8') ?></h6>
-                                        <?php for ($slot = 1; $slot <= (int) $config['slots']; $slot += 1): ?>
-                                            <?php
-                                            $fieldName = $section . '_slot_' . $slot;
-                                            $selectedId = $featuredSelections[$section][$slot] ?? 0;
-                                            ?>
-                                            <div class="mb-3">
-                                                <label class="form-label" for="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">Slot <?= (int) $slot ?></label>
-                                                <select class="form-select" id="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>" name="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">
-                                                    <option value="0">-- None --</option>
-                                                    <?php foreach ($casinos as $casino): ?>
-                                                        <option value="<?= (int) $casino['id'] ?>" <?= (int) $selectedId === (int) $casino['id'] ? 'selected' : '' ?>>
-                                                            <?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        <?php endfor; ?>
+                                    <?php
+                                    $columnClass = match ((int) $config['slots']) {
+                                        1 => 'col-12 col-lg-3',
+                                        4 => 'col-12 col-lg-4',
+                                        default => 'col-12 col-lg-5',
+                                    };
+                                    ?>
+                                    <div class="<?= htmlspecialchars($columnClass, ENT_QUOTES, 'UTF-8') ?>">
+                                        <div class="admin-featured-card">
+                                            <h6 class="mb-2"><?= htmlspecialchars($config['label'], ENT_QUOTES, 'UTF-8') ?></h6>
+                                            <?php for ($slot = 1; $slot <= (int) $config['slots']; $slot += 1): ?>
+                                                <?php
+                                                $fieldName = $section . '_slot_' . $slot;
+                                                $selectedId = $featuredSelections[$section][$slot] ?? 0;
+                                                ?>
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">Slot <?= (int) $slot ?></label>
+                                                    <select class="form-select" id="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>" name="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">
+                                                        <option value="0">-- None --</option>
+                                                        <?php foreach ($casinos as $casino): ?>
+                                                            <option value="<?= (int) $casino['id'] ?>" <?= (int) $selectedId === (int) $casino['id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                            <?php endfor; ?>
+                                        </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>

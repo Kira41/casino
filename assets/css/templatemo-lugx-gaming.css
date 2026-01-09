@@ -2401,11 +2401,31 @@ Pagination
   border-left: 6px solid #6366f1;
 }
 
+.admin-navbar {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  padding: 16px 20px;
+}
+
+.admin-navbar .container-fluid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-navbar .admin-menu-links {
+  flex: 1;
+}
+
 .admin-menu-title h5 {
   font-weight: 600;
 }
 
-.admin-menu .nav-link {
+.admin-menu .nav-link,
+.admin-navbar .nav-link {
   border-radius: 999px;
   padding: 6px 16px;
   font-size: 0.9rem;
@@ -2413,7 +2433,8 @@ Pagination
   background-color: #eef2ff;
 }
 
-.admin-menu .nav-link.active {
+.admin-menu .nav-link.active,
+.admin-navbar .nav-link.active {
   background-color: #6366f1;
   color: #ffffff;
 }
@@ -2440,6 +2461,14 @@ Pagination
   border-radius: 16px;
   padding: 20px;
   border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.admin-featured-card {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  height: 100%;
 }
 
 .admin-step-actions {
