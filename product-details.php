@@ -177,6 +177,7 @@ foreach ($gameRows as $gameRow) {
 $gameRows = !empty($uniqueGameRows) ? $uniqueGameRows : $gameRows;
 $iconifyBase = 'https://api.iconify.design/';
 $iconAccent = '#b33aa4';
+$reviewIconColor = '#595c5f';
 $gameTypeIcons = [
     'roulette' => 'game-icons:abstract-066',
     'slots' => 'mdi:slot-machine',
@@ -373,7 +374,7 @@ include __DIR__ . '/partials/header.php';
                                       $methodName = (string) ($method['method_name'] ?? ($method['name'] ?? ''));
                                       $iconKey = (string) ($method['icon_key'] ?? '');
                                       $isImage = $iconKey !== '' && (str_contains($iconKey, '/') || str_starts_with($iconKey, 'http'));
-                                      $iconSrc = $isImage ? $iconKey : ($iconKey !== '' ? $iconifyBase . $iconKey . '.svg?color=' . urlencode($iconAccent) : '');
+                                      $iconSrc = $isImage ? $iconKey : ($iconKey !== '' ? $iconifyBase . $iconKey . '.svg?color=' . urlencode($reviewIconColor) : '');
                                       ?>
                                       <div class="payment-method">
                                         <?php if ($iconSrc !== ''): ?>
