@@ -97,55 +97,70 @@ foreach ($reviewSectionOrder as $key => $meta) {
     $section['key'] = $key;
     $orderedReviewSections[] = $section;
 }
-$gameRows = !empty($games)
-    ? $games
-    : [
-        [
-            'game_type' => 'Roulette',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Slots',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Blackjack',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Video Poker',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Scratch Cards',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Keno',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Craps',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Bingo',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-        [
-            'game_type' => 'Baccarat',
-            'live_dealer_supported' => false,
-            'virtual_reality_supported' => false,
-        ],
-    ];
+$defaultGameRows = [
+    [
+        'game_type' => 'Roulette',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Slots',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Blackjack',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Video Poker',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Scratch Cards',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Keno',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Craps',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Bingo',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+    [
+        'game_type' => 'Baccarat',
+        'live_dealer_supported' => false,
+        'virtual_reality_supported' => false,
+    ],
+];
+$gamesByType = [];
+foreach ($games as $gameRow) {
+    $gameTypeKey = strtolower(trim((string) ($gameRow['game_type'] ?? '')));
+    if ($gameTypeKey === '') {
+        continue;
+    }
+    $gamesByType[$gameTypeKey] = $gameRow;
+}
+$gameRows = [];
+foreach ($defaultGameRows as $defaultGameRow) {
+    $gameTypeKey = strtolower(trim((string) ($defaultGameRow['game_type'] ?? '')));
+    $gameRows[] = isset($gamesByType[$gameTypeKey])
+        ? array_merge($defaultGameRow, $gamesByType[$gameTypeKey])
+        : $defaultGameRow;
+    unset($gamesByType[$gameTypeKey]);
+}
+$gameRows = array_merge($gameRows, array_values($gamesByType));
 $uniqueGameRows = [];
 $seenGameTypes = [];
 foreach ($gameRows as $gameRow) {
