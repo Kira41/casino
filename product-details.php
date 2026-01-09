@@ -418,7 +418,13 @@ include __DIR__ . '/partials/header.php';
                                 </div>
                               <?php endif; ?>
                               <?php if (!empty($section['summary'])): ?>
-                                <p class="mb-3"><?= htmlspecialchars($section['summary'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php
+                                $summaryClasses = 'mb-3';
+                                if ($section['key'] === 'banking-methods' && !empty($paymentMethods)) {
+                                    $summaryClasses = 'mt-3 mb-3';
+                                }
+                                ?>
+                                <p class="<?= $summaryClasses ?>"><?= htmlspecialchars($section['summary'], ENT_QUOTES, 'UTF-8') ?></p>
                               <?php endif; ?>
                               <?php if ($section['key'] === 'banking-methods'): ?>
                                 <p class="mt-3 mb-0">Some casinos require KYC verification before any withdrawal.</p>
