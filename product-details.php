@@ -256,7 +256,7 @@ include __DIR__ . '/partials/header.php';
           <ul class="product-meta-list">
             <li class="product-meta-item">
               <i class="fa fa-building me-2"></i>
-              <span class="product-meta-label">Casino Name:</span>
+              <span class="product-meta-label">Operator:</span>
               <span class="product-meta-value"><?= htmlspecialchars($casino['operator'] ?? $casino['name'], ENT_QUOTES, 'UTF-8') ?></span>
             </li>
             <li class="product-meta-item">
