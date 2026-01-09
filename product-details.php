@@ -99,11 +99,53 @@ foreach ($reviewSectionOrder as $key => $meta) {
 }
 $gameRows = !empty($games)
     ? $games
-    : [[
-        'game_type' => 'N/A',
-        'live_dealer_supported' => false,
-        'virtual_reality_supported' => false,
-    ]];
+    : [
+        [
+            'game_type' => 'Roulette',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Slots',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Blackjack',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Video Poker',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Scratch Cards',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Keno',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Craps',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Bingo',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+        [
+            'game_type' => 'Baccarat',
+            'live_dealer_supported' => false,
+            'virtual_reality_supported' => false,
+        ],
+    ];
 $uniqueGameRows = [];
 $seenGameTypes = [];
 foreach ($gameRows as $gameRow) {
