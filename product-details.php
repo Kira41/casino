@@ -309,8 +309,6 @@ include __DIR__ . '/partials/header.php';
               <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
                   <p><i class="fa fa-dice text-warning me-2"></i><?= htmlspecialchars($casino['short_description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
-                  <br>
-                  <p><?= htmlspecialchars($casino['short_description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
                   <div class="table-responsive mt-4">
                     <table class="table">
                       <thead>
