@@ -1031,10 +1031,7 @@ include __DIR__ . '/partials/html-head.php';
                             <a class="nav-link" href="#featured-sections">Homepage Featured</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#providers">Providers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#payment-methods">Payment Methods</a>
+                            <a class="nav-link" href="#providers-payment-methods">Providers &amp; Payment Methods</a>
                         </li>
                     </ul>
                 </nav>
@@ -1425,8 +1422,8 @@ include __DIR__ . '/partials/html-head.php';
                 </div>
             </div>
         </div>
-        <div class="row mt-4">
-            <div class="col-lg-6 d-none" id="providers" data-admin-section="providers">
+        <div class="row mt-4 d-none" id="providers-payment-methods" data-admin-section="providers-payment-methods">
+            <div class="col-lg-6" id="providers">
                 <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Software Providers</h5>
@@ -1478,7 +1475,7 @@ include __DIR__ . '/partials/html-head.php';
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 d-none" id="payment-methods" data-admin-section="payment-methods">
+            <div class="col-lg-6" id="payment-methods">
                 <div class="card shadow-sm h-100 admin-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Payment Methods</h5>
