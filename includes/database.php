@@ -97,6 +97,7 @@ function initializeTables(PDO $database): void
     ensureCasinoCategorySeeds($database);
     ensureTopCasinoColumn($database);
     ensureCasinoProviderLinks($database);
+    ensureCasinoDevices($database);
 }
 
 function ensureMetadataTable(PDO $database): void
@@ -216,6 +217,23 @@ function ensureCasinoProviderLinks(PDO $database): void
             UNIQUE KEY casino_provider_unique (casino_id, provider_id),
             FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE,
             FOREIGN KEY (provider_id) REFERENCES providers(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+}
+
+function ensureCasinoDevices(PDO $database): void
+{
+    if (tableExists($database, 'casino_devices')) {
+        return;
+    }
+
+    $database->exec(
+        'CREATE TABLE IF NOT EXISTS casino_devices (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            casino_id BIGINT UNSIGNED NOT NULL,
+            device_group VARCHAR(50) NOT NULL,
+            device_key VARCHAR(50) NOT NULL,
+            FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
 }
