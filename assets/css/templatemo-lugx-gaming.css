@@ -2221,13 +2221,13 @@ body {
 .pros-cons-heading.pros,
 .pros-cons-heading.pros i,
 .list-with-icons.pros i {
-  color: #16a34a;
+  color: #16a34a !important;
 }
 
 .pros-cons-heading.cons,
 .pros-cons-heading.cons i,
 .list-with-icons.cons i {
-  color: #dc2626;
+  color: #dc2626 !important;
 }
 
 /*
