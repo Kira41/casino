@@ -68,7 +68,7 @@ include __DIR__ . '/partials/header.php';
         </div>
         <div class="col-lg-4 offset-lg-2">
           <a class="right-image d-inline-block" href="<?= htmlspecialchars($topCasinoLink, ENT_QUOTES, 'UTF-8') ?>">
-            <img src="<?= htmlspecialchars($topCasinoImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($topCasinoName, ENT_QUOTES, 'UTF-8') ?>" style="width: 150%; max-width: none;">
+            <img src="<?= htmlspecialchars($topCasinoImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($topCasinoName, ENT_QUOTES, 'UTF-8') ?>">
             <?php if ($topCasinoMinDeposit !== ''): ?>
               <span class="price"><?= htmlspecialchars($topCasinoMinDeposit, ENT_QUOTES, 'UTF-8') ?></span>
             <?php endif; ?>
