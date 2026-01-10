@@ -456,21 +456,34 @@ include __DIR__ . '/partials/header.php';
                                   <?php endforeach; ?>
                                 </div>
                               <?php endif; ?>
-                              <?php if (!empty($section['summary'])): ?>
+                              <?php
+                              $bankingHighlights = [];
+                              if ($section['key'] === 'banking-methods') {
+                                  if (!empty($section['summary'])) {
+                                      $bankingHighlights[] = [
+                                          'icon' => 'fa-credit-card text-warning',
+                                          'content' => $section['summary'],
+                                      ];
+                                  }
+                                  $bankingHighlights[] = [
+                                      'icon' => 'fa-shield-alt text-warning',
+                                      'content' => 'Some casinos require KYC verification before any withdrawal.',
+                                  ];
+                              }
+                              $pointsToRender = $section['points'];
+                              if (!empty($bankingHighlights)) {
+                                  $pointsToRender = array_merge($bankingHighlights, $pointsToRender);
+                              }
+                              ?>
+                              <?php if (!empty($section['summary']) && $section['key'] !== 'banking-methods'): ?>
                                 <?php
                                 $summaryClasses = 'mb-3';
-                                if ($section['key'] === 'banking-methods' && !empty($paymentMethods)) {
-                                    $summaryClasses = 'mt-3 mb-3';
-                                }
                                 ?>
                                 <p class="<?= $summaryClasses ?>"><?= htmlspecialchars($section['summary'], ENT_QUOTES, 'UTF-8') ?></p>
                               <?php endif; ?>
-                              <?php if ($section['key'] === 'banking-methods'): ?>
-                                <p class="mt-3 mb-0">Some casinos require KYC verification before any withdrawal.</p>
-                              <?php endif; ?>
-                              <?php if (!empty($section['points']) && $section['key'] !== 'devices' && $section['key'] !== 'software-providers'): ?>
+                              <?php if (!empty($pointsToRender) && $section['key'] !== 'devices' && $section['key'] !== 'software-providers'): ?>
                                 <div class="row g-3 align-items-start">
-                                  <?php foreach ($section['points'] as $point): ?>
+                                  <?php foreach ($pointsToRender as $point): ?>
                                     <div class="col-md-6">
                                       <div class="d-flex align-items-start">
                                         <?php if (!empty($point['icon'])): ?>
