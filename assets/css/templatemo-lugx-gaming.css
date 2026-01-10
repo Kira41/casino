@@ -2169,6 +2169,7 @@ body {
 .platform-subscribe h4 {
   font-size: 1.4rem;
   margin-bottom: 8px;
+  color: #fff;
 }
 
 .platform-subscribe p {
@@ -2215,6 +2216,18 @@ body {
 .platform-subscribe .list-inline-item {
   color: #9aa3bb;
   font-weight: 600;
+}
+
+.pros-cons-heading.pros,
+.pros-cons-heading.pros i,
+.list-with-icons.pros i {
+  color: #16a34a;
+}
+
+.pros-cons-heading.cons,
+.pros-cons-heading.cons i,
+.list-with-icons.cons i {
+  color: #dc2626;
 }
 
 /*

@@ -513,18 +513,18 @@ include __DIR__ . '/partials/header.php';
                           <div class="accordion-body">
                             <div class="row g-4">
                               <div class="col-md-6">
-                                <h6 class="pros-cons-heading text-success"><i class="fa fa-thumbs-up me-2"></i><span>Pros</span></h6>
+                                <h6 class="pros-cons-heading pros"><i class="fa fa-thumbs-up me-2"></i><span>Pros</span></h6>
                                 <ul class="list-with-icons pros mb-0">
                                   <?php foreach ($prosCons['pros'] as $pro): ?>
-                                    <li><i class="fa fa-check text-success me-2"></i><span><?= htmlspecialchars($pro, ENT_QUOTES, 'UTF-8') ?></span></li>
+                                    <li><i class="fa fa-check me-2"></i><span><?= htmlspecialchars($pro, ENT_QUOTES, 'UTF-8') ?></span></li>
                                   <?php endforeach; ?>
                                 </ul>
                               </div>
                               <div class="col-md-6">
-                                <h6 class="pros-cons-heading text-danger"><i class="fa fa-thumbs-down me-2"></i><span>Cons</span></h6>
+                                <h6 class="pros-cons-heading cons"><i class="fa fa-thumbs-down me-2"></i><span>Cons</span></h6>
                                 <ul class="list-with-icons cons mb-0">
                                   <?php foreach ($prosCons['cons'] as $con): ?>
-                                    <li><i class="fa fa-times text-danger me-2"></i><span><?= htmlspecialchars($con, ENT_QUOTES, 'UTF-8') ?></span></li>
+                                    <li><i class="fa fa-times me-2"></i><span><?= htmlspecialchars($con, ENT_QUOTES, 'UTF-8') ?></span></li>
                                   <?php endforeach; ?>
                                 </ul>
                               </div>
