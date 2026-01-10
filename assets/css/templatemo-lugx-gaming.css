@@ -795,10 +795,14 @@ Banner Style
 
 .main-banner .right-image {
   position: relative;
+  overflow: visible;
 }
 
 .main-banner .right-image img {
   border-radius: 25px;
+  width: 300%;
+  max-width: none;
+  height: auto;
 }
 
 .main-banner .right-image span.price {
