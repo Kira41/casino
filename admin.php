@@ -1256,9 +1256,9 @@ include __DIR__ . '/partials/html-head.php';
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                             <div>
                                 <h5 class="card-title mb-1"><?= $formValues['id'] ? 'Edit Casino' : 'Add New Casino' ?></h5>
-                                <p class="text-muted mb-0">Complete the details in five guided steps.</p>
+                                <p class="text-muted mb-0">Complete the details in four guided steps.</p>
                             </div>
-                            <span class="admin-step-indicator badge bg-light text-dark" data-step-indicator>Step 1 of 5</span>
+                            <span class="admin-step-indicator badge bg-light text-dark" data-step-indicator>Step 1 of 4</span>
                         </div>
                         <form method="post" enctype="multipart/form-data" data-admin-stepper>
                             <input type="hidden" name="action" value="save_casino">
@@ -1272,13 +1272,10 @@ include __DIR__ . '/partials/html-head.php';
                                     <button class="nav-link" type="button" data-step-target="2">Description + Game Types</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" type="button" data-step-target="3">Additional Information</button>
+                                    <button class="nav-link" type="button" data-step-target="3">Additional Information &amp; Support</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" type="button" data-step-target="4">Support</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" type="button" data-step-target="5">Reviews &amp; Extras</button>
+                                    <button class="nav-link" type="button" data-step-target="4">Reviews &amp; Extras</button>
                                 </li>
                             </ul>
 
@@ -1424,14 +1421,7 @@ include __DIR__ . '/partials/html-head.php';
                                         <input type="text" class="form-control" id="affiliate_program" name="affiliate_program" value="<?= htmlspecialchars((string) $formValues['affiliate_program'], ENT_QUOTES, 'UTF-8') ?>" required>
                                     </div>
                                 </div>
-                                <div class="admin-step-actions">
-                                    <button class="btn btn-outline-light" type="button" data-step-prev>Back</button>
-                                    <button class="btn btn-brand" type="button" data-step-next>Next</button>
-                                </div>
-                            </div>
-
-                            <div class="admin-step d-none" data-step="4">
-                                <div class="row g-3">
+                                <div class="row g-3 mt-1">
                                     <div class="col-lg-4">
                                         <label class="form-label" for="support_live_chat">Live Chat</label>
                                         <select class="form-select" id="support_live_chat" name="support_live_chat" required>
@@ -1455,7 +1445,7 @@ include __DIR__ . '/partials/html-head.php';
                                 </div>
                             </div>
 
-                            <div class="admin-step d-none" data-step="5">
+                            <div class="admin-step d-none" data-step="4">
                                 <div class="mb-4">
                                     <label class="form-label">Payment Methods</label>
                                     <?php if (!empty($paymentMethodsCatalog)): ?>
