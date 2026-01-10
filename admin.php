@@ -320,6 +320,66 @@ function updateCasinoDevices(PDO $database, int $casinoId, array $devices): void
     }
 }
 
+function updateCasinoReviewSectionPoints(PDO $database, int $casinoId, string $title, array $points, ?string $summary = null): void
+{
+    if (!tableExists($database, 'casino_review_sections') || !tableExists($database, 'casino_review_points')) {
+        return;
+    }
+
+    $selectStatement = $database->prepare(
+        'SELECT id FROM casino_review_sections WHERE casino_id = :casino_id AND title = :title LIMIT 1'
+    );
+    $selectStatement->execute([':casino_id' => $casinoId, ':title' => $title]);
+    $sectionId = $selectStatement->fetchColumn();
+
+    if ($sectionId === false) {
+        $insertStatement = $database->prepare(
+            'INSERT INTO casino_review_sections (casino_id, title, summary) VALUES (:casino_id, :title, :summary)'
+        );
+        $insertStatement->execute([
+            ':casino_id' => $casinoId,
+            ':title' => $title,
+            ':summary' => $summary ?? '',
+        ]);
+        $sectionId = (int) $database->lastInsertId();
+    } else {
+        $sectionId = (int) $sectionId;
+        if ($summary !== null) {
+            $updateStatement = $database->prepare(
+                'UPDATE casino_review_sections SET summary = :summary WHERE id = :id'
+            );
+            $updateStatement->execute([
+                ':summary' => $summary,
+                ':id' => $sectionId,
+            ]);
+        }
+    }
+
+    $deleteStatement = $database->prepare('DELETE FROM casino_review_points WHERE review_section_id = :section_id');
+    $deleteStatement->execute([':section_id' => $sectionId]);
+
+    if ($points === []) {
+        return;
+    }
+
+    $insertPointStatement = $database->prepare(
+        'INSERT INTO casino_review_points (review_section_id, icon, content) VALUES (:review_section_id, :icon, :content)'
+    );
+
+    foreach ($points as $point) {
+        $content = trim((string) ($point['content'] ?? ''));
+        if ($content === '') {
+            continue;
+        }
+        $icon = trim((string) ($point['icon'] ?? ''));
+        $insertPointStatement->execute([
+            ':review_section_id' => $sectionId,
+            ':icon' => $icon,
+            ':content' => $content,
+        ]);
+    }
+}
+
 function seedCasinoReviewSections(PDO $database, int $casinoId, string $casinoName): void
 {
     if (!tableExists($database, 'casino_review_sections')) {
@@ -491,6 +551,38 @@ function fetchCasinoCardSources(PDO $database, array $casinoIds): array
     return $sources;
 }
 
+function normalizeReviewSectionKey(string $title): string
+{
+    $key = strtolower(trim($title));
+    $key = preg_replace('/[^a-z0-9]+/', '-', $key) ?? '';
+    $key = trim($key, '-');
+    $aliases = [
+        'additional-info' => 'additional-info',
+        'additional-information' => 'additional-info',
+        'support' => 'support',
+    ];
+
+    return $aliases[$key] ?? $key;
+}
+
+function mapReviewSectionsByKey(array $sections): array
+{
+    $mapped = [];
+    foreach ($sections as $section) {
+        $title = (string) ($section['title'] ?? '');
+        if ($title === '') {
+            continue;
+        }
+        $key = normalizeReviewSectionKey($title);
+        if ($key === '' || isset($mapped[$key])) {
+            continue;
+        }
+        $mapped[$key] = $section;
+    }
+
+    return $mapped;
+}
+
 if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $casinoId = isset($_POST['casino_id']) ? (int) $_POST['casino_id'] : 0;
     $existingCasino = $casinoId > 0 ? fetchCasinoById($database, $casinoId) : null;
@@ -506,6 +598,16 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $ctaUrl = isset($_POST['cta_url']) ? trim((string) $_POST['cta_url']) : '';
     $heroImageInput = isset($_POST['hero_image']) ? trim((string) $_POST['hero_image']) : '';
     $thumbnailImageInput = isset($_POST['thumbnail_image']) ? trim((string) $_POST['thumbnail_image']) : '';
+    $availableLanguages = isset($_POST['available_languages']) ? trim((string) $_POST['available_languages']) : '';
+    $restrictedCountries = isset($_POST['restricted_countries']) ? trim((string) $_POST['restricted_countries']) : '';
+    $affiliateProgram = isset($_POST['affiliate_program']) ? trim((string) $_POST['affiliate_program']) : '';
+    $supportLiveChat = strtolower(trim((string) ($_POST['support_live_chat'] ?? '')));
+    $supportEmails = isset($_POST['support_emails']) ? trim((string) $_POST['support_emails']) : '';
+    $supportPhone = isset($_POST['support_phone']) ? trim((string) $_POST['support_phone']) : '';
+    $validSupportLiveChatValues = ['yes', 'no'];
+    if (!in_array($supportLiveChat, $validSupportLiveChatValues, true)) {
+        $supportLiveChat = '';
+    }
 
     $deviceCatalog = getDeviceSupportCatalog();
     $deviceInput = (array) ($_POST['devices'] ?? []);
@@ -609,6 +711,30 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         $errors[] = 'Add at least one con.';
     }
 
+    if ($isNewCasino && $availableLanguages === '') {
+        $errors[] = 'Provide available languages.';
+    }
+
+    if ($isNewCasino && $restrictedCountries === '') {
+        $errors[] = 'Provide restricted countries.';
+    }
+
+    if ($isNewCasino && $affiliateProgram === '') {
+        $errors[] = 'Provide affiliate program details.';
+    }
+
+    if ($isNewCasino && $supportLiveChat === '') {
+        $errors[] = 'Select live chat availability.';
+    }
+
+    if ($isNewCasino && $supportEmails === '') {
+        $errors[] = 'Provide support emails.';
+    }
+
+    if ($isNewCasino && $supportPhone === '') {
+        $errors[] = 'Provide a support phone number.';
+    }
+
     if ($errors === []) {
         $checkStatement = $database->prepare('SELECT id FROM casinos WHERE slug = :slug LIMIT 1');
         $checkStatement->execute([':slug' => $slug]);
@@ -678,6 +804,46 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         updateCasinoGameModes($database, $casinoId, $gameModes);
         updateCasinoProsCons($database, $casinoId, $pros, $cons);
         updateCasinoDevices($database, $casinoId, $deviceSelections);
+        $additionalInfoPoints = [];
+        if ($availableLanguages !== '') {
+            $additionalInfoPoints[] = [
+                'icon' => 'fa-language text-warning',
+                'content' => 'Available Languages: ' . $availableLanguages,
+            ];
+        }
+        if ($restrictedCountries !== '') {
+            $additionalInfoPoints[] = [
+                'icon' => 'fa-ban text-danger',
+                'content' => 'Restricted Countries: ' . $restrictedCountries,
+            ];
+        }
+        if ($affiliateProgram !== '') {
+            $additionalInfoPoints[] = [
+                'icon' => 'fa-handshake text-success',
+                'content' => 'Affiliate program: ' . $affiliateProgram,
+            ];
+        }
+        $supportPoints = [];
+        if ($supportLiveChat !== '') {
+            $supportPoints[] = [
+                'icon' => $supportLiveChat === 'yes' ? 'fa-check text-success' : 'fa-times text-danger',
+                'content' => 'Live chat: ' . ($supportLiveChat === 'yes' ? 'Yes' : 'No'),
+            ];
+        }
+        if ($supportEmails !== '') {
+            $supportPoints[] = [
+                'icon' => 'fa-envelope text-warning',
+                'content' => 'Emails: ' . $supportEmails,
+            ];
+        }
+        if ($supportPhone !== '') {
+            $supportPoints[] = [
+                'icon' => 'fa-phone text-warning',
+                'content' => 'Phone number: ' . $supportPhone,
+            ];
+        }
+        updateCasinoReviewSectionPoints($database, $casinoId, 'Additional Info', $additionalInfoPoints);
+        updateCasinoReviewSectionPoints($database, $casinoId, 'Support', $supportPoints);
 
         $actionMessage = $casinoId > 0 ? 'Casino saved successfully.' : 'Casino created successfully.';
         header('Location: admin.php?status=' . urlencode($actionMessage));
@@ -924,6 +1090,12 @@ $formValues = [
     'pros' => $editCasino['pros_cons']['pros'] ?? [],
     'cons' => $editCasino['pros_cons']['cons'] ?? [],
     'devices' => $editCasino['devices'] ?? [],
+    'available_languages' => '',
+    'restricted_countries' => '',
+    'affiliate_program' => '',
+    'support_live_chat' => '',
+    'support_emails' => '',
+    'support_phone' => '',
 ];
 
 $casinos = fetchCasinos($database);
@@ -935,6 +1107,45 @@ $providers = fetchProviders($database);
 $paymentMethodsCatalog = fetchPaymentMethodsCatalog($database);
 
 if ($editCasino) {
+    $reviewSectionsByKey = mapReviewSectionsByKey($editCasino['review_sections'] ?? []);
+    $additionalInfoSection = $reviewSectionsByKey['additional-info'] ?? null;
+    if (is_array($additionalInfoSection)) {
+        foreach ($additionalInfoSection['points'] ?? [] as $point) {
+            $content = trim((string) ($point['content'] ?? ''));
+            if ($content === '') {
+                continue;
+            }
+            if (stripos($content, 'Available Languages:') === 0) {
+                $formValues['available_languages'] = trim(substr($content, strlen('Available Languages:')));
+            } elseif (stripos($content, 'Restricted Countries:') === 0) {
+                $formValues['restricted_countries'] = trim(substr($content, strlen('Restricted Countries:')));
+            } elseif (stripos($content, 'Affiliate program:') === 0) {
+                $formValues['affiliate_program'] = trim(substr($content, strlen('Affiliate program:')));
+            }
+        }
+    }
+    $supportSection = $reviewSectionsByKey['support'] ?? null;
+    if (is_array($supportSection)) {
+        foreach ($supportSection['points'] ?? [] as $point) {
+            $content = trim((string) ($point['content'] ?? ''));
+            if ($content === '') {
+                continue;
+            }
+            if (stripos($content, 'Live chat:') === 0) {
+                $value = strtolower(trim(substr($content, strlen('Live chat:'))));
+                if (str_starts_with($value, 'yes')) {
+                    $formValues['support_live_chat'] = 'yes';
+                } elseif (str_starts_with($value, 'no')) {
+                    $formValues['support_live_chat'] = 'no';
+                }
+            } elseif (stripos($content, 'Emails:') === 0) {
+                $formValues['support_emails'] = trim(substr($content, strlen('Emails:')));
+            } elseif (stripos($content, 'Phone number:') === 0) {
+                $formValues['support_phone'] = trim(substr($content, strlen('Phone number:')));
+            }
+        }
+    }
+
     $selectedPaymentMethodNames = array_map(
         static fn(array $method): string => (string) ($method['method_name'] ?? ''),
         $editCasino['payment_methods'] ?? []
@@ -1045,9 +1256,9 @@ include __DIR__ . '/partials/html-head.php';
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                             <div>
                                 <h5 class="card-title mb-1"><?= $formValues['id'] ? 'Edit Casino' : 'Add New Casino' ?></h5>
-                                <p class="text-muted mb-0">Complete the details in three guided steps.</p>
+                                <p class="text-muted mb-0">Complete the details in five guided steps.</p>
                             </div>
-                            <span class="admin-step-indicator badge bg-light text-dark" data-step-indicator>Step 1 of 3</span>
+                            <span class="admin-step-indicator badge bg-light text-dark" data-step-indicator>Step 1 of 5</span>
                         </div>
                         <form method="post" enctype="multipart/form-data" data-admin-stepper>
                             <input type="hidden" name="action" value="save_casino">
@@ -1061,7 +1272,13 @@ include __DIR__ . '/partials/html-head.php';
                                     <button class="nav-link" type="button" data-step-target="2">Description + Game Types</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" type="button" data-step-target="3">Reviews &amp; Extras</button>
+                                    <button class="nav-link" type="button" data-step-target="3">Additional Information</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" type="button" data-step-target="4">Support</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" type="button" data-step-target="5">Reviews &amp; Extras</button>
                                 </li>
                             </ul>
 
@@ -1192,6 +1409,53 @@ include __DIR__ . '/partials/html-head.php';
                             </div>
 
                             <div class="admin-step d-none" data-step="3">
+                                <div class="row g-3">
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="available_languages">Available Languages</label>
+                                        <input type="text" class="form-control" id="available_languages" name="available_languages" value="<?= htmlspecialchars((string) $formValues['available_languages'], ENT_QUOTES, 'UTF-8') ?>" required>
+                                        <small class="text-muted">Comma-separated or full list.</small>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="restricted_countries">Restricted Countries</label>
+                                        <input type="text" class="form-control" id="restricted_countries" name="restricted_countries" value="<?= htmlspecialchars((string) $formValues['restricted_countries'], ENT_QUOTES, 'UTF-8') ?>" required>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="affiliate_program">Affiliate Program</label>
+                                        <input type="text" class="form-control" id="affiliate_program" name="affiliate_program" value="<?= htmlspecialchars((string) $formValues['affiliate_program'], ENT_QUOTES, 'UTF-8') ?>" required>
+                                    </div>
+                                </div>
+                                <div class="admin-step-actions">
+                                    <button class="btn btn-outline-light" type="button" data-step-prev>Back</button>
+                                    <button class="btn btn-brand" type="button" data-step-next>Next</button>
+                                </div>
+                            </div>
+
+                            <div class="admin-step d-none" data-step="4">
+                                <div class="row g-3">
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="support_live_chat">Live Chat</label>
+                                        <select class="form-select" id="support_live_chat" name="support_live_chat" required>
+                                            <option value="" disabled <?= $formValues['support_live_chat'] === '' ? 'selected' : '' ?>>Select</option>
+                                            <option value="yes" <?= $formValues['support_live_chat'] === 'yes' ? 'selected' : '' ?>>Yes</option>
+                                            <option value="no" <?= $formValues['support_live_chat'] === 'no' ? 'selected' : '' ?>>No</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="support_emails">Emails</label>
+                                        <input type="text" class="form-control" id="support_emails" name="support_emails" value="<?= htmlspecialchars((string) $formValues['support_emails'], ENT_QUOTES, 'UTF-8') ?>" required>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="form-label" for="support_phone">Phone Number</label>
+                                        <input type="text" class="form-control" id="support_phone" name="support_phone" value="<?= htmlspecialchars((string) $formValues['support_phone'], ENT_QUOTES, 'UTF-8') ?>" required>
+                                    </div>
+                                </div>
+                                <div class="admin-step-actions">
+                                    <button class="btn btn-outline-light" type="button" data-step-prev>Back</button>
+                                    <button class="btn btn-brand" type="button" data-step-next>Next</button>
+                                </div>
+                            </div>
+
+                            <div class="admin-step d-none" data-step="5">
                                 <div class="mb-4">
                                     <label class="form-label">Payment Methods</label>
                                     <?php if (!empty($paymentMethodsCatalog)): ?>

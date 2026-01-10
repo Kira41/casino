@@ -484,12 +484,24 @@ include __DIR__ . '/partials/header.php';
                               <?php if (!empty($pointsToRender) && $section['key'] !== 'devices' && $section['key'] !== 'software-providers'): ?>
                                 <div class="row g-3 align-items-start">
                                   <?php foreach ($pointsToRender as $point): ?>
+                                    <?php
+                                    $pointContent = (string) ($point['content'] ?? '');
+                                    $pointIcon = trim((string) ($point['icon'] ?? ''));
+                                    if ($pointIcon === '' && $section['key'] === 'support' && stripos($pointContent, 'Live chat:') === 0) {
+                                        $liveChatValue = strtolower(trim(substr($pointContent, strlen('Live chat:'))));
+                                        if (str_starts_with($liveChatValue, 'yes')) {
+                                            $pointIcon = 'fa-check text-success';
+                                        } elseif (str_starts_with($liveChatValue, 'no')) {
+                                            $pointIcon = 'fa-times text-danger';
+                                        }
+                                    }
+                                    ?>
                                     <div class="col-md-6">
                                       <div class="d-flex align-items-start">
-                                        <?php if (!empty($point['icon'])): ?>
-                                          <i class="fa <?= htmlspecialchars($point['icon'], ENT_QUOTES, 'UTF-8') ?> me-3 mt-1"></i>
+                                        <?php if ($pointIcon !== ''): ?>
+                                          <i class="fa <?= htmlspecialchars($pointIcon, ENT_QUOTES, 'UTF-8') ?> me-3 mt-1"></i>
                                         <?php endif; ?>
-                                        <p class="mb-0"><?= htmlspecialchars($point['content'], ENT_QUOTES, 'UTF-8') ?></p>
+                                        <p class="mb-0"><?= htmlspecialchars($pointContent, ENT_QUOTES, 'UTF-8') ?></p>
                                       </div>
                                     </div>
                                   <?php endforeach; ?>
