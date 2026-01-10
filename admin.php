@@ -636,6 +636,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
     $paymentMethodIds = array_values(array_filter($paymentMethodIds, static fn(int $id): bool => $id > 0));
     $providerIds = array_map('intval', (array) ($_POST['providers'] ?? []));
     $providerIds = array_values(array_filter($providerIds, static fn(int $id): bool => $id > 0));
+    $relatedSelections = [];
+    for ($slot = 1; $slot <= 5; $slot += 1) {
+        $fieldName = 'related_slot_' . $slot;
+        $casinoId = isset($_POST[$fieldName]) ? (int) $_POST[$fieldName] : 0;
+        if ($casinoId > 0) {
+            $relatedSelections[$slot] = $casinoId;
+        }
+    }
     $gameModesInput = (array) ($_POST['game_modes'] ?? []);
     $gameModes = [];
     if ($gameModesInput !== []) {
@@ -733,6 +741,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
 
     if ($isNewCasino && $supportPhone === '') {
         $errors[] = 'Provide a support phone number.';
+    }
+
+    if (count($relatedSelections) !== count(array_unique($relatedSelections))) {
+        $errors[] = 'Related casino selections must be unique.';
+    }
+
+    if ($isNewCasino && count($relatedSelections) !== 5) {
+        $errors[] = 'Select 5 related casinos.';
     }
 
     if ($errors === []) {
@@ -844,6 +860,49 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         }
         updateCasinoReviewSectionPoints($database, $casinoId, 'Additional Info', $additionalInfoPoints);
         updateCasinoReviewSectionPoints($database, $casinoId, 'Support', $supportPoints);
+
+        if ($relatedSelections !== [] || $isNewCasino) {
+            $deleteStatement = $database->prepare('DELETE FROM casino_cards WHERE section = :section');
+            $deleteStatement->execute([':section' => 'related']);
+
+            if ($relatedSelections !== []) {
+                $sources = fetchCasinoCardSources($database, array_values($relatedSelections));
+                $insertStatement = $database->prepare(
+                    'INSERT INTO casino_cards (casino_id, section, title, image_path, min_deposit_label, rating, price_label, position)
+                    VALUES (:casino_id, :section, :title, :image_path, :min_deposit_label, :rating, :price_label, :position)'
+                );
+
+                foreach ($relatedSelections as $position => $casinoId) {
+                    if (!isset($sources[$casinoId])) {
+                        continue;
+                    }
+
+                    $source = $sources[$casinoId];
+                    $imagePath = (string) ($source['thumbnail_image'] ?? '');
+                    if ($imagePath === '') {
+                        $imagePath = (string) ($source['hero_image'] ?? '');
+                    }
+
+                    $rating = is_numeric($source['rating'] ?? null) ? (int) $source['rating'] : null;
+                    $minDepositLabel = formatMinDeposit(
+                        isset($source['min_deposit_usd']) && is_numeric($source['min_deposit_usd'])
+                            ? (int) $source['min_deposit_usd']
+                            : null
+                    );
+
+                    $insertStatement->execute([
+                        ':casino_id' => $casinoId,
+                        ':section' => 'related',
+                        ':title' => $source['name'] ?? '',
+                        ':image_path' => $imagePath,
+                        ':min_deposit_label' => $minDepositLabel,
+                        ':rating' => $rating,
+                        ':price_label' => null,
+                        ':position' => $position,
+                    ]);
+                }
+            }
+        }
 
         $actionMessage = $casinoId > 0 ? 'Casino saved successfully.' : 'Casino created successfully.';
         header('Location: admin.php?status=' . urlencode($actionMessage));
@@ -1099,6 +1158,7 @@ $formValues = [
 ];
 
 $casinos = fetchCasinos($database);
+$relatedSelections = fetchFeaturedSectionSelections($database, 'related');
 $featuredSelections = [];
 foreach ($featuredSections as $section => $config) {
     $featuredSelections[$section] = fetchFeaturedSectionSelections($database, $section);
@@ -1256,9 +1316,9 @@ include __DIR__ . '/partials/html-head.php';
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                             <div>
                                 <h5 class="card-title mb-1"><?= $formValues['id'] ? 'Edit Casino' : 'Add New Casino' ?></h5>
-                                <p class="text-muted mb-0">Complete the details in four guided steps.</p>
+                                <p class="text-muted mb-0">Complete the details in five guided steps.</p>
                             </div>
-                            <span class="admin-step-indicator badge bg-light text-dark" data-step-indicator>Step 1 of 4</span>
+                            <span class="admin-step-indicator badge bg-light text-dark" data-step-indicator>Step 1 of 5</span>
                         </div>
                         <form method="post" enctype="multipart/form-data" data-admin-stepper>
                             <input type="hidden" name="action" value="save_casino">
@@ -1276,6 +1336,9 @@ include __DIR__ . '/partials/html-head.php';
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" type="button" data-step-target="4">Reviews &amp; Extras</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" type="button" data-step-target="5">Related Casinos</button>
                                 </li>
                             </ul>
 
@@ -1566,6 +1629,41 @@ include __DIR__ . '/partials/html-head.php';
                                             </button>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="admin-step-actions">
+                                    <button class="btn btn-outline-light" type="button" data-step-prev>Back</button>
+                                    <button class="btn btn-brand" type="button" data-step-next>Next</button>
+                                </div>
+                            </div>
+
+                            <div class="admin-step d-none" data-step="5">
+                                <div class="row g-3">
+                                    <?php
+                                    $relatedCasinoOptions = array_values(array_filter(
+                                        $casinos,
+                                        static fn(array $casino): bool => (int) $casino['id'] !== (int) $formValues['id']
+                                    ));
+                                    ?>
+                                    <?php for ($slot = 1; $slot <= 5; $slot += 1): ?>
+                                        <?php
+                                        $fieldName = 'related_slot_' . $slot;
+                                        $selectedId = $relatedSelections[$slot] ?? 0;
+                                        ?>
+                                        <div class="col-lg-6">
+                                            <label class="form-label" for="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">Related Casino <?= (int) $slot ?></label>
+                                            <select class="form-select"
+                                                    id="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>"
+                                                    name="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>"
+                                                <?= $formValues['id'] ? '' : 'required' ?>>
+                                                <option value="0">Select a casino</option>
+                                                <?php foreach ($relatedCasinoOptions as $casino): ?>
+                                                    <option value="<?= (int) $casino['id'] ?>" <?= (int) $selectedId === (int) $casino['id'] ? 'selected' : '' ?>>
+                                                        <?= htmlspecialchars($casino['name'], ENT_QUOTES, 'UTF-8') ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    <?php endfor; ?>
                                 </div>
                                 <div class="admin-step-actions">
                                     <button class="btn btn-outline-light" type="button" data-step-prev>Back</button>
