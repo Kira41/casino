@@ -98,6 +98,9 @@ CREATE TABLE IF NOT EXISTS content_cards (
     position INT NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_content_cards_section_position_title
+    ON content_cards(section, position, title);
+
 CREATE TABLE IF NOT EXISTS category_cards (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
