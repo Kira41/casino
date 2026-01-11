@@ -11,6 +11,35 @@ $vipPlaybooks = fetchContentCards($database, 'vip_playbooks');
 $vipSignals = fetchContentCards($database, 'vip_signals');
 $pageTitle = 'Lugx Gaming - VIP & Loyalty Insights';
 
+function dedupeContentCards(array $cards): array
+{
+    $seen = [];
+    $unique = [];
+
+    foreach ($cards as $card) {
+        $keyParts = [
+            strtolower(trim((string) ($card['title'] ?? ''))),
+            strtolower(trim((string) ($card['category'] ?? ''))),
+            strtolower(trim((string) ($card['badge'] ?? ''))),
+            strtolower(trim((string) ($card['description'] ?? ''))),
+            strtolower(trim((string) ($card['image_path'] ?? ''))),
+        ];
+        $key = implode('|', $keyParts);
+
+        if (isset($seen[$key])) {
+            continue;
+        }
+
+        $seen[$key] = true;
+        $unique[] = $card;
+    }
+
+    return $unique;
+}
+
+$vipPlaybooks = dedupeContentCards($vipPlaybooks);
+$vipSignals = dedupeContentCards($vipSignals);
+
 if (empty($vipPlaybooks)) {
     $vipPlaybooks = [
         [
