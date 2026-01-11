@@ -98,6 +98,7 @@ function initializeTables(PDO $database): void
     ensureTopCasinoColumn($database);
     ensureCasinoProviderLinks($database);
     ensureCasinoDevices($database);
+    ensureContentCardUniqueness($database);
 }
 
 function ensureMetadataTable(PDO $database): void
@@ -184,6 +185,39 @@ function columnExists(PDO $database, string $table, string $column): bool
     return (bool) $statement->fetchColumn();
 }
 
+function indexExists(PDO $database, string $table, string $index): bool
+{
+    $driver = $database->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+    if ($driver === 'sqlite') {
+        $statement = $database->prepare('PRAGMA index_list(' . $table . ')');
+        $statement->execute();
+        $indexes = $statement->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        foreach ($indexes as $indexInfo) {
+            if (($indexInfo['name'] ?? null) === $index) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    if ($driver === 'mysql') {
+        $indexLike = $database->quote($index);
+        if ($indexLike === false) {
+            return false;
+        }
+
+        $statement = $database->query("SHOW INDEX FROM `{$table}` WHERE Key_name = {$indexLike}");
+        return (bool) $statement->fetchColumn();
+    }
+
+    $statement = $database->prepare(
+        'SELECT 1 FROM information_schema.statistics WHERE table_name = :table AND index_name = :index LIMIT 1'
+    );
+    $statement->execute([':table' => $table, ':index' => $index]);
+    return (bool) $statement->fetchColumn();
+}
+
 function ensureTopCasinoColumn(PDO $database): void
 {
     if (!tableExists($database, 'casinos')) {
@@ -236,6 +270,28 @@ function ensureCasinoDevices(PDO $database): void
             FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
+}
+
+function ensureContentCardUniqueness(PDO $database): void
+{
+    if (!tableExists($database, 'content_cards')) {
+        return;
+    }
+
+    $indexName = 'uniq_content_cards_section_position_title';
+
+    if ($database->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql') {
+        deleteDuplicateRows($database, 'content_cards', ['section', 'position', 'title']);
+    }
+
+    if (indexExists($database, 'content_cards', $indexName)) {
+        return;
+    }
+
+    $database->exec(sprintf(
+        'CREATE UNIQUE INDEX %s ON content_cards(section, position, title)',
+        $indexName
+    ));
 }
 
 function removeDuplicateSeedData(PDO $database): void
