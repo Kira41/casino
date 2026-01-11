@@ -11,6 +11,68 @@ $vipPlaybooks = fetchContentCards($database, 'vip_playbooks');
 $vipSignals = fetchContentCards($database, 'vip_signals');
 $pageTitle = 'Lugx Gaming - VIP & Loyalty Insights';
 
+if (empty($vipPlaybooks)) {
+    $vipPlaybooks = [
+        [
+            'image_path' => 'assets/images/trending-01.jpg',
+            'badge' => 'Tier 1',
+            'category' => 'Onboarding',
+            'title' => 'First 30 Days Blueprint',
+            'description' => 'Hit early wagering goals, unlock support access, and track weekly lift metrics.',
+        ],
+        [
+            'image_path' => 'assets/images/trending-02.jpg',
+            'badge' => 'Tier 2',
+            'category' => 'Momentum',
+            'title' => 'Seasonal Bonus Radar',
+            'description' => 'Plan around promo calendars, leaderboard surges, and reload rhythm windows.',
+        ],
+        [
+            'image_path' => 'assets/images/trending-03.jpg',
+            'badge' => 'Tier 3',
+            'category' => 'Retention',
+            'title' => 'Concierge Access Map',
+            'description' => 'Trigger VIP outreach with session cadence, game mix, and deposit timing.',
+        ],
+        [
+            'image_path' => 'assets/images/trending-04.jpg',
+            'badge' => 'Tier 4',
+            'category' => 'Elite',
+            'title' => 'High-Roller Safeguards',
+            'description' => 'Balance volatility targets with cash-out plans and reward multipliers.',
+        ],
+    ];
+}
+
+if (empty($vipSignals)) {
+    $vipSignals = [
+        [
+            'image_path' => 'assets/images/top-game-01.jpg',
+            'category' => 'Perks',
+            'title' => 'Cashback Velocity',
+            'description' => 'Measure how quickly you can redeem cashback after peak play sessions.',
+        ],
+        [
+            'image_path' => 'assets/images/top-game-02.jpg',
+            'category' => 'Support',
+            'title' => 'Concierge Response Time',
+            'description' => 'Look for under-30 minute replies when hosts manage withdrawals.',
+        ],
+        [
+            'image_path' => 'assets/images/top-game-03.jpg',
+            'category' => 'Events',
+            'title' => 'Invite-Only Calendar',
+            'description' => 'Track live tournaments, travel offers, and seasonal VIP stacks.',
+        ],
+        [
+            'image_path' => 'assets/images/top-game-04.jpg',
+            'category' => 'Limits',
+            'title' => 'Withdrawal Priority',
+            'description' => 'Confirm fast-track lanes and personalized payout thresholds.',
+        ],
+    ];
+}
+
 include __DIR__ . '/partials/html-head.php';
 include __DIR__ . '/partials/header.php';
 ?>
