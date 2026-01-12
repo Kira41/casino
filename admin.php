@@ -743,12 +743,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         $errors[] = 'Provide a support phone number.';
     }
 
-    if (count($relatedSelections) !== count(array_unique($relatedSelections))) {
+    if ($relatedSelections !== [] && count($relatedSelections) !== count(array_unique($relatedSelections))) {
         $errors[] = 'Related casino selections must be unique.';
-    }
-
-    if ($isNewCasino && count($relatedSelections) !== 5) {
-        $errors[] = 'Select 5 related casinos.';
     }
 
     if ($errors === []) {
