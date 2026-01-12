@@ -267,6 +267,16 @@ include __DIR__ . '/partials/header.php';
                 <?php
                 $categorySlug = slugifyTag((string) ($category['title'] ?? ''));
                 $categoryImagePath = (string) ($category['image_path'] ?? '');
+                $categoryImageOverrides = [
+                    'slots-jackpots' => 'assets/images/slots-jackpots.png',
+                    'live-dealer-tables' => 'assets/images/live-dealer-tables.png',
+                    'sports-betting' => 'assets/images/sports-betting.png',
+                    'vip-programs' => 'assets/images/vip-programs.png',
+                    'crypto-casinos' => 'assets/images/crypto-casinos.png',
+                ];
+                if ($categoryImagePath === '' && isset($categoryImageOverrides[$categorySlug])) {
+                    $categoryImagePath = $categoryImageOverrides[$categorySlug];
+                }
                 if ($categoryImagePath !== '' && !str_contains($categoryImagePath, '/')) {
                     $categoryImagePath = 'assets/images/' . $categoryImagePath;
                 }
