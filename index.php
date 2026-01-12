@@ -264,8 +264,14 @@ include __DIR__ . '/partials/header.php';
             <div class="item">
               <h4><?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?></h4>
               <div class="thumb">
-                <?php $categorySlug = slugifyTag((string) ($category['title'] ?? '')); ?>
-                <a href="all-casinos.php?category=<?= urlencode($categorySlug) ?>"><img src="<?= htmlspecialchars($category['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
+                <?php
+                $categorySlug = slugifyTag((string) ($category['title'] ?? ''));
+                $categoryImagePath = (string) ($category['image_path'] ?? '');
+                if ($categoryImagePath !== '' && !str_contains($categoryImagePath, '/')) {
+                    $categoryImagePath = 'assets/images/' . $categoryImagePath;
+                }
+                ?>
+                <a href="all-casinos.php?category=<?= urlencode($categorySlug) ?>"><img src="<?= htmlspecialchars($categoryImagePath, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
               </div>
             </div>
           </div>
