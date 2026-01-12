@@ -685,6 +685,18 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
         $slug = slugifyValue($slug);
     }
 
+    if ($slug !== '') {
+        $checkStatement = $database->prepare('SELECT id FROM casinos WHERE slug = :slug LIMIT 1');
+        $checkStatement->execute([':slug' => $slug]);
+        $existingId = $checkStatement->fetchColumn();
+
+        if ($existingId !== false && (int) $existingId !== $casinoId) {
+            $casinoId = (int) $existingId;
+            $existingCasino = fetchCasinoById($database, $casinoId);
+            $isNewCasino = false;
+        }
+    }
+
     if ($rating < 0 || $rating > 5) {
         $errors[] = 'Rating must be between 0 and 5.';
     }
@@ -745,16 +757,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_casino') {
 
     if ($relatedSelections !== [] && count($relatedSelections) !== count(array_unique($relatedSelections))) {
         $errors[] = 'Related casino selections must be unique.';
-    }
-
-    if ($errors === []) {
-        $checkStatement = $database->prepare('SELECT id FROM casinos WHERE slug = :slug LIMIT 1');
-        $checkStatement->execute([':slug' => $slug]);
-        $existingId = $checkStatement->fetchColumn();
-
-        if ($existingId !== false && (int) $existingId !== $casinoId) {
-            $errors[] = 'Slug already exists. Please choose another.';
-        }
     }
 
     if ($errors === []) {
