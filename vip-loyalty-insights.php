@@ -76,25 +76,25 @@ if (empty($vipPlaybooks)) {
 if (empty($vipSignals)) {
     $vipSignals = [
         [
-            'image_path' => 'assets/images/top-game-01.jpg',
+            'image_path' => 'assets/images/bonus-page/top-game-01.png',
             'category' => 'Perks',
             'title' => 'Cashback Velocity',
             'description' => 'Measure how quickly you can redeem cashback after peak play sessions.',
         ],
         [
-            'image_path' => 'assets/images/top-game-02.jpg',
+            'image_path' => 'assets/images/bonus-page/top-game-02.png',
             'category' => 'Support',
             'title' => 'Concierge Response Time',
             'description' => 'Look for under-30 minute replies when hosts manage withdrawals.',
         ],
         [
-            'image_path' => 'assets/images/top-game-03.jpg',
+            'image_path' => 'assets/images/bonus-page/top-game-03.png',
             'category' => 'Events',
             'title' => 'Invite-Only Calendar',
             'description' => 'Track live tournaments, travel offers, and seasonal VIP stacks.',
         ],
         [
-            'image_path' => 'assets/images/top-game-04.jpg',
+            'image_path' => 'assets/images/bonus-page/top-game-04.png',
             'category' => 'Limits',
             'title' => 'Withdrawal Priority',
             'description' => 'Confirm fast-track lanes and personalized payout thresholds.',
