@@ -274,8 +274,17 @@ include __DIR__ . '/partials/header.php';
                     'vip-programs' => 'assets/images/vip-programs.png',
                     'crypto-casinos' => 'assets/images/crypto-casinos.png',
                 ];
+                $legacyCategoryImages = [
+                    'categories-01.jpg' => 'assets/images/slots-jackpots.png',
+                    'categories-03.jpg' => 'assets/images/sports-betting.png',
+                    'categories-04.jpg' => 'assets/images/vip-programs.png',
+                    'categories-05.jpg' => 'assets/images/live-dealer-tables.png',
+                ];
+                $categoryImageBasename = basename($categoryImagePath);
                 if ($categoryImagePath === '' && isset($categoryImageOverrides[$categorySlug])) {
                     $categoryImagePath = $categoryImageOverrides[$categorySlug];
+                } elseif (isset($legacyCategoryImages[$categoryImageBasename])) {
+                    $categoryImagePath = $categoryImageOverrides[$categorySlug] ?? $legacyCategoryImages[$categoryImageBasename];
                 }
                 if ($categoryImagePath !== '' && !str_contains($categoryImagePath, '/')) {
                     $categoryImagePath = 'assets/images/' . $categoryImagePath;
