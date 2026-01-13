@@ -351,8 +351,8 @@ VALUES
         NULL,
         NULL,
         NULL,
-        'assets/images/categories-01.jpg',
-        'assets/images/categories-01.jpg',
+        'assets/images/slots-jackpots.png',
+        'assets/images/slots-jackpots.png',
         0,
         'Bright, modern casino featured as a related destination in the review page.',
         'https://neonmirage.example.com'
@@ -365,8 +365,8 @@ VALUES
         NULL,
         NULL,
         NULL,
-        'assets/images/categories-05.jpg',
-        'assets/images/categories-05.jpg',
+        'assets/images/live-dealer-tables.png',
+        'assets/images/live-dealer-tables.png',
         0,
         'Coastal-inspired casino listed alongside other related recommendations.',
         'https://azurespire.example.com'
@@ -379,8 +379,8 @@ VALUES
         NULL,
         NULL,
         NULL,
-        'assets/images/categories-03.jpg',
-        'assets/images/categories-03.jpg',
+        'assets/images/sports-betting.png',
+        'assets/images/sports-betting.png',
         0,
         'Lounge experience for players exploring additional curated casinos.',
         'https://luckyhorizon.example.com'
@@ -393,8 +393,8 @@ VALUES
         NULL,
         NULL,
         NULL,
-        'assets/images/categories-04.jpg',
-        'assets/images/categories-04.jpg',
+        'assets/images/vip-programs.png',
+        'assets/images/vip-programs.png',
         0,
         'Boutique casino highlighted as a related option for readers.',
         'https://starlitcrown.example.com'
@@ -407,8 +407,8 @@ VALUES
         NULL,
         NULL,
         NULL,
-        'assets/images/categories-05.jpg',
-        'assets/images/categories-05.jpg',
+        'assets/images/crypto-casinos.png',
+        'assets/images/crypto-casinos.png',
         0,
         'Resort-style casino rounding out the related destinations list.',
         'https://goldendrift.example.com'
@@ -535,11 +535,11 @@ VALUES
     ((SELECT id FROM casinos WHERE slug = 'obsidian-crown-club'), 'most_played', 'Obsidian Crown Club', 'assets/images/top-game-04.jpg', NULL, 5, NULL, 4),
     ((SELECT id FROM casinos WHERE slug = 'mirage-of-millions'), 'most_played', 'Mirage of Millions', 'assets/images/top-game-05.jpg', NULL, 2, NULL, 5),
     ((SELECT id FROM casinos WHERE slug = 'luminous-ledger-casino'), 'most_played', 'Luminous Ledger Casino', 'assets/images/top-game-06.jpg', NULL, 4, NULL, 6),
-    ((SELECT id FROM casinos WHERE slug = 'neon-mirage-casino'), 'related', 'Neon Mirage Casino', 'assets/images/categories-01.jpg', NULL, NULL, NULL, 1),
-    ((SELECT id FROM casinos WHERE slug = 'azure-spire-casino'), 'related', 'Azure Spire Casino', 'assets/images/categories-05.jpg', NULL, NULL, NULL, 2),
-    ((SELECT id FROM casinos WHERE slug = 'lucky-horizon-lounge'), 'related', 'Lucky Horizon Lounge', 'assets/images/categories-03.jpg', NULL, NULL, NULL, 3),
-    ((SELECT id FROM casinos WHERE slug = 'starlit-crown-casino'), 'related', 'Starlit Crown Casino', 'assets/images/categories-04.jpg', NULL, NULL, NULL, 4),
-    ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'related', 'Golden Drift Resort', 'assets/images/categories-05.jpg', NULL, NULL, NULL, 5);
+    ((SELECT id FROM casinos WHERE slug = 'neon-mirage-casino'), 'related', 'Neon Mirage Casino', 'assets/images/slots-jackpots.png', NULL, NULL, NULL, 1),
+    ((SELECT id FROM casinos WHERE slug = 'azure-spire-casino'), 'related', 'Azure Spire Casino', 'assets/images/live-dealer-tables.png', NULL, NULL, NULL, 2),
+    ((SELECT id FROM casinos WHERE slug = 'lucky-horizon-lounge'), 'related', 'Lucky Horizon Lounge', 'assets/images/sports-betting.png', NULL, NULL, NULL, 3),
+    ((SELECT id FROM casinos WHERE slug = 'starlit-crown-casino'), 'related', 'Starlit Crown Casino', 'assets/images/vip-programs.png', NULL, NULL, NULL, 4),
+    ((SELECT id FROM casinos WHERE slug = 'golden-drift-resort'), 'related', 'Golden Drift Resort', 'assets/images/crypto-casinos.png', NULL, NULL, NULL, 5);
 
 INSERT IGNORE INTO content_cards (section, title, category, badge, description, image_path, position)
 VALUES
@@ -559,10 +559,10 @@ VALUES
     ('bonus_shortlist', 'Big match playbooks', 'High-roller', NULL, 'Prioritize flexible max bets, higher withdrawal caps, and accelerated VIP status triggers.', 'assets/images/top-game-02.jpg', 2),
     ('bonus_shortlist', 'Token-based promos', 'Crypto', NULL, 'Use faster payouts and coin-specific bonuses to avoid conversion fees and release delays.', 'assets/images/top-game-03.jpg', 3),
     ('bonus_shortlist', 'Bet-slip boosts', 'Sports', NULL, 'Balance bet insurance, odds boosts, and wagering contribution rules for multi-leg slips.', 'assets/images/top-game-04.jpg', 4),
-    ('game_library', 'Fresh releases weekly', 'Slots & jackpots', '12K+ titles', 'We flag casinos adding new Megaways, cluster pays, and branded slots as soon as they drop.', 'assets/images/categories-01.jpg', 1),
-    ('game_library', 'Studios with low latency', 'Tables & shows', 'Live dealers', 'Lightning roulette, blackjack parties, and game shows streamed with multi-camera coverage.', 'assets/images/categories-05.jpg', 2),
-    ('game_library', 'One wallet play', 'Sports & eSports', 'Hybrid', 'Single-balance wagering across sportsbook, racebook, and in-house virtuals with instant settlement.', 'assets/images/categories-03.jpg', 3),
-    ('game_library', 'Balanced catalogs', 'Premium studios', 'Provider mix', 'NetEnt visuals, Pragmatic volatility, and Evolution live tables curated for every bankroll.', 'assets/images/categories-04.jpg', 4),
+    ('game_library', 'Fresh releases weekly', 'Slots & jackpots', '12K+ titles', 'We flag casinos adding new Megaways, cluster pays, and branded slots as soon as they drop.', 'assets/images/slots-jackpots.png', 1),
+    ('game_library', 'Studios with low latency', 'Tables & shows', 'Live dealers', 'Lightning roulette, blackjack parties, and game shows streamed with multi-camera coverage.', 'assets/images/live-dealer-tables.png', 2),
+    ('game_library', 'One wallet play', 'Sports & eSports', 'Hybrid', 'Single-balance wagering across sportsbook, racebook, and in-house virtuals with instant settlement.', 'assets/images/sports-betting.png', 3),
+    ('game_library', 'Balanced catalogs', 'Premium studios', 'Provider mix', 'NetEnt visuals, Pragmatic volatility, and Evolution live tables curated for every bankroll.', 'assets/images/vip-programs.png', 4),
     ('library_signals', 'Smart search', 'Filters', NULL, 'Category filters, volatility tags, and provider shortcuts make it easy to find the right title fast.', 'assets/images/top-game-09.jpg', 1),
     ('library_signals', 'RTP transparency', 'Fairness', NULL, 'Visible RTP, provably fair checks for crypto titles, and clear game contribution toward wagering.', 'assets/images/top-game-10.jpg', 2),
     ('library_signals', 'Mobile-ready', 'Performance', NULL, 'HTML5 catalogs with portrait mode, quick-load lobbies, and low-data settings for traveling players.', 'assets/images/top-game-11.jpg', 3),
@@ -578,11 +578,11 @@ VALUES
 
 INSERT IGNORE INTO category_cards (title, image_path, section)
 VALUES
-    ('Slots & Jackpots', 'assets/images/categories-01.jpg', 'top_categories'),
-    ('Live Dealer Tables', 'assets/images/categories-05.jpg', 'top_categories'),
-    ('Sports Betting', 'assets/images/categories-03.jpg', 'top_categories'),
-    ('VIP Programs', 'assets/images/categories-04.jpg', 'top_categories'),
-    ('Crypto Casinos', 'assets/images/categories-05.jpg', 'top_categories');
+    ('Slots & Jackpots', 'assets/images/slots-jackpots.png', 'top_categories'),
+    ('Live Dealer Tables', 'assets/images/live-dealer-tables.png', 'top_categories'),
+    ('Sports Betting', 'assets/images/sports-betting.png', 'top_categories'),
+    ('VIP Programs', 'assets/images/vip-programs.png', 'top_categories'),
+    ('Crypto Casinos', 'assets/images/crypto-casinos.png', 'top_categories');
 
 INSERT IGNORE INTO casino_game_modes (casino_id, game_type, live_dealer_supported, virtual_reality_supported)
 VALUES
