@@ -9,6 +9,56 @@ $activePage = 'payouts';
 $casinoDirectory = fetchCasinoDirectory($database);
 $payoutHighlights = fetchContentCards($database, 'fast_payout_highlights');
 $payoutChecklist = fetchContentCards($database, 'fast_payout_checklist');
+$payoutSpeedInsights = [
+    [
+        'eyebrow' => 'Instant blockchain approvals',
+        'title' => 'Crypto cashouts',
+        'description' => 'BTC, ETH, and USDT withdrawals are prioritized with automated checks and blockchain monitoring.',
+        'image' => 'assets/images/fast-payout/crypto-cashouts.png',
+    ],
+    [
+        'eyebrow' => 'Skip the bank queue',
+        'title' => 'E-wallets',
+        'description' => 'Neteller, Skrill, and PayPal partners with 24/7 AML desks to release funds on the day you request.',
+        'image' => 'assets/images/fast-payout/e-wallets.png',
+    ],
+    [
+        'eyebrow' => 'Local payouts',
+        'title' => 'Bank wires',
+        'description' => 'Low-fee SEPA and ACH corridors keep funds domestic and reduce costly intermediary holds.',
+        'image' => 'assets/images/fast-payout/bank-wires.png',
+    ],
+    [
+        'eyebrow' => 'Faster approvals',
+        'title' => 'VIP queueing',
+        'description' => 'Dedicated agents review large withdrawals with proactive KYC refreshes to keep lines moving.',
+        'image' => 'assets/images/fast-payout/VIP-queueing.png',
+    ],
+    [
+        'eyebrow' => 'Processing metrics',
+        'title' => 'Proof',
+        'description' => 'Average approval times for each payment method and the hours when compliance teams are active.',
+        'image' => 'assets/images/fast-payout/processing-metrics.png',
+    ],
+    [
+        'eyebrow' => 'Caps & escalations',
+        'title' => 'Limits',
+        'description' => 'Per-transaction limits, weekly ceilings, and when VIP managers can double or triple your cap.',
+        'image' => 'assets/images/fast-payout/caps-escalations.png',
+    ],
+    [
+        'eyebrow' => 'KYC refresh rules',
+        'title' => 'Verification',
+        'description' => 'Document requests, source-of-funds standards, and cooldown periods after large cashouts.',
+        'image' => 'assets/images/fast-payout/KYC-refresh-rules.png',
+    ],
+    [
+        'eyebrow' => 'Escalation paths',
+        'title' => 'Support',
+        'description' => 'Live chat and phone SLAs plus finance-team contacts when you need real-time updates.',
+        'image' => 'assets/images/fast-payout/escalation-paths.png',
+    ],
+];
 $pageTitle = 'Lugx Gaming - Fast Payout Casinos';
 
 include __DIR__ . '/partials/html-head.php';
@@ -87,6 +137,35 @@ include __DIR__ . '/partials/header.php';
                   <span class="category"><?= htmlspecialchars($card['category'], ENT_QUOTES, 'UTF-8') ?></span>
                   <h4><?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?></h4>
                   <p class="mb-0"><?= htmlspecialchars($card['description'], ENT_QUOTES, 'UTF-8') ?></p>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <div class="row mb-4 align-items-end">
+        <div class="col-lg-8">
+          <div class="section-heading">
+            <h6>Fast Payout Intel</h6>
+            <h2>Know exactly where the speed advantage comes from</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <?php foreach ($payoutSpeedInsights as $insight): ?>
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="item h-100">
+              <div class="thumb">
+                <img src="<?= htmlspecialchars($insight['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($insight['title'], ENT_QUOTES, 'UTF-8') ?>">
+              </div>
+              <div class="down-content">
+                <span class="category"><?= htmlspecialchars($insight['eyebrow'], ENT_QUOTES, 'UTF-8') ?></span>
+                <h4><?= htmlspecialchars($insight['title'], ENT_QUOTES, 'UTF-8') ?></h4>
+                <p class="mb-0"><?= htmlspecialchars($insight['description'], ENT_QUOTES, 'UTF-8') ?></p>
               </div>
             </div>
           </div>
