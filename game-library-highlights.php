@@ -9,6 +9,12 @@ $activePage = 'library';
 $casinoDirectory = fetchCasinoDirectory($database);
 $libraryHighlights = fetchContentCards($database, 'game_library');
 $librarySignals = fetchContentCards($database, 'library_signals');
+$librarySignalImages = [
+    'Smart search' => 'assets/images/game-library-highlights/smart-search.png',
+    'RTP transparency' => 'assets/images/game-library-highlights/RTP-transparency.png',
+    'Mobile-ready' => 'assets/images/game-library-highlights/mobile-ready.png',
+    'Limited drops' => 'assets/images/game-library-highlights/limited-drops.png',
+];
 $pageTitle = 'Lugx Gaming - Game Library Highlights';
 
 include __DIR__ . '/partials/html-head.php';
@@ -78,10 +84,11 @@ include __DIR__ . '/partials/header.php';
           </div>
         </div>
         <?php foreach ($librarySignals as $card): ?>
+          <?php $signalImage = $librarySignalImages[$card['title']] ?? $card['image_path']; ?>
           <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="item">
               <div class="thumb">
-                <a href="product-details.php"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
+                <a href="product-details.php"><img src="<?= htmlspecialchars($signalImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
               </div>
               <div class="down-content">
                   <span class="category"><?= htmlspecialchars($card['category'], ENT_QUOTES, 'UTF-8') ?></span>
