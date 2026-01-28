@@ -78,6 +78,80 @@ include __DIR__ . '/partials/header.php';
     </div>
   </div>
 
+  <div class="section">
+    <div class="container">
+      <div class="row align-items-center mb-4">
+        <div class="col-lg-8">
+          <div class="section-heading">
+            <h6>Fast Payout Visuals</h6>
+            <h2>Inside the workflows that keep cashouts quick</h2>
+          </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <p class="mb-0 text-muted">Verified process snapshots and banking touchpoints.</p>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/processing-metrics.png" alt="Payout processing metrics dashboard">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/crypto-cashouts.png" alt="Crypto cashouts tracking visuals">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/e-wallets.png" alt="E-wallet speed performance tiles">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/bank-wires.png" alt="Bank wire payout schedule chart">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/KYC-refresh-rules.png" alt="KYC refresh rules checklist">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/VIP-queueing.png" alt="VIP queueing priority overview">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/caps-escalations.png" alt="Cashout caps and escalation guide">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="item">
+            <div class="thumb">
+              <img src="assets/images/fast-payout/escalation-paths.png" alt="Escalation paths for payout issues">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="section most-played">
     <div class="container">
       <div class="row">
