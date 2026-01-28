@@ -10,6 +10,21 @@ $casinoDirectory = fetchCasinoDirectory($database);
 $payoutHighlights = fetchContentCards($database, 'fast_payout_highlights');
 $payoutChecklist = fetchContentCards($database, 'fast_payout_checklist');
 $pageTitle = 'Lugx Gaming - Fast Payout Casinos';
+$imageSwap = [
+    'assets/images/trending-01.jpg' => 'assets/images/fast-payout/crypto-cashouts.png',
+    'assets/images/trending-02.jpg' => 'assets/images/fast-payout/e-wallets.png',
+    'assets/images/trending-03.jpg' => 'assets/images/fast-payout/bank-wires.png',
+    'assets/images/trending-04.jpg' => 'assets/images/fast-payout/VIP-queueing.png',
+    'assets/images/top-game-05.jpg' => 'assets/images/fast-payout/processing-metrics.png',
+    'assets/images/top-game-06.jpg' => 'assets/images/fast-payout/caps-escalations.png',
+    'assets/images/top-game-07.jpg' => 'assets/images/fast-payout/KYC-refresh-rules.png',
+    'assets/images/top-game-08.jpg' => 'assets/images/fast-payout/escalation-paths.png',
+];
+
+function payoutImage(string $path, array $imageSwap): string
+{
+    return $imageSwap[$path] ?? $path;
+}
 
 include __DIR__ . '/partials/html-head.php';
 include __DIR__ . '/partials/header.php';
@@ -46,7 +61,7 @@ include __DIR__ . '/partials/header.php';
           <div class="col-lg-3 col-md-6 align-self-center mb-30 trending-items">
             <div class="item">
               <div class="thumb">
-                <a href="product-details.php"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
+                <a href="product-details.php"><img src="<?= htmlspecialchars(payoutImage($card['image_path'], $imageSwap), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
                 <?php if (!empty($card['badge'])): ?>
                   <span class="price"><?= htmlspecialchars($card['badge'], ENT_QUOTES, 'UTF-8') ?></span>
                 <?php endif; ?>
@@ -81,7 +96,7 @@ include __DIR__ . '/partials/header.php';
           <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="item">
               <div class="thumb">
-                <a href="product-details.php"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
+                <a href="product-details.php"><img src="<?= htmlspecialchars(payoutImage($card['image_path'], $imageSwap), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
               </div>
               <div class="down-content">
                   <span class="category"><?= htmlspecialchars($card['category'], ENT_QUOTES, 'UTF-8') ?></span>
