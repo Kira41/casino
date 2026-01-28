@@ -40,6 +40,35 @@ function dedupeContentCards(array $cards): array
 $vipPlaybooks = dedupeContentCards($vipPlaybooks);
 $vipSignals = dedupeContentCards($vipSignals);
 
+$vipImageMap = [
+    'assets/images/trending-01.jpg' => 'assets/images/vip-loyalty-insights/accelerate-early-progress.png',
+    'assets/images/trending-02.jpg' => 'assets/images/vip-loyalty-insights/unlock-priority-support.png',
+    'assets/images/trending-03.jpg' => 'assets/images/vip-loyalty-insights/custom-rewards.png',
+    'assets/images/trending-04.jpg' => 'assets/images/vip-loyalty-insights/travel-hospitality.png',
+    'assets/images/top-game-13.jpg' => 'assets/images/vip-loyalty-insights/point-mechanics.png',
+    'assets/images/top-game-14.jpg' => 'assets/images/vip-loyalty-insights/what-you-can-claim.png',
+    'assets/images/top-game-15.jpg' => 'assets/images/vip-loyalty-insights/keep-your-status.png',
+    'assets/images/top-game-16.jpg' => 'assets/images/vip-loyalty-insights/events-hospitality.png',
+];
+
+$vipPlaybooks = array_map(static function (array $card) use ($vipImageMap): array {
+    $imagePath = $card['image_path'] ?? '';
+    if (isset($vipImageMap[$imagePath])) {
+        $card['image_path'] = $vipImageMap[$imagePath];
+    }
+
+    return $card;
+}, $vipPlaybooks);
+
+$vipSignals = array_map(static function (array $card) use ($vipImageMap): array {
+    $imagePath = $card['image_path'] ?? '';
+    if (isset($vipImageMap[$imagePath])) {
+        $card['image_path'] = $vipImageMap[$imagePath];
+    }
+
+    return $card;
+}, $vipSignals);
+
 if (empty($vipPlaybooks)) {
     $vipPlaybooks = [
         [
