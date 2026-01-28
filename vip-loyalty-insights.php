@@ -43,28 +43,28 @@ $vipSignals = dedupeContentCards($vipSignals);
 if (empty($vipPlaybooks)) {
     $vipPlaybooks = [
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/accelerate-early-progress.png',
+            'image_path' => 'assets/images/trending-01.jpg',
             'badge' => 'Tier 1',
             'category' => 'Onboarding',
             'title' => 'First 30 Days Blueprint',
             'description' => 'Hit early wagering goals, unlock support access, and track weekly lift metrics.',
         ],
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/unlock-priority-support.png',
+            'image_path' => 'assets/images/trending-02.jpg',
             'badge' => 'Tier 2',
             'category' => 'Momentum',
             'title' => 'Seasonal Bonus Radar',
             'description' => 'Plan around promo calendars, leaderboard surges, and reload rhythm windows.',
         ],
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/custom-rewards.png',
+            'image_path' => 'assets/images/trending-03.jpg',
             'badge' => 'Tier 3',
             'category' => 'Retention',
             'title' => 'Concierge Access Map',
             'description' => 'Trigger VIP outreach with session cadence, game mix, and deposit timing.',
         ],
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/travel-hospitality.png',
+            'image_path' => 'assets/images/trending-04.jpg',
             'badge' => 'Tier 4',
             'category' => 'Elite',
             'title' => 'High-Roller Safeguards',
@@ -76,25 +76,25 @@ if (empty($vipPlaybooks)) {
 if (empty($vipSignals)) {
     $vipSignals = [
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/point-mechanics.png',
+            'image_path' => 'assets/images/bonus-page/top-game-01.png',
             'category' => 'Perks',
             'title' => 'Cashback Velocity',
             'description' => 'Measure how quickly you can redeem cashback after peak play sessions.',
         ],
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/what-you-can-claim.png',
+            'image_path' => 'assets/images/bonus-page/top-game-02.png',
             'category' => 'Support',
             'title' => 'Concierge Response Time',
             'description' => 'Look for under-30 minute replies when hosts manage withdrawals.',
         ],
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/keep-your-status.png',
+            'image_path' => 'assets/images/bonus-page/top-game-03.png',
             'category' => 'Events',
             'title' => 'Invite-Only Calendar',
             'description' => 'Track live tournaments, travel offers, and seasonal VIP stacks.',
         ],
         [
-            'image_path' => 'assets/images/vip-loyalty-insights/events-hospitality.png',
+            'image_path' => 'assets/images/bonus-page/top-game-04.png',
             'category' => 'Limits',
             'title' => 'Withdrawal Priority',
             'description' => 'Confirm fast-track lanes and personalized payout thresholds.',
