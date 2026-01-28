@@ -52,7 +52,7 @@ include __DIR__ . '/partials/header.php';
           <div class="col-lg-3 col-md-6 align-self-center mb-30 trending-items">
             <div class="item">
               <div class="thumb">
-                <a href="product-details.php"><img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
+                <img src="<?= htmlspecialchars($card['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>">
                 <?php if (!empty($card['badge'])): ?>
                   <span class="price"><?= htmlspecialchars($card['badge'], ENT_QUOTES, 'UTF-8') ?></span>
                 <?php endif; ?>
@@ -88,7 +88,7 @@ include __DIR__ . '/partials/header.php';
           <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="item">
               <div class="thumb">
-                <a href="product-details.php"><img src="<?= htmlspecialchars($signalImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>"></a>
+                <img src="<?= htmlspecialchars($signalImage, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($card['title'], ENT_QUOTES, 'UTF-8') ?>">
               </div>
               <div class="down-content">
                   <span class="category"><?= htmlspecialchars($card['category'], ENT_QUOTES, 'UTF-8') ?></span>
